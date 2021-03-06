@@ -1,8 +1,8 @@
 use Mix.Config
 
-config :porcelain,
-  driver: Porcelain.Driver.Basic
+config :nostrum,
+  token: System.get_env("TOKEN"),
+  num_shards: :auto
 
 config :spoticord,
-  token: System.get_env("TOKEN"),
   prefix: '$'

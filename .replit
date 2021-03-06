@@ -1,1 +1,1 @@
-run = "mix run --no-halt"
+run = "clear; iex -S mix run"

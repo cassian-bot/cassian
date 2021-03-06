@@ -22,7 +22,7 @@ defmodule Spoticord.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:alchemy, "~> 0.6.8", hex: :discord_alchemy}
+      {:nostrum, "~> 0.4"}
     ]
   end
 end

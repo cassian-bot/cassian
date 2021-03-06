@@ -1,11 +1,7 @@
 defmodule Spoticord.Application do
   use Application
-
-  @moduledoc """
-  Documentation for `Spoticord`.
-  """
-
-  @token Application.get_env(:spoticord, :token)
+  
+  @token Application.get_env(:nostrum, :token)
 
   def start(_type, _args) do
     IO.puts "Spoticord bot is starting... with token #{@token}"
@@ -18,10 +14,12 @@ defmodule Spoticord.Application do
   end
 
   def add_children() do
+    alias Spoticord.Consumer
+
     children = [
       %{
-        id: Alchemy.Client,
-        start: {Alchemy.Client, :start, [@token]}
+        id: Consumer,
+        start: {Consumer, :start_link, []}
       }
     ]
 
