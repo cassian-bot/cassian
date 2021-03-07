@@ -73,15 +73,12 @@ defmodule Spoticord.Utils do
     |> Api.update_voice_state(nil)
   end
 
-  def allowed_voice?(guild_id, channel_id) do
-    # _guild = GuildCache.get!(guild_id)
+  alias Spoticord.Structs.VoicePermissions
 
-    # ChannelCache.get!(channel_id)
-    # |> Map.get(:permission_overwrites)
-    # |> Enum.map(fn member -> %Nostrum.Struct.Overwrite{member | allow: Integer.to_string(member.allow, 16)} end)
-    # |> IO.inspect(label: "Permission overwrites")
-    # |> Enum.filter(fn data -> data.type == :role and data.allow == 0 end)
-    # |> Enum.reduce([], fn data, acc -> acc ++ [data.id] end)
-    # |> IO.inspect(label: "Voice data")
+  def can_connect?(guild_id, voice_id) do
+    perms =
+      VoicePermissions.my_channel_permissions(guild_id, voice_id)
+
+    perms.administrator || perms.connect
   end
 end
