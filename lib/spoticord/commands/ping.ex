@@ -5,6 +5,7 @@ defmodule Spoticord.Commands.Ping do
   The ping command. Shows how many ms was needed to perform the request.
   """
 
+  def ship?, do: true
   def caller, do: "ping"
   def desc, do: "Show the delay!"
 

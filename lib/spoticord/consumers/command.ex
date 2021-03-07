@@ -48,6 +48,7 @@ defmodule Spoticord.Consumers.Command do
     name_modules_map =
       modules
       |> Enum.filter(fn module -> Spoticord.Behaviours.Command in (module.module_info(:attributes)[:behaviour] || []) end)
+      |> Enum.filter(fn module -> if Mix.env == :prod, do: module.ship?, else: true end)
       |> Enum.reduce(%{}, fn module, acc -> Map.merge(acc, %{module.caller => module}) end)
 
     name_modules_map

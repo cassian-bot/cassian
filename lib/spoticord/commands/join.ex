@@ -3,6 +3,7 @@ defmodule Spoticord.Commands.Join do
 
   alias Spoticord.Utils
 
+  def ship?, do: false
   def caller, do: "join"
   def desc, do: "Join the current voice channel!"
 

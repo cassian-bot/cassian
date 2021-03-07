@@ -5,6 +5,7 @@ defmodule Spoticord.Commands.Help do
   The help command. Shows a menu of commands.
   """
 
+  def ship?, do: true
   def caller, do: "help"
   def desc, do: "Show this menu!"
 

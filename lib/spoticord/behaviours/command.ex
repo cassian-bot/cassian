@@ -19,6 +19,11 @@ defmodule Spoticord.Behaviours.Command do
   """
   @callback execute(message :: Nostrum.Struct.Message.t(), args :: List.t()) :: :ok
 
+  @doc """
+  Should the command be shipped in production?
+  """
+  @callback ship? :: boolean()
+
   defmacro __using__(_) do
     quote do
       defmacro handle_command(message, args), do: execute(message, args)
