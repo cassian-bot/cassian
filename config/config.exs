@@ -1,9 +1,10 @@
 use Mix.Config
 config :porcelain,
-  driver: Procelain.Driver.Basic
+  driver: Porcelain.Driver.Basic
 
 config :nostrum,
   ffmpeg: "/usr/bin/ffmpeg",
+  youtubedl: "/usr/local/bin/youtube-dl",
   token: System.get_env("DISCORD_BOT_TOKEN"),
   num_shards: :auto
 

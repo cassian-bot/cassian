@@ -49,7 +49,6 @@ defmodule Spoticord.Utils.Permissions do
     |> Enum.reduce([], fn {_, role}, acc -> acc ++ [role] end)
     |> Enum.filter(fn role -> role.name == name end)
     |> List.first()
-    |> IO.inspect()
   end
 
   @doc """
