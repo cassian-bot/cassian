@@ -18,6 +18,10 @@ defmodule Spoticord.Application do
       %{
         id: Consumer,
         start: {Consumer, :start_link, []}
+      },
+      %{
+        id: Spoticord.CommandCache,
+        start: {ConCache, :start_link, [[name: :command_cache, ttl_check_interval: false]]}
       }
     ]
 

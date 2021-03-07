@@ -5,7 +5,8 @@ defmodule Spoticord.Commands.Help do
   The help command. Shows a menu of commands.
   """
 
-  def description, do: "Show this menu!"
+  def caller, do: "help"
+  def desc, do: "Show this menu!"
 
   @doc false
   def execute(message, _args) do

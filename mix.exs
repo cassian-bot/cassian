@@ -22,7 +22,8 @@ defmodule Spoticord.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nostrum, "~> 0.4"}
+      {:nostrum, "~> 0.4"},
+      {:con_cache, "~> 0.13"}
     ]
   end
 end

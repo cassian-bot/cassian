@@ -8,7 +8,12 @@ defmodule Spoticord.Command do
   @doc """
   Get the description of the command.
   """
-  @callback description() :: String.t()
+  @callback desc() :: String.t()
+
+  @doc """
+  Get the caller for the command.
+  """
+  @callback caller() :: String.t()
 
   @doc """
   The function which is called that does all of the stuff needed in the command.
@@ -37,10 +42,11 @@ defmodule Spoticord.Command do
       |> List.pop_at(0)
       |> filter_command()
 
-    commands = commands!()
-
-    if Map.has_key?(commands, command), do:
-      Map.fetch!(commands, command).execute(message, args)
+    case associated_module!(command) do
+      {:ok, module} ->
+        module.execute(message, args)
+      _ -> nil
+    end
 
     :noop
   end
@@ -50,6 +56,25 @@ defmodule Spoticord.Command do
   defp filter_command({command, args}), do: {String.replace_leading(command, Spoticord.command_prefix!, ""), args}
 
   # Everything regarding command names
+
+  def associated_module!(name) do
+    if(ConCache.get(:command_cache, :loaded)) do
+      module = ConCache.get(:command_cache, name)
+      {(if module, do: :ok, else: :error), module || :noop }
+    else
+      load_modules_cache()
+      associated_module!(name)
+    end
+  end
+
+  def load_modules_cache() do
+    :code.all_loaded()
+    |> Enum.filter(fn {module, _} -> __MODULE__ in (module.module_info(:attributes)[:behaviour] || []) end)
+    |> Enum.reduce([], fn {module, _}, acc -> acc ++ [module] end)
+    |> Enum.each(fn module -> ConCache.put(:command_cache, module.caller, module) end)
+
+    ConCache.put(:command_cache, :loaded, true)
+  end
 
   @doc """
   Okay so this was a bit hacky. Basically the file structure is that every

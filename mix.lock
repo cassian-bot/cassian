@@ -2,6 +2,7 @@
   "benchee": {:hex, :benchee, "1.0.1", "66b211f9bfd84bd97e6d1beaddf8fc2312aaabe192f776e8931cb0c16f53a521", [:mix], [{:deep_merge, "~> 1.0", [hex: :deep_merge, repo: "hexpm", optional: false]}], "hexpm", "3ad58ae787e9c7c94dd7ceda3b587ec2c64604563e049b2a0e8baafae832addb"},
   "certifi": {:hex, :certifi, "2.5.3", "70bdd7e7188c804f3a30ee0e7c99655bc35d8ac41c23e12325f36ab449b70651", [:rebar3], [{:parse_trans, "~>3.3", [hex: :parse_trans, repo: "hexpm", optional: false]}], "hexpm", "ed516acb3929b101208a9d700062d520f3953da3b6b918d866106ffa980e1c10"},
   "chacha20": {:hex, :chacha20, "1.0.2", "73c5e96eba5e94917603a43c5c7c6b049436a5d71d9d3182781c345d87d28c8b", [:mix], [], "hexpm", "549b89314cbffa0893ef923d999d625c227cab5f1301133598793225f02a3963"},
+  "con_cache": {:hex, :con_cache, "0.14.0", "863acb90fa08017be3129074993af944cf7a4b6c3ee7c06c5cd0ed6b94fbc223", [:mix], [], "hexpm", "50887a8949377d0b707a3c6653b7610de06074751b52d0f267f52135f391aece"},
   "cowlib": {:hex, :cowlib, "2.7.3", "a7ffcd0917e6d50b4d5fb28e9e2085a0ceb3c97dea310505f7460ff5ed764ce9", [:rebar3], [], "hexpm", "1e1a3d176d52daebbecbbcdfd27c27726076567905c2a9d7398c54da9d225761"},
   "curve25519": {:hex, :curve25519, "1.0.4", "e570561b832c29b3ce4fd8b9fcd9c9546916188860568f1c1fc9428d7cb00894", [:mix], [], "hexpm", "1a068bf9646e7067bf6aa5bf802b404002734e09bb5300f098109df03e31f9f5"},
   "deep_merge": {:hex, :deep_merge, "1.0.0", "b4aa1a0d1acac393bdf38b2291af38cb1d4a52806cf7a4906f718e1feb5ee961", [:mix], [], "hexpm", "ce708e5f094b9cd4e8f2be4f00d2f4250c4095be93f8cd6d018c753894885430"},
