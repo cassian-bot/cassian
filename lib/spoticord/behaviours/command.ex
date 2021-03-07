@@ -1,5 +1,4 @@
 defmodule Spoticord.Behaviours.Command do
-
   @moduledoc """
   The general comand behaviour. Don't use `@behaviour` but rather `use` this module
   in other commands. It will implement the behaviour by itself.
