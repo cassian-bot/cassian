@@ -13,7 +13,7 @@ defmodule Spoticord.Utils.Permissions do
   @spec channel_permissions(user :: Nostrum.Struct.User, guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) :: integer()
   def channel_permissions(user, guild_id, channel_id) do
     user_id = user.id
-    roles = GuildCache.get!(guild_id).members[user_id].roles
+    roles = GuildCache.get!(guild_id).members[user_id].roles ++ [guild_role(guild_id).id]
 
     overs =
       ChannelCache.get!(channel_id)
@@ -41,14 +41,23 @@ defmodule Spoticord.Utils.Permissions do
   end
 
   @doc """
-  Get the permissoin of the server for the role name
+  Get the guild role based upon the name.
   """
-  @spec server_permissions(guild_id :: Snowflake.t(), name :: String.t()) :: integer()
-  def server_permissions(guild_id, name \\ "@everyone") do
+  @spec guild_role(guild_id :: Snowflake.t(), name :: String.t()) :: Nostrum.Struct.Guild.Role.t()
+  def guild_role(guild_id, name \\ "@everyone") do
     GuildCache.get!(guild_id).roles
     |> Enum.reduce([], fn {_, role}, acc -> acc ++ [role] end)
     |> Enum.filter(fn role -> role.name == name end)
     |> List.first()
+    |> IO.inspect()
+  end
+
+  @doc """
+  Get the permissoin of the server for the role name
+  """
+  @spec server_permissions(guild_id :: Snowflake.t(), name :: String.t()) :: integer()
+  def server_permissions(guild_id, name \\ "@everyone") do
+    guild_role(guild_id, name)
     |> Map.get(:permissions)
   end
 
