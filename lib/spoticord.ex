@@ -19,6 +19,6 @@ defmodule Spoticord do
   """
   @spec command_prefix!(server_id :: Nostrum.Struct.Guild.id() | nil) :: binary
   def command_prefix!(_server_id \\ nil) do
-    @default_command_prefix |> to_string
+    @default_command_prefix
   end
 end
