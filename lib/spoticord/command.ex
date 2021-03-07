@@ -2,14 +2,23 @@ defmodule Spoticord.Command do
 
   @moduledoc """
   The general comand module. It can be used by commands under the
-  `Spoticord.Commands` modue path.
+  `Spoticord.Commands` module path.
   """
+
+  @doc """
+  Get the description of the command.
+  """
+  @callback description() :: String.t()
+
+  @doc """
+  The function which is called that does all of the stuff needed in the command.
+  """
+  @callback execute(message :: Nostrum.Struct.Message.t(), args :: List.t()) :: :ok
 
   defmacro __using__(_) do
     quote do
-      def handle_command(message, args), do: execute(message, args)
-
-      @callback execute(message :: Nostrum.Struct.Message.t(), args :: List.t()) :: :ok
+      defmacro handle_command(message, args), do: execute(message, args)
+      @behaviour Spoticord.Command
     end
   end
 
@@ -28,7 +37,7 @@ defmodule Spoticord.Command do
       |> List.pop_at(0)
       |> filter_command()
 
-    commands = get_command_names()
+    commands = commands!()
 
     if Map.has_key?(commands, command), do:
       Map.fetch!(commands, command).execute(message, args)
@@ -44,12 +53,14 @@ defmodule Spoticord.Command do
 
   # Everything regarding command names
 
-  # Okay so this was a bit hacky. Basically the file structure is that every
-  # module under `Spoticord.Commands` is a command itself and after the `Commands` part
-  # is the real name of the commend. This will dynamically load the name of the modues and
-  # generate a hash which contains the command callers and the module themselves.
-  @spec get_command_names() :: %{String.t() => Module}
-  defp get_command_names() do
+  @doc """
+  Okay so this was a bit hacky. Basically the file structure is that every
+  module under `Spoticord.Commands` is a command itself and after the `Commands` part
+  is the real name of the commend. This will dynamically load the name of the modules and
+  generate a hash which contains the command callers and the modules themselves.
+  """
+  @spec commands!() :: %{String.t() => Module}
+  def commands!() do
     {:ok, modules} = :application.get_key(:spoticord, :modules)
     modules
     |> Enum.map(fn module -> {to_string(module), module} end)
