@@ -31,7 +31,6 @@ defmodule Spoticord.Commands.Ping do
   alias Nostrum.Struct.Embed
 
   def generate_ping_embed!(author, diff) do
-    IO.inspect(author)
     Utils.create_empty_embed!()
     |> Embed.put_title("Pong!")
     |> Embed.put_description("Command took `#{diff}ms` to execute!")
