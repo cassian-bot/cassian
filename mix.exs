@@ -22,9 +22,7 @@ defmodule Spoticord.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nostrum, "~> 0.4"},
-      {:benchee, "~> 1.0", only: :dev},
-      {:elixilorem, "~> 0.0.1", only: :dev}
+      {:nostrum, "~> 0.4"}
     ]
   end
 end

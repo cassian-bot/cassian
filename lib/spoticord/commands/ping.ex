@@ -1,26 +1,36 @@
 defmodule Spoticord.Commands.Ping do
   use Spoticord.Command
 
-  def on_command(message, _args) do
-  {:ok, time, _} =
-    message.timestamp
-    |> DateTime.from_iso8601
+  @moduledoc """
+  The ping command. Shows how many ms was needed to perform the request.
+  """
 
-  diff =
-    DateTime.utc_now
-    |> DateTime.diff(time, :millisecond)
+  @doc false
+  def execute(message, _args) do
+    {:ok, request_time, _} =
+      message.timestamp
+      |> DateTime.from_iso8601
 
-  text = "Time difference is `#{diff}ms`."
+    recieved_time = DateTime.utc_now
 
-    alias Nostrum.Api
-    Api.create_message(message.channel_id, embed: generate_ping_embed!(text))
-  :ok
+    request_recieved_diff =
+      recieved_time
+      |> DateTime.diff(request_time, :millisecond)
+
+
+    Nostrum.Api.create_message(
+      message.channel_id,
+      embed: generate_ping_embed!("Pong took `#{request_recieved_diff}ms` to respond!")
+    )
+
+    :ok
   end
 
+  @doc false
   def generate_ping_embed!(message) do
     import Nostrum.Struct.Embed
 
-     %Nostrum.Struct.Embed{}
+    %Nostrum.Struct.Embed{}
     |> put_title("Pong!")
     |> put_description(message)
   end
