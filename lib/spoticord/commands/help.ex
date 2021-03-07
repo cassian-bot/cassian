@@ -11,7 +11,7 @@ defmodule Spoticord.Commands.Help do
   def execute(message, _args) do
     Nostrum.Api.create_message(
       message.channel_id,
-      embed: generate_help_embed!(message.author)
+      embed: generate_help_embed!()
     )
 
     :ok
@@ -20,12 +20,12 @@ defmodule Spoticord.Commands.Help do
   alias Spoticord.Utils
   alias Nostrum.Struct.Embed
 
-  def generate_help_embed!(author) do
+  def generate_help_embed!() do
     embed =
       Utils.create_empty_embed!()
       |> Embed.put_title("Help!")
       |> Embed.put_description("Help for all of the commands!")
-      |> Embed.put_author(author.username, nil, Utils.user_avatar(author))
+      |> Embed.put_thumbnail(Spoticord.get_own_avatar)
 
     Enum.reduce(Spoticord.Command.commands!, embed, &add_command/2)
   end

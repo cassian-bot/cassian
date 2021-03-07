@@ -23,7 +23,7 @@ defmodule Spoticord.Commands.Ping do
 
     Nostrum.Api.create_message(
       message.channel_id,
-      embed: generate_ping_embed!(message.author, request_recieved_diff)
+      embed: generate_ping_embed!(request_recieved_diff)
     )
 
     :ok
@@ -32,10 +32,9 @@ defmodule Spoticord.Commands.Ping do
   alias Spoticord.Utils
   alias Nostrum.Struct.Embed
 
-  def generate_ping_embed!(author, diff) do
+  def generate_ping_embed!(diff) do
     Utils.create_empty_embed!()
     |> Embed.put_title("Pong!")
     |> Embed.put_description("Command took `#{diff}ms` to execute!")
-    |> Embed.put_author(author.username, nil, Utils.user_avatar(author))
   end
 end

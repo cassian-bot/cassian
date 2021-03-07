@@ -5,10 +5,11 @@ defmodule Spoticord do
   which might as well be used from external apps.
   """
 
-  # TODO: Use this to retrieve the image, name, etc...
-  # alias Nostrum.Cache.Me
+  alias Nostrum.Cache.Me
 
   @default_command_prefix Application.get_env(:spoticord, :prefix)
+
+  def get_own_avatar(), do: Spoticord.Utils.user_avatar(Me.get)
 
   @doc """
   Get the command prefix of the bot from a server. if no server
