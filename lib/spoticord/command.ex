@@ -47,9 +47,7 @@ defmodule Spoticord.Command do
 
   # Filter the prefix from the command in the tuple.
   @spec filter_command({command :: String.t(), args :: list(String.t())}) :: {command :: String.t(), args :: list(String.t())}
-  defp filter_command({command, args}) do
-    {String.replace_leading(command, Spoticord.command_prefix!, ""), args}
-  end
+  defp filter_command({command, args}), do: {String.replace_leading(command, Spoticord.command_prefix!, ""), args}
 
   # Everything regarding command names
 
@@ -74,8 +72,5 @@ defmodule Spoticord.Command do
   defp name_to_command(name), do: name |> String.split(".") |> List.last |> String.downcase
 
   @spec module_to_map({name :: String.t(), module :: Module}, acc :: Map) :: %{String.t() => Module}
-  defp module_to_map({name, module}, acc) do
-    acc
-    |> Map.put(name_to_command(name), module)
-  end
+  defp module_to_map({name, module}, acc), do: Map.put(acc, name_to_command(name), module)
 end

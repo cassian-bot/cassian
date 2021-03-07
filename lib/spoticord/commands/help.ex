@@ -30,8 +30,6 @@ defmodule Spoticord.Commands.Help do
     Enum.reduce(Spoticord.Command.commands!, embed, &add_command/2)
   end
 
-  def add_command({name, module}, embed) do
-    embed
-    |> Embed.put_field("#{Spoticord.command_prefix!()}#{name}", module.description, true)
-  end
+  def add_command({name, module}, embed), do:
+    Embed.put_field(embed, "#{Spoticord.command_prefix!()}#{name}", module.description, true)
 end
