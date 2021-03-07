@@ -8,6 +8,7 @@ defmodule Spoticord.Command do
   defmacro __using__(_) do
     quote do
       def handle_command(message, args), do: execute(message, args)
+
       @callback execute(message :: Nostrum.Struct.Message.t(), args :: List.t()) :: :ok
     end
   end

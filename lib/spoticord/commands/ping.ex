@@ -7,6 +7,7 @@ defmodule Spoticord.Commands.Ping do
 
   @doc false
   def execute(message, _args) do
+
     {:ok, request_time, _} =
       message.timestamp
       |> DateTime.from_iso8601
@@ -20,18 +21,20 @@ defmodule Spoticord.Commands.Ping do
 
     Nostrum.Api.create_message(
       message.channel_id,
-      embed: generate_ping_embed!("Pong took `#{request_recieved_diff}ms` to respond!")
+      embed: generate_ping_embed!(message.author, request_recieved_diff)
     )
 
     :ok
   end
 
-  @doc false
-  def generate_ping_embed!(message) do
-    import Nostrum.Struct.Embed
+  alias Spoticord.Utils
+  alias Nostrum.Struct.Embed
 
-    %Nostrum.Struct.Embed{}
-    |> put_title("Pong!")
-    |> put_description(message)
+  def generate_ping_embed!(author, diff) do
+    IO.inspect(author)
+    Utils.create_empty_embed!()
+    |> Embed.put_title("Pong!")
+    |> Embed.put_description("Command took `#{diff}ms` to execute!")
+    |> Embed.put_author(author.username, nil, Utils.user_avatar(author))
   end
 end
