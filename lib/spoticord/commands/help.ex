@@ -1,5 +1,5 @@
 defmodule Spoticord.Commands.Help do
-  use Spoticord.Command
+  use Spoticord.Behaviours.Command
 
   @moduledoc """
   The help command. Shows a menu of commands.
@@ -28,9 +28,9 @@ defmodule Spoticord.Commands.Help do
       |> Embed.put_description("Help for all of the commands!")
       |> Embed.put_thumbnail(Spoticord.get_own_avatar)
 
-    Enum.reduce(Spoticord.Command.commands!, embed, &add_command/2)
+    Enum.reduce(Spoticord.commands!, embed, &add_command/2)
   end
 
-  def add_command({name, module}, embed), do:
-    Embed.put_field(embed, "#{Spoticord.command_prefix!()}#{name}", module.description, true)
+  def add_command({caller, module}, embed), do:
+    Embed.put_field(embed, "#{Spoticord.command_prefix!()}#{caller}", module.desc, true)
 end

@@ -1,5 +1,5 @@
 defmodule Spoticord.Commands.Ping do
-  use Spoticord.Command
+  use Spoticord.Behaviours.Command
 
   @moduledoc """
   The ping command. Shows how many ms was needed to perform the request.
@@ -10,7 +10,6 @@ defmodule Spoticord.Commands.Ping do
 
   @doc false
   def execute(message, _args) do
-
     {:ok, request_time, _} =
       message.timestamp
       |> DateTime.from_iso8601

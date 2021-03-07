@@ -14,7 +14,7 @@ defmodule Spoticord.Consumer do
   @doc false
   def handle_event({:MESSAGE_CREATE, message, _ws_state}) do
     if (!message.author.bot and is_spoticord_command? message), do:
-      Spoticord.Command.handle_message(message)
+      Spoticord.Consumers.Command.handle_message(message)
   end
 
   @dialyzer {:no_return, {:update_status, 3}}
