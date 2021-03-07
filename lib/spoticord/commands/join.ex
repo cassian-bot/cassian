@@ -11,7 +11,6 @@ defmodule Spoticord.Commands.Join do
       {:ok, {guild_id, voice_id}} ->
         if Utils.can_connect?(guild_id, voice_id) do
           Utils.join_or_switch_voice(guild_id, voice_id)
-          |> IO.inspect(label: "Voice response")
         else
           Nostrum.Api.create_message!(message.channel_id, embed: no_perms_embed())
         end

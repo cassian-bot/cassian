@@ -33,6 +33,10 @@ defmodule Spoticord.Structs.VoicePermissions do
 
   alias Spoticord.Utils.Permissions, as: Util
 
+  @doc """
+  Generate the struct from the perm number.
+  """
+  @spec from_number(value :: integer()) :: __MODULE__.t()
   def from_number(value) do
     %__MODULE__{
       administrator: Util.admin?(value),
@@ -42,16 +46,28 @@ defmodule Spoticord.Structs.VoicePermissions do
     }
   end
 
+  @doc """
+  Get the base server permissions.
+  """
+  @spec base_server_permissions(guild_id :: Snowflake.t()) :: __MODULE__.t()
   def base_server_permissions(guild_id) do
-    Util.base_permissions(guild_id)
+    Util.server_permissions(guild_id)
     |> from_number()
   end
 
+  @doc """
+  Get the permission for a channel in a guild.
+  """
+  @spec channel_permission(user :: Nostrum.Struct.User, guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) ::__MODULE__.t()
   def channel_permission(user, guild_id, channel_id) do
     Util.channel_permissions(user, guild_id, channel_id)
     |> from_number()
   end
 
+  @doc """
+  Get the permission for a channel in a guild for this bot.
+  """
+  @spec my_channel_permissions(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) ::__MODULE__.t()
   def my_channel_permissions(guild_id, channel_id), do:
     channel_permission(Nostrum.Cache.Me.get(), guild_id, channel_id)
 end

@@ -2,12 +2,13 @@ defmodule Spoticord.Utils do
   @moduledoc """
   Module for general utils...
   """
-  alias Nostrum.Cache.{GuildCache, ChannelCache}
-  alias Nostrum.Struct.Guild.Member
+  alias Nostrum.Cache.{GuildCache}
   alias Nostrum.Struct.Embed
   alias Nostrum.Api
 
   import Embed
+
+  alias Spoticord.Structs.VoicePermissions
 
   @doc """
   Add a color on an embed. The `color` params ia a hex string value of the color.
@@ -63,18 +64,29 @@ defmodule Spoticord.Utils do
     channel[:channel_id]
   end
 
+  @doc """
+  Join or switch from the voice channel. Set the channel to nil to
+  leave it.
+  """
+  @spec join_or_switch_voice(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) :: :ok
   def join_or_switch_voice(guild_id, channel_id) do
     guild_id
     |> Api.update_voice_state(channel_id, false, true)
   end
 
+  @doc """
+  Leave the voice channel on the guild.
+  """
+  @spec leave_voice(guild_id :: Snowflake.t()) :: :ok
   def leave_voice(guild_id) do
     guild_id
     |> Api.update_voice_state(nil)
   end
 
-  alias Spoticord.Structs.VoicePermissions
-
+  @doc """
+  Check if the bot can connect to a specific voice channel.
+  """
+  @spec can_connect?(guild_id :: Snowflake.t(), voice_id :: Snowflake.t()) :: boolean()
   def can_connect?(guild_id, voice_id) do
     perms =
       VoicePermissions.my_channel_permissions(guild_id, voice_id)
