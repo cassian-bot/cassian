@@ -3,6 +3,8 @@
 ![Artificer Banner](https://i.imgur.com/yuFUI9F.jpg)
 A Magical Bot for Discord Music
 
+![Server count](https://img.shields.io/endpoint?url=https%3A%2F%2Fartificer.gigalixirapp.com%2Fguilds) ![Elixir version](https://img.shields.io/endpoint?url=https%3A%2F%2Fartificer.gigalixirapp.com%2Fsystem)
+
 Note: The main image for the bot is from [here](https://www.artstation.com/artwork/v10g8x) and belongs to [Otto Metzger](https://ottometzger.artstation.com/) so do support their art!
 
 ## About
