@@ -1,11 +1,11 @@
-defmodule Artificer.Commands.Join do
+defmodule Artificer.Commands.Play do
   use Artificer.Behaviours.Command
 
   alias Artificer.Utils
 
-  def ship?, do: false
-  def caller, do: "join"
-  def desc, do: "Join the current voice channel!"
+  def ship?, do: true
+  def caller, do: "play"
+  def desc, do: "Play music in your voice channel!"
 
   def execute(message, args) do
     case Utils.get_sender_voice_id(message) do
@@ -23,16 +23,15 @@ defmodule Artificer.Commands.Join do
 
   alias Nostrum.Struct.Embed
 
-  def handle_voice(guild_id, voice_id, _message, _args) do
+  def handle_voice(guild_id, voice_id, _message, args) do
     Utils.join_or_switch_voice(guild_id, voice_id)
-    play_when_ready("https://www.youtube.com/watch?v=R5U98v1yxd0", guild_id)
+    play_when_ready(Enum.fetch!(args, 0), guild_id)
   end
 
   # Recurison ___MAGIC___.
   defp play_when_ready(link, guild_id) do
     if Nostrum.Voice.ready?(guild_id) do
       Nostrum.Voice.play(guild_id, link, :ytdl)
-      |> IO.inspect(label: "Voice")
     else
       :timer.sleep(10)
       play_when_ready(link, guild_id)

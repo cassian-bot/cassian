@@ -9,7 +9,6 @@ defmodule Artificer.Consumers.Command do
     {command, args} =
       message.content
       |> String.trim_leading()
-      |> String.downcase
       |> String.split(" ")
       |> List.pop_at(0)
       |> filter_command()
@@ -25,7 +24,7 @@ defmodule Artificer.Consumers.Command do
 
   # Filter the prefix from the command in the tuple.
   @spec filter_command({command :: String.t(), args :: list(String.t())}) :: {command :: String.t(), args :: list(String.t())}
-  defp filter_command({command, args}), do: {String.replace_leading(command, Artificer.command_prefix!, ""), args}
+  defp filter_command({command, args}), do: {String.replace_leading(command, Artificer.command_prefix!, "") |> String.downcase(), args}
 
   @doc """
   Get the associated module for the command name. Has a safe tuple based return.
