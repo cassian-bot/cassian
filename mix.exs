@@ -22,7 +22,7 @@ defmodule Spoticord.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nostrum, "~> 0.4"},
+      {:nostrum, git: "https://github.com/Kraigie/nostrum.git"},
       {:con_cache, "~> 0.13"}
     ]
   end
