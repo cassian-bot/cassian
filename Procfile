@@ -1,1 +1,1 @@
-worker: mix --no-halt
+worker: mix run --no-halt
