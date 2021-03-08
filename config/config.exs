@@ -3,8 +3,8 @@ config :porcelain,
   driver: Porcelain.Driver.Basic
 
 config :nostrum,
-  ffmpeg: "/usr/bin/ffmpeg",
-  youtubedl: "/usr/local/bin/youtube-dl",
+  ffmpeg: System.get_env("FFMPEG_PATH") || "/usr/bin/ffmpeg",
+  youtubedl: System.get_env("YTDL_PATH") || "/usr/bin/youtube-dl",
   token: System.get_env("DISCORD_BOT_TOKEN"),
   num_shards: :auto
 
