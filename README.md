@@ -57,8 +57,24 @@ config :nostrum,
   num_shards: :auto
 
 config :artificer,
-  prefix: System.get_env("DEFAULT_BOT_PREFIX")
-
+  prefix: System.get_env("DEFAULT_BOT_PREFIX"),
+  web_enabled: true,
+  force_https: true,
+  port: System.get_env("BOT_PORT")
 ```
 
 Two required configs are `DISCORD_BOT_TOKEN` and `DEFAULT_BOT_PREFIX`.
+
+You can enable or disable `web_enabled`. They are used for some endpoints and the reason can be found [here](###https-certs). If `web_enabled` is set to false you don't have to worry about `force_https` and `port`.
+
+## Development
+
+### HTTPS certs
+
+Currently the bot has endpoints for `shields.io` using `:plug_cowboy`. Shields.io requires you to use HTTPs, for that reason you should have a cert file. TO generate a cert file you can do:
+
+```bash
+mix x509.gen.selfsigned
+```
+
+And you will generate a selfcert files under `/priv/cert`. You can use them to start the endpoints in https.
