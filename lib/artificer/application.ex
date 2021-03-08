@@ -55,7 +55,7 @@ defmodule Artificer.Application do
 
   @doc false
   def https? do
-    Application.get_env(:artificer, :force_https) == "true" || Mix.env == :prod
+    Application.get_env(:artificer, :force_https) == "true" # || Mix.env == :prod
   end
 
   defp cert_options! do
