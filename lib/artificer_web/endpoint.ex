@@ -16,6 +16,10 @@ defmodule ArtificerWeb.Endpoint do
     apply(ArtificerWeb.Controllers.Guilds, :show, [conn])
   end
 
+  get "/system" do
+    apply(ArtificerWeb.Controllers.Elixir, :show, [conn])
+  end
+
   match _ do
     send_resp(conn, 404, "{\"error\": \"Path Undefined\"}")
   end

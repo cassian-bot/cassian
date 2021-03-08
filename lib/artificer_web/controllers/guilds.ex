@@ -7,7 +7,14 @@ defmodule ArtificerWeb.Controllers.Guilds do
   end
 
   def guilds do
-    %{guilds: []}
+    %{
+      schemaVersion: 1,
+      label: "Guilds",
+      message: Nostrum.Cache.GuildCache.all() |> Enum.to_list() |> length() |> to_string,
+      color: "#7289DA",
+      namedLogo: "Discord",
+      logoColor: "#fff"
+    }
     |> Poison.encode!()
   end
 end
