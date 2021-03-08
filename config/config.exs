@@ -12,6 +12,6 @@ config :artificer,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
   web_enabled: System.get_env("WEB_ENABLED"),
   force_https: System.get_env("FORCE_HTTPS"),
-  port: System.get_env("PORT"),
+  port: System.get_env("PORT") || "4000",
   cert_key: System.get_env("CERTFILE_KEY"),
   cert: System.get_env("CERTFILE")
