@@ -10,6 +10,8 @@ config :nostrum,
 
 config :artificer,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
-  web_enabled: true,
-  force_https: true,
-  port: System.get_env("BOT_PORT")
+  web_enabled: System.get_env("WEB_ENABLED"),
+  force_https: System.get_env("FORCE_HTTPS"),
+  port: System.get_env("BOT_PORT"),
+  cert_key: System.get_env("CERTFILE_KEY"),
+  cert: System.get_env("CERTFILE")

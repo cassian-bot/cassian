@@ -15,6 +15,10 @@ The Discord library is [Nostrum](https://github.com/Kraigie/nostrum), written in
 
 As of now the Hex release of Nostrum `v0.4.6` is a bit buggy so the current version of this bot uses the nightly version of Nostrum.
 
+## Note regarding the web part
+
+This is deprecated. It will be removed once a webb app has been created because I don't want to add web functionality to the bot.
+
 ## System requirements
 
 ### Voice requirements
@@ -58,18 +62,22 @@ config :nostrum,
 
 config :artificer,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
-  web_enabled: true,
-  force_https: true,
-  port: System.get_env("BOT_PORT")
+  web_enabled: System.get_env("WEB_ENABLED") == "true",
+  port: System.get_env("BOT_PORT") || 4000,
+  force_https: System.get_env("FORCE_HTTPS") == "true",
+  cert_key: System.get_env("CERTFILE_KEY"),
+  cert: System.get_env("CERTFILE")
 ```
 
 Two required configs are `DISCORD_BOT_TOKEN` and `DEFAULT_BOT_PREFIX`.
 
-You can enable or disable `web_enabled`. They are used for some endpoints and the reason can be found [here](###https-certs). If `web_enabled` is set to false you don't have to worry about `force_https` and `port`.
+**[Depracation warning](##note-regarding-the-web-part)**
 
-## Development
+You can enable or disable `web_enabled`. They are used for some endpoints and the reason can be found [here](###https-certs). If `web_enabled` is set to false you don't have to worry about anything below it. Everything under `port` is regarding SSL/HTTPS.
 
-### HTTPS certs
+## HTTPS certs
+
+**[Depracation warning](##note-regarding-the-web-part)**
 
 Currently the bot has endpoints for `shields.io` using `:plug_cowboy`. Shields.io requires you to use HTTPs, for that reason you should have a cert file. TO generate a cert file you can do:
 
@@ -78,3 +86,19 @@ mix x509.gen.selfsigned
 ```
 
 And you will generate a selfcert files under `/priv/cert`. You can use them to start the endpoints in https.
+
+## Up 'n' runnin'
+
+To start the app, once you have done everything you can just run:
+
+Interactive console for debugging:
+
+```bash
+iex -S mix
+```
+
+Standard start without a console:
+
+```bash
+mix --no-halt
+```
