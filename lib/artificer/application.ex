@@ -34,33 +34,11 @@ defmodule Artificer.Application do
     if Application.get_env(:artificer, :web_enabled) == "true" do
       [
         Plug.Cowboy.child_spec(
-          scheme: scheme!(),
+          scheme: :http,
           plug: ArtificerWeb.Endpoint,
-          options: [port: Application.get_env(:artificer, :port) |> String.to_integer()] ++ cert_options!()
+          options: [port: Application.get_env(:artificer, :port) |> String.to_integer()]
         )
       ]
-    else
-      []
-    end
-  end
-
-  @doc false
-  defp scheme! do
-    if https?() do
-      :https
-    else
-      :http
-    end
-  end
-
-  @doc false
-  def https? do
-    Application.get_env(:artificer, :force_https) == "true" # || Mix.env == :prod
-  end
-
-  defp cert_options! do
-    if https?() do
-      [certfile: Application.get_env(:artificer, :cert), keyfile: Application.get_env(:artificer, :cert_key), cipher_suite: :strong]
     else
       []
     end

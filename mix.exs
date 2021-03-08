@@ -26,8 +26,7 @@ defmodule Artificer.MixProject do
       {:con_cache, "~> 0.13"},
       {:cowlib, "~> 2.9.1", override: true},
       {:plug_cowboy, "~> 2.4"},
-      {:poison, "~> 4.0", override: true},
-      {:x509, "~> 0.8.2", only: :dev}
+      {:poison, "~> 4.0", override: true}
     ]
   end
 end

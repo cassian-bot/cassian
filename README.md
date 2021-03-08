@@ -19,17 +19,17 @@ As of now the Hex release of Nostrum `v0.4.6` is a bit buggy so the current vers
 
 ## Note regarding the web part
 
-This is deprecated. It will be removed once a webb app has been created because I don't want to add web functionality to the bot.
+This is deprecated. It will be removed once a web app has been created because I don't want to add web functionality to the bot.
 
 ## System requirements
 
 ### Voice requirements
 
-This bot needs `youtube-dl` and `ffmpeg` in order to play music. The path of them can be set with `FFMPEG_PATH` and `YTDL_PATH` accordingly. If they are not set they will back to `/usr/bin/ffmpeg/` and `/usr/bin/youtube-dl` accordingly. So if your `whereis <name>` returns those two, you don't need to worry about them.
+This bot needs `youtube-dl` and `ffmpeg` in order to play music. The path of them can be set with `FFMPEG_PATH` and `YTDL_PATH` accordingly. If they are not set they will fallback to `/usr/bin/ffmpeg/` and `/usr/bin/youtube-dl` accordingly. So if your `whereis <name>` returns those two, you don't need to worry about them.
 
 ### General bot requirements
 
-Of course as this is written in Elixir, you will need Elixir and the BEAM systme installed. This can be easyly done on Debian-based distros:
+Of course as this is written in Elixir, you will need Elixir installed. This can be easily done on Debian-based distros:
 
 ```bash
 sudo apt-get install elixir
@@ -64,30 +64,15 @@ config :nostrum,
 
 config :artificer,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
-  web_enabled: System.get_env("WEB_ENABLED") == "true",
-  port: System.get_env("PORT") || "4000",
-  force_https: System.get_env("FORCE_HTTPS") == "true",
-  cert_key: System.get_env("CERTFILE_KEY"),
-  cert: System.get_env("CERTFILE")
+  web_enabled: System.get_env("WEB_ENABLED"),
+  port: System.get_env("PORT") || "4000"
 ```
 
 Two required configs are `DISCORD_BOT_TOKEN` and `DEFAULT_BOT_PREFIX`.
 
 **[Depracation warning](##note-regarding-the-web-part)**
 
-You can enable or disable `web_enabled`. They are used for some endpoints and the reason can be found [here](###https-certs). If `web_enabled` is set to false you don't have to worry about anything below it. Everything under `port` is regarding SSL/HTTPS.
-
-## HTTPS certs
-
-**[Depracation warning](##note-regarding-the-web-part)**
-
-Currently the bot has endpoints for `shields.io` using `:plug_cowboy`. Shields.io requires you to use HTTPs, for that reason you should have a cert file. TO generate a cert file you can do:
-
-```bash
-mix x509.gen.selfsigned
-```
-
-And you will generate a selfcert files under `/priv/cert`. You can use them to start the endpoints in https.
+You can start a small `plug_cowboy` server via `web_enabled`. This is used for shields.io. If `web_enabled` is set to false you don't have to worry about anything below it else just set the port or use the standard `4000` one.
 
 ## Up 'n' runnin'
 

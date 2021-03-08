@@ -5,8 +5,6 @@ defmodule ArtificerWeb.Endpoint do
   plug(Plug.Logger)
   # Resonsible for endpoint mattching
   plug(:match)
-  # SSL
-  # plug(Plug.SSL)
   # JSON parse library
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
   # Set every response to be `application/json`
