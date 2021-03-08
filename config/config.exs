@@ -9,4 +9,6 @@ config :nostrum,
   num_shards: :auto
 
 config :artificer,
-  prefix: System.get_env("DEFAULT_BOT_PREFIX")
+  prefix: System.get_env("DEFAULT_BOT_PREFIX"),
+  web_enabled: true,
+  port: System.get_env("BOT_PORT") || 4000

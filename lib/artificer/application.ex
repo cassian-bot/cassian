@@ -25,6 +25,19 @@ defmodule Artificer.Application do
       }
     ]
 
+    children =
+      if Application.get_env(:artificer, :web_enabled) do
+        children ++ [
+          Plug.Cowboy.child_spec(
+            scheme: (if (Mix.env == :prod), do: :https, else: :http),
+            plug: ArtificerWeb.Endpoint,
+            options: [port: Application.get_env(:artificer, :port)]
+          )
+        ]
+      else
+        children
+      end
+
     children
     |> Enum.each(fn child -> DynamicSupervisor.start_child(Artificer.Supervisor, child) end)
   end
