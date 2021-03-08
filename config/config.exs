@@ -8,5 +8,5 @@ config :nostrum,
   token: System.get_env("DISCORD_BOT_TOKEN"),
   num_shards: :auto
 
-config :spoticord,
+config :artificer,
   prefix: System.get_env("DEFAULT_BOT_PREFIX")
