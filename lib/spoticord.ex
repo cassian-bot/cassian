@@ -1,4 +1,4 @@
-defmodule Spoticord do
+defmodule Artificer do
 
   @moduledoc """
   General module for the bot. Has all high-level API calls
@@ -7,21 +7,21 @@ defmodule Spoticord do
 
   alias Nostrum.Cache.Me
 
-  @default_command_prefix Application.get_env(:spoticord, :prefix)
+  @default_command_prefix Application.get_env(:artificer, :prefix)
 
   @doc """
   The a map containing all of the commands and their associated modules
   """
   @spec commands! :: %{String.t() => Module}
   def commands!, do:
-    Spoticord.Consumers.Command.commands!
+    Artificer.Consumers.Command.commands!
 
   @doc """
   Get the avatar of the bot itself.
   """
   @spec get_own_avatar() :: String.t()
   def get_own_avatar,
-    do: Spoticord.Utils.user_avatar(Me.get)
+    do: Artificer.Utils.user_avatar(Me.get)
 
   @doc """
   Get the command prefix of the bot from a server. if no server

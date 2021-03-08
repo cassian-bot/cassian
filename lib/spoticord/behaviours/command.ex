@@ -1,4 +1,4 @@
-defmodule Spoticord.Behaviours.Command do
+defmodule Artificer.Behaviours.Command do
   @moduledoc """
   The general comand behaviour. Don't use `@behaviour` but rather `use` this module
   in other commands. It will implement the behaviour by itself.
@@ -27,7 +27,7 @@ defmodule Spoticord.Behaviours.Command do
   defmacro __using__(_) do
     quote do
       defmacro handle_command(message, args), do: execute(message, args)
-      @behaviour Spoticord.Behaviours.Command
+      @behaviour Artificer.Behaviours.Command
     end
   end
 end

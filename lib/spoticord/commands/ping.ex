@@ -1,5 +1,5 @@
-defmodule Spoticord.Commands.Ping do
-  use Spoticord.Behaviours.Command
+defmodule Artificer.Commands.Ping do
+  use Artificer.Behaviours.Command
 
   @moduledoc """
   The ping command. Shows how many ms was needed to perform the request.
@@ -30,7 +30,7 @@ defmodule Spoticord.Commands.Ping do
     :ok
   end
 
-  alias Spoticord.Utils
+  alias Artificer.Utils
   alias Nostrum.Struct.Embed
 
   def generate_ping_embed!(diff) do

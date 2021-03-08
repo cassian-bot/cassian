@@ -1,4 +1,4 @@
-defmodule Spoticord.Utils.Permissions do
+defmodule Artificer.Utils.Permissions do
   alias Nostrum.Cache.{GuildCache, ChannelCache}
   use Bitwise
 

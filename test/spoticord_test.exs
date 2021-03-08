@@ -1,8 +1,8 @@
-defmodule SpoticordTest do
+defmodule ArtificerTest do
   use ExUnit.Case
-  doctest Spoticord
+  doctest Artificer
 
   test "greets the world" do
-    assert Spoticord.hello() == :world
+    assert Artificer.hello() == :world
   end
 end

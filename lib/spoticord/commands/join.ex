@@ -1,7 +1,7 @@
-defmodule Spoticord.Commands.Join do
-  use Spoticord.Behaviours.Command
+defmodule Artificer.Commands.Join do
+  use Artificer.Behaviours.Command
 
-  alias Spoticord.Utils
+  alias Artificer.Utils
 
   def ship?, do: false
   def caller, do: "join"
