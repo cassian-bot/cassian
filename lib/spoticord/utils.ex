@@ -1,4 +1,4 @@
-defmodule Spoticord.Utils do
+defmodule Artificer.Utils do
   @moduledoc """
   Module for general utils...
   """
@@ -8,7 +8,7 @@ defmodule Spoticord.Utils do
 
   import Embed
 
-  alias Spoticord.Structs.VoicePermissions
+  alias Artificer.Structs.VoicePermissions
 
   @doc """
   Add a color on an embed. The `color` params ia a hex string value of the color.

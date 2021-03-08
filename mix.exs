@@ -1,9 +1,9 @@
-defmodule Spoticord.MixProject do
+defmodule Artificer.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :spoticord,
+      app: :artificer,
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
@@ -14,7 +14,7 @@ defmodule Spoticord.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Spoticord.Application, []},
+      mod: {Artificer.Application, []},
       extra_applications: [:logger]
     ]
   end

@@ -1,5 +1,5 @@
-defmodule Spoticord.Commands.Help do
-  use Spoticord.Behaviours.Command
+defmodule Artificer.Commands.Help do
+  use Artificer.Behaviours.Command
 
   @moduledoc """
   The help command. Shows a menu of commands.
@@ -19,7 +19,7 @@ defmodule Spoticord.Commands.Help do
     :ok
   end
 
-  alias Spoticord.Utils
+  alias Artificer.Utils
   alias Nostrum.Struct.Embed
 
   def generate_help_embed!() do
@@ -27,11 +27,11 @@ defmodule Spoticord.Commands.Help do
       Utils.create_empty_embed!()
       |> Embed.put_title("Help!")
       |> Embed.put_description("Help for all of the commands!")
-      |> Embed.put_thumbnail(Spoticord.get_own_avatar)
+      |> Embed.put_thumbnail(Artificer.get_own_avatar)
 
-    Enum.reduce(Spoticord.commands!, embed, &add_command/2)
+    Enum.reduce(Artificer.commands!, embed, &add_command/2)
   end
 
   def add_command({caller, module}, embed), do:
-    Embed.put_field(embed, "#{Spoticord.command_prefix!()}#{caller}", module.desc, true)
+    Embed.put_field(embed, "#{Artificer.command_prefix!()}#{caller}", module.desc, true)
 end

@@ -1,4 +1,4 @@
-defmodule Spoticord.Consumer do
+defmodule Artificer.Consumer do
 
   @moduledoc """
   The main consumer module. This handles all of the events
@@ -13,8 +13,8 @@ defmodule Spoticord.Consumer do
 
   @doc false
   def handle_event({:MESSAGE_CREATE, message, _ws_state}) do
-    if (!message.author.bot and is_spoticord_command? message), do:
-      Spoticord.Consumers.Command.handle_message(message)
+    if (!message.author.bot and is_artificer_command? message), do:
+      Artificer.Consumers.Command.handle_message(message)
   end
 
   @dialyzer {:no_return, {:update_status, 3}}
@@ -32,11 +32,11 @@ defmodule Spoticord.Consumer do
   @doc """
   Checks whether the command is for this bot. Returns a boolean.
   """
-  @spec is_spoticord_command?(message :: Nostrum.Struct.Message) :: boolean()
-  def is_spoticord_command?(message) do
+  @spec is_artificer_command?(message :: Nostrum.Struct.Message) :: boolean()
+  def is_artificer_command?(message) do
     message.content
     |> String.trim_leading()
     |> String.downcase
-    |> String.starts_with?(Spoticord.command_prefix!)
+    |> String.starts_with?(Artificer.command_prefix!)
   end
 end
