@@ -21,7 +21,6 @@ defmodule Artificer.Commands.Ping do
       recieved_time
       |> DateTime.diff(request_time, :millisecond)
 
-
     Nostrum.Api.create_message(
       message.channel_id,
       embed: generate_ping_embed!(request_recieved_diff)
@@ -30,11 +29,11 @@ defmodule Artificer.Commands.Ping do
     :ok
   end
 
-  alias Artificer.Utils
+  import Artificer.Utils.Embed
   alias Nostrum.Struct.Embed
 
   def generate_ping_embed!(diff) do
-    Utils.create_empty_embed!()
+    create_empty_embed!()
     |> Embed.put_title("Pong!")
     |> Embed.put_description("Command took `#{diff}ms` to execute!")
   end

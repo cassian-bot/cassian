@@ -19,12 +19,12 @@ defmodule Artificer.Commands.Help do
     :ok
   end
 
-  alias Artificer.Utils
+  import Artificer.Utils.Embed
   alias Nostrum.Struct.Embed
 
   def generate_help_embed!() do
     embed =
-      Utils.create_empty_embed!()
+      create_empty_embed!()
       |> Embed.put_title("Help!")
       |> Embed.put_description("Help for all of the commands!")
 
