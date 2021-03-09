@@ -83,7 +83,7 @@ Two required configs are `DISCORD_BOT_TOKEN` and `DEFAULT_BOT_PREFIX`.
 
 **[Depracation warning](##note-regarding-the-web-part)**
 
-You can start a small `plug_cowboy` server via `web_enabled`. This is used for shields.io. If `web_enabled` is set to false you don't have to worry about anything below it else just set the port or use the standard `4000` one. `force_ssl` is there to, well, enforce SSL on request. This is meant more for services which give you certs like Heroku or Gigalixir.
+You can start a small `plug_cowboy` server via `web_enabled`. This is used for shields.io. If `web_enabled` is set to false you don't have to worry about anything below it else just set the port or use the standard `4000` one. `force_ssl` is there to, well, enforce SSL on request. This is meant more for services which give you certs like Heroku or [Gigalixir](##deploy-to-gigalixir).
 
 ## Up 'n' runnin'
 
@@ -103,11 +103,7 @@ mix --no-halt
 
 ## Deploy to Gigalixir
 
-### Note
-
-As Heroku as the same config of buildpacks as Gigalixir, this could theoretically be deployed on Heroku the same way.
-
-- End note
+**Note**: As Heroku as the same config of buildpacks as Gigalixir, this could theoretically be deployed on Heroku the same way.
 
 Gigalixir uses buildpacks just like Heroku. Currently the bot has buildpacks set and it is almost ready to be deployed. You'll just have to set a couple of variables. It's easy to set them. You can either set them via the the panel on Gigalixir or:
 
