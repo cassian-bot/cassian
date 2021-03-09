@@ -51,4 +51,7 @@ defmodule Cassian do
     {:ok, vsn} = :application.get_key(:cassian, :vsn)
     List.to_string(vsn)
   end
+
+  @spec own_id() :: Snowflake.t()
+  def own_id, do: Me.get().id
 end

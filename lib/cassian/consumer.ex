@@ -25,7 +25,22 @@ defmodule Cassian.Consumer do
   end
 
   @doc false
-  def handle_event(_event) do
+  def handle_event({:VOICE_SPEAKING_UPDATE, data, _}) do
+    unless data.speaking, do:
+      Cassian.Servers.Queue.delete_if_empty(data.guild_id)
+  end
+
+  @doc false
+  def handle_event({:VOICE_STATE_UPDATE, data, _}) do
+    if !data.channel_id and data.member.user_id == Cassian.own_id() do
+      Cassian.Servers.Queue.delete(data.guild_id)
+    end
+
+    # TODO: Play next in queue.
+  end
+
+  @doc false
+  def handle_event(_) do
     :noop
   end
 
