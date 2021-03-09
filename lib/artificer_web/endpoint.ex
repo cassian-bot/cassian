@@ -9,7 +9,7 @@ defmodule CassianWeb.Endpoint do
   plug(Plug.Logger)
 
   # Forcing SSL on Gigalixir (for some reason I can't use a macro nor a function...)
-  if Application.get_env(:artificer, :force_ssl) == "true" do
+  if Application.get_env(:cassian, :force_ssl) == "true" do
     plug(Plug.SSL, rewrite_on: [:x_forwarded_proto], host: nil)
   else
     nil

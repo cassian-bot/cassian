@@ -7,7 +7,7 @@ defmodule Cassian do
 
   alias Nostrum.Cache.Me
 
-  @default_command_prefix Application.get_env(:artificer, :prefix)
+  @default_command_prefix Application.get_env(:cassian, :prefix)
 
   @doc """
   The a map containing all of the commands and their associated modules
@@ -48,7 +48,7 @@ defmodule Cassian do
   """
   @spec version! :: String.t()
   def version! do
-    {:ok, vsn} = :application.get_key(:artificer, :vsn)
+    {:ok, vsn} = :application.get_key(:cassian, :vsn)
     List.to_string(vsn)
   end
 end

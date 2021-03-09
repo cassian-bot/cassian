@@ -13,7 +13,7 @@ defmodule Cassian.Consumer do
 
   @doc false
   def handle_event({:MESSAGE_CREATE, message, _ws_state}) do
-    if (!message.author.bot and is_artificer_command? message), do:
+    if (!message.author.bot and is_cassian_command? message), do:
       Cassian.Consumers.Command.handle_message(message)
   end
 
@@ -32,8 +32,8 @@ defmodule Cassian.Consumer do
   @doc """
   Checks whether the command is for this bot. Returns a boolean.
   """
-  @spec is_artificer_command?(message :: Nostrum.Struct.Message) :: boolean()
-  def is_artificer_command?(message) do
+  @spec is_cassian_command?(message :: Nostrum.Struct.Message) :: boolean()
+  def is_cassian_command?(message) do
     message.content
     |> String.trim_leading()
     |> String.downcase

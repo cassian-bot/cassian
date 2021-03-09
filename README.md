@@ -3,7 +3,7 @@
 ![Cassian Banner](https://i.imgur.com/yuFUI9F.jpg)
 A Magical Bot for Discord Music
 
-![Server count](https://img.shields.io/endpoint?url=https%3A%2F%2Fartificer.gigalixirapp.com%2Fapi%2Fshields%2Fguilds) ![Elixir version](https://img.shields.io/endpoint?url=https%3A%2F%2Fartificer.gigalixirapp.com%2Fapi%2Fshields%2Fsystem)
+![Server count](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.gigalixirapp.com%2Fapi%2Fshields%2Fguilds) ![Elixir version](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.gigalixirapp.com%2Fapi%2Fshields%2Fsystem)
 
 Note: The main image for the bot is from [here](https://www.artstation.com/artwork/v10g8x) and belongs to [Otto Metzger](https://ottometzger.artstation.com/) so do support their art!
 
@@ -72,7 +72,7 @@ config :nostrum,
   token: System.get_env("DISCORD_BOT_TOKEN"),
   num_shards: :auto
 
-config :artificer,
+config :cassian,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
   web_enabled: System.get_env("WEB_ENABLED"),
   port: System.get_env("PORT") || "4000",

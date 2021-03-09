@@ -42,7 +42,7 @@ defmodule Cassian.Consumers.Command do
 
   # Get all of the modules which implement Cassian.Command behaviour and store them in a ETS cache.
   defp load_modules_cache() do
-    {_, modules} = :application.get_key(:artificer, :modules)
+    {_, modules} = :application.get_key(:cassian, :modules)
 
     name_modules_map =
       modules

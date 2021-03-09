@@ -31,12 +31,12 @@ defmodule Cassian.Application do
 
   @doc false
   defp web_child! do
-    if Application.get_env(:artificer, :web_enabled) == "true" do
+    if Application.get_env(:cassian, :web_enabled) == "true" do
       [
         Plug.Cowboy.child_spec(
           scheme: :http,
           plug: CassianWeb.Endpoint,
-          options: [port: Application.get_env(:artificer, :port) |> String.to_integer()]
+          options: [port: Application.get_env(:cassian, :port) |> String.to_integer()]
         )
       ]
     else
