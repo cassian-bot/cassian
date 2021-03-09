@@ -1,5 +1,5 @@
-defmodule ArtificerWeb.Controllers.Api.Shields.System do
-  use ArtificerWeb.Api.DataResponse
+defmodule CassianWeb.Controllers.Api.Shields.System do
+  use CassianWeb.Api.DataResponse
 
   def data do
     %{

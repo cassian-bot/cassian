@@ -1,4 +1,4 @@
-defmodule Artificer.Consumer do
+defmodule Cassian.Consumer do
 
   @moduledoc """
   The main consumer module. This handles all of the events
@@ -14,7 +14,7 @@ defmodule Artificer.Consumer do
   @doc false
   def handle_event({:MESSAGE_CREATE, message, _ws_state}) do
     if (!message.author.bot and is_artificer_command? message), do:
-      Artificer.Consumers.Command.handle_message(message)
+      Cassian.Consumers.Command.handle_message(message)
   end
 
   @dialyzer {:no_return, {:update_status, 3}}
@@ -37,6 +37,6 @@ defmodule Artificer.Consumer do
     message.content
     |> String.trim_leading()
     |> String.downcase
-    |> String.starts_with?(Artificer.command_prefix!)
+    |> String.starts_with?(Cassian.command_prefix!)
   end
 end

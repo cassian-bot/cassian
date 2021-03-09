@@ -1,4 +1,4 @@
-defmodule Artificer.Structs.VoicePermissions do
+defmodule Cassian.Structs.VoicePermissions do
 
   @moduledoc """
   Struct for the permissions of the bot. Generally this should be
@@ -31,7 +31,7 @@ defmodule Artificer.Structs.VoicePermissions do
   @typedoc "Permission whether the bot can speak in the channel"
   @type speak :: boolean()
 
-  alias Artificer.Utils.Permissions, as: Util
+  alias Cassian.Utils.Permissions, as: Util
 
   @doc """
   Generate the struct from the perm number.

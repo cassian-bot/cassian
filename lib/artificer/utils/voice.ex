@@ -1,6 +1,6 @@
-defmodule Artificer.Utils.Voice do
+defmodule Cassian.Utils.Voice do
   alias Nostrum.Api
-  alias Artificer.Structs.VoicePermissions
+  alias Cassian.Structs.VoicePermissions
   alias Nostrum.Cache.GuildCache
 
   @doc """

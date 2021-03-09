@@ -1,4 +1,4 @@
-defmodule Artificer.MixProject do
+defmodule Cassian.MixProject do
   use Mix.Project
 
   def project do
@@ -14,7 +14,7 @@ defmodule Artificer.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Artificer.Application, []},
+      mod: {Cassian.Application, []},
       extra_applications: [:logger, :plug_cowboy]
     ]
   end

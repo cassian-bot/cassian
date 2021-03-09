@@ -1,8 +1,8 @@
-defmodule ArtificerTest do
+defmodule CassianTest do
   use ExUnit.Case
-  doctest Artificer
+  doctest Cassian
 
   test "greets the world" do
-    assert Artificer.hello() == :world
+    assert Cassian.hello() == :world
   end
 end

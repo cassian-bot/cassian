@@ -1,4 +1,4 @@
-defmodule ArtificerWeb.Api.DataResponse do
+defmodule CassianWeb.Api.DataResponse do
   @moduledoc """
   Behaviour module for a shield controller.
   """
@@ -14,7 +14,7 @@ defmodule ArtificerWeb.Api.DataResponse do
         |> send_resp(200, data() |> Poison.encode!())
       end
 
-      @behaviour ArtificerWeb.Api.DataResponse
+      @behaviour CassianWeb.Api.DataResponse
     end
   end
 end

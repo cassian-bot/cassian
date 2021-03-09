@@ -1,6 +1,6 @@
-# Artificer
+# Cassian
 
-![Artificer Banner](https://i.imgur.com/yuFUI9F.jpg)
+![Cassian Banner](https://i.imgur.com/yuFUI9F.jpg)
 A Magical Bot for Discord Music
 
 ![Server count](https://img.shields.io/endpoint?url=https%3A%2F%2Fartificer.gigalixirapp.com%2Fapi%2Fshields%2Fguilds) ![Elixir version](https://img.shields.io/endpoint?url=https%3A%2F%2Fartificer.gigalixirapp.com%2Fapi%2Fshields%2Fsystem)

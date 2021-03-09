@@ -1,5 +1,5 @@
-defmodule Artificer.Commands.Ping do
-  use Artificer.Behaviours.Command
+defmodule Cassian.Commands.Ping do
+  use Cassian.Behaviours.Command
 
   @moduledoc """
   The ping command. Shows how many ms was needed to perform the request.
@@ -29,7 +29,7 @@ defmodule Artificer.Commands.Ping do
     :ok
   end
 
-  import Artificer.Utils.Embed
+  import Cassian.Utils.Embed
   alias Nostrum.Struct.Embed
 
   def generate_ping_embed!(diff) do

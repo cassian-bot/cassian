@@ -1,4 +1,4 @@
-defmodule ArtificerWeb.Plugs.JsonRequestPlug do
+defmodule CassianWeb.Plugs.JsonRequestPlug do
   import Plug.Conn
 
   @moduledoc """

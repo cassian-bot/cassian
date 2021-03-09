@@ -1,4 +1,4 @@
-defmodule ArtificerWeb.Endpoint do
+defmodule CassianWeb.Endpoint do
   use Plug.Router
 
   @moduledoc """
@@ -19,16 +19,16 @@ defmodule ArtificerWeb.Endpoint do
   # JSON parse library
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
   # Set every response to be `application/json`
-  plug(ArtificerWeb.Plugs.JsonRequestPlug)
+  plug(CassianWeb.Plugs.JsonRequestPlug)
   # Responsible for dispatching responses
   plug(:dispatch)
 
   get "/api/shields/guilds" do
-    apply(ArtificerWeb.Controllers.Api.Shields.Guilds, :show, [conn])
+    apply(CassianWeb.Controllers.Api.Shields.Guilds, :show, [conn])
   end
 
   get "/api/shields/system" do
-    apply(ArtificerWeb.Controllers.Api.Shields.System, :show, [conn])
+    apply(CassianWeb.Controllers.Api.Shields.System, :show, [conn])
   end
 
   match _ do

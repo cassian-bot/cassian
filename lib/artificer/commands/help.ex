@@ -1,5 +1,5 @@
-defmodule Artificer.Commands.Help do
-  use Artificer.Behaviours.Command
+defmodule Cassian.Commands.Help do
+  use Cassian.Behaviours.Command
 
   @moduledoc """
   The help command. Shows a menu of commands.
@@ -19,7 +19,7 @@ defmodule Artificer.Commands.Help do
     :ok
   end
 
-  import Artificer.Utils.Embed
+  import Cassian.Utils.Embed
   alias Nostrum.Struct.Embed
 
   def generate_help_embed!() do
@@ -27,11 +27,11 @@ defmodule Artificer.Commands.Help do
       create_empty_embed!()
       |> Embed.put_title("Help!")
       |> Embed.put_description("Help for all of the commands!")
-      |> Embed.put_thumbnail(Artificer.get_own_avatar())
+      |> Embed.put_thumbnail(Cassian.get_own_avatar())
 
-    Enum.reduce(Artificer.commands!, embed, &add_command/2)
+    Enum.reduce(Cassian.commands!, embed, &add_command/2)
   end
 
   def add_command({caller, module}, embed), do:
-    Embed.put_field(embed, "#{Artificer.command_prefix!()}#{caller}", module.desc, false)
+    Embed.put_field(embed, "#{Cassian.command_prefix!()}#{caller}", module.desc, false)
 end

@@ -1,4 +1,4 @@
-defmodule Artificer.Utils.Permissions do
+defmodule Cassian.Utils.Permissions do
   alias Nostrum.Cache.{GuildCache, ChannelCache}
   use Bitwise
 

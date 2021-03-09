@@ -1,4 +1,4 @@
-defmodule Artificer.Utils do
+defmodule Cassian.Utils do
   @moduledoc """
   Module for general utils...
   """
@@ -20,7 +20,7 @@ defmodule Artificer.Utils do
       "https://www.youtube.com/oembed?url=#{url}&format=json"
 
     headers = [
-      "User-agent": "#{Artificer.username!()} #{Artificer.version!}",
+      "User-agent": "#{Cassian.username!()} #{Cassian.version!}",
       "Accept": "Application/json; Charset=utf-8"
     ]
 

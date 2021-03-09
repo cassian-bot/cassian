@@ -1,9 +1,9 @@
-defmodule Artificer.Commands.Play do
-  use Artificer.Behaviours.Command
+defmodule Cassian.Commands.Play do
+  use Cassian.Behaviours.Command
 
-  import Artificer.Utils
-  alias Artificer.Utils.Embed, as: EmbedUtils
-  alias Artificer.Utils.Voice, as: VoiceUtils
+  import Cassian.Utils
+  alias Cassian.Utils.Embed, as: EmbedUtils
+  alias Cassian.Utils.Voice, as: VoiceUtils
 
   def ship?, do: true
   def caller, do: "play"

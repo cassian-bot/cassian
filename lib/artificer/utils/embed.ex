@@ -1,4 +1,4 @@
-defmodule Artificer.Utils.Embed do
+defmodule Cassian.Utils.Embed do
   alias Nostrum.Struct.Embed
 
   import Embed
