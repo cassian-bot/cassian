@@ -15,7 +15,6 @@ defmodule Artificer.Commands.Play do
         else
           Nostrum.Api.create_message!(message.channel_id, embed: no_perms_embed())
         end
-
       {:error, :noop} ->
         Nostrum.Api.create_message!(message.channel_id, embed: no_channel_embed())
     end
@@ -25,17 +24,7 @@ defmodule Artificer.Commands.Play do
 
   def handle_voice(guild_id, voice_id, _message, args) do
     Utils.join_or_switch_voice(guild_id, voice_id)
-    play_when_ready(Enum.fetch!(args, 0), guild_id)
-  end
-
-  # Recurison ___MAGIC___.
-  defp play_when_ready(link, guild_id) do
-    if Nostrum.Voice.ready?(guild_id) do
-      Nostrum.Voice.play(guild_id, link, :ytdl)
-    else
-      :timer.sleep(10)
-      play_when_ready(link, guild_id)
-    end
+    Utils.play_when_ready(Enum.fetch!(args, 0), guild_id, 50)
   end
 
   def no_channel_embed() do

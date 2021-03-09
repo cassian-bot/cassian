@@ -93,4 +93,38 @@ defmodule Artificer.Utils do
 
     perms.administrator || perms.connect
   end
+
+  defguard positive_integer(value) when is_integer(value) and value > 0
+
+  @doc """
+  Play the music with a max retry amount. If the retry amount is less than zero it will just fail automatically.
+  Every retry approx lasts for approx. `100ms`.
+  """
+  @spec play_when_ready(link :: String.t(), guild_id :: Snowflake.t(), max_retries :: integer()) :: {:ok, :ok | any()} | {:error, :failed_max}
+  def play_when_ready(link, guild_id, max_retries) when is_integer(max_retries) and max_retries > 0 do
+    if Nostrum.Voice.ready?(guild_id) do
+      {:ok, Nostrum.Voice.play(guild_id, link, :ytdl)}
+    else
+      :timer.sleep(100)
+      play_when_ready(link, guild_id, max_retries - 1)
+    end
+  end
+
+  def play_when_ready(_, _, _) do
+    {:ok, :failed_max}
+  end
+
+  @doc """
+  Play the music without a max retry. This in theory can infinitely loop if the bot is never ready to play music.
+
+  See `play_when_ready/3` as a safe way to play this.
+  """
+  def play_when_ready!(link, guild_id) do
+    if Nostrum.Voice.ready?(guild_id) do
+      Nostrum.Voice.play(guild_id, link, :ytdl)
+    else
+      :timer.sleep(100)
+      play_when_ready!(link, guild_id)
+    end
+  end
 end
