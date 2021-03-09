@@ -1,6 +1,10 @@
 defmodule ArtificerWeb.Endpoint do
   use Plug.Router
 
+  @moduledoc """
+  Current endpoint for this bot. It's minimalistic and will be removed soon.
+  """
+
   # Using Plug.Loader for logging request informaiton
   plug(Plug.Logger)
   # Resonsible for endpoint mattching
