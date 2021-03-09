@@ -7,8 +7,13 @@ defmodule ArtificerWeb.Endpoint do
 
   # Using Plug.Loader for logging request informaiton
   plug(Plug.Logger)
-  # Forcing SSL on Gigalixir
-  plug(Plug.SSL, rewrite_on: [:x_forwarded_proto], host: nil)
+
+  # Forcing SSL on Gigalixir (for some reason I can't use a macro nor a function...)
+  if Application.get_env(:artificer, :force_ssl) == "true" do
+    plug(Plug.SSL, rewrite_on: [:x_forwarded_proto], host: nil)
+  else
+    nil
+  end
   # Resonsible for endpoint mattching
   plug(:match)
   # JSON parse library

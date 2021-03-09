@@ -11,4 +11,5 @@ config :nostrum,
 config :artificer,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
   web_enabled: System.get_env("WEB_ENABLED"),
-  port: System.get_env("PORT") || "4000"
+  port: System.get_env("PORT") || "4000",
+  force_ssl: System.get_env("FORCE_SSL")
