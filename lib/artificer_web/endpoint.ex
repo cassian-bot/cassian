@@ -7,6 +7,8 @@ defmodule ArtificerWeb.Endpoint do
 
   # Using Plug.Loader for logging request informaiton
   plug(Plug.Logger)
+  # Forcing SSL on Gigalixir
+  plug(Plug.SSL)
   # Resonsible for endpoint mattching
   plug(:match)
   # JSON parse library
