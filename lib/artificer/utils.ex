@@ -15,13 +15,17 @@ defmodule Artificer.Utils do
   It will be automaically converted to something Discord can use.
   """
   @spec put_color_on_embed(embed :: Embed, color :: String.t()) :: Embed
-  def put_color_on_embed(embed, color \\ "#1DB954") do
+  def put_color_on_embed(embed, color \\ "#6699ff") do
     {color, _} =
       color
       |> String.replace_leading("#", "")
       |> Integer.parse(16)
 
     put_color(embed, color)
+  end
+
+  def put_error_color_on_embed(embed) do
+    put_color(embed, 16711731)
   end
 
   @doc """
@@ -131,7 +135,7 @@ defmodule Artificer.Utils do
   @doc """
   Check whether a link is a YouTube one.
   """
-  @spec youtube_link?(url :: String.t()) :: :ok | :error
+  @spec youtube_link?(url :: String.t()) :: boolean()
   def youtube_link?(url) do
     url =
       "https://www.youtube.com/oembed?url=#{url}&format=json"
@@ -143,9 +147,9 @@ defmodule Artificer.Utils do
 
     case HTTPoison.get(url, headers) do
       {:ok, %HTTPoison.Response{status_code: 200}} ->
-        :ok
+        true
       _ ->
-        :error
+        false
     end
   end
 end

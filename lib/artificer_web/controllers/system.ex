@@ -9,7 +9,7 @@ defmodule ArtificerWeb.Controllers.Elixir do
   def guilds do
     %{
       schemaVersion: 1,
-      labelColor: "#4B275F",
+      labelColor: "#9900ff",
       namedLogo: "Elixir",
       label: "Elixir",
       color: "#fff",
