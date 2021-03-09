@@ -7,6 +7,16 @@ A Magical Bot for Discord Music
 
 Note: The main image for the bot is from [here](https://www.artstation.com/artwork/v10g8x) and belongs to [Otto Metzger](https://ottometzger.artstation.com/) so do support their art!
 
+## Table of contents
+
+- [About](##about)
+- [Note regarding Nostrum](##note-regarding-nostrm)
+- [Note regarding the web part](##note-regarding-the-web-part)
+- [System requirements](##system-requirements)
+- [Configuration](##configuration)
+- [Up 'n' runnin'](##up-'n'-runnin')
+- [Deploy to Gigalixir](##deploy-to-gigalixir)
+
 ## About
 
 The bot is written in Elixir, a functional programming language based upon Erlang. It has great performance and maintainability in live environments.
@@ -89,3 +99,33 @@ Standard start without a console:
 ```bash
 mix --no-halt
 ```
+
+## Deploy to Gigalixir
+
+### Note
+
+As Heroku as the same config of buildpacks as Gigalixir, this could theoretically be deployed on Heroku the same way.
+
+- End note
+
+Gigalixir uses buildpacks just like Heroku. Currently the bot has buildpacks set and it is almost ready to be deployed. You'll just have to set a couple of variables. It's easy to set them. You can either set them via the the panel on Gigalixir or:
+
+```bash
+gigalixir config:set FFMPEG_PATH=/app/vendor/ffmpeg/ffmpeg
+gigalixir config:set YTDL_PATH=/app/vendor/youtube-dl/bin/youtube-dl
+gigalixir config:set DEFAULT_BOT_PREFIX=${YOUR BOT PREFIX}
+gigalixir config:set DISCORD_BOT_TOKEN=${YOUR BOT TOKEN}
+gigalixir config:set WEB_ENABLED=${WEB_ENABLED} # If you want to use the endpoints...
+```
+
+After that just do:
+
+```bash
+git push gigalixir
+```
+
+And you should be up 'n' runnin'!
+
+Note
+
+Currently the bot accepts both HTTP and HTTPS requests, so if you have some sensitive data use HTTPS...
