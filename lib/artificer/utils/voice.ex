@@ -1,5 +1,9 @@
 defmodule Artificer.Utils.Voice do
-   @doc """
+  alias Nostrum.Api
+  alias Artificer.Structs.VoicePermissions
+  alias Nostrum.Cache.GuildCache
+
+  @doc """
   Join or switch from the voice channel. Set the channel to nil to
   leave it.
   """
@@ -61,14 +65,6 @@ defmodule Artificer.Utils.Voice do
       :timer.sleep(100)
       play_when_ready!(link, guild_id)
     end
-  end
-
-    @doc """
-  Get the user avatar url.
-  """
-  @spec user_avatar(user :: Nostrum.Struct.User) :: String.t()
-  def user_avatar(user) do
-    "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png"
   end
 
   @doc """

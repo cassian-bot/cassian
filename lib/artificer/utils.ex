@@ -4,6 +4,14 @@ defmodule Artificer.Utils do
   """
 
   @doc """
+  Get the user avatar url.
+  """
+  @spec user_avatar(user :: Nostrum.Struct.User) :: String.t()
+  def user_avatar(user) do
+    "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png"
+  end
+
+  @doc """
   Check whether a link is a YouTube one.
   """
   @spec youtube_link?(url :: String.t()) :: boolean()

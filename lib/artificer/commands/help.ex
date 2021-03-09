@@ -27,6 +27,7 @@ defmodule Artificer.Commands.Help do
       create_empty_embed!()
       |> Embed.put_title("Help!")
       |> Embed.put_description("Help for all of the commands!")
+      |> Embed.put_thumbnail(Artificer.get_own_avatar())
 
     Enum.reduce(Artificer.commands!, embed, &add_command/2)
   end
