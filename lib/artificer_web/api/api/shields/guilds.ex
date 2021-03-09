@@ -1,12 +1,7 @@
-defmodule ArtificerWeb.Controllers.Guilds do
-  import Plug.Conn
+defmodule ArtificerWeb.Controllers.Api.Shields.Guilds do
+  use ArtificerWeb.Api.DataResponse
 
-  def show(conn) do
-    conn
-    |> send_resp(200, guilds())
-  end
-
-  def guilds do
+  def data do
     %{
       schemaVersion: 1,
       label: "Guilds",
@@ -16,6 +11,6 @@ defmodule ArtificerWeb.Controllers.Guilds do
       style: "flat-square",
       logoColor: "#fff"
     }
-    |> Poison.encode!()
   end
+
 end

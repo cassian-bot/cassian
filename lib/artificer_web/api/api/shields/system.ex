@@ -1,12 +1,7 @@
-defmodule ArtificerWeb.Controllers.Elixir do
-  import Plug.Conn
+defmodule ArtificerWeb.Controllers.Api.Shields.System do
+  use ArtificerWeb.Api.DataResponse
 
-  def show(conn) do
-    conn
-    |> send_resp(200, guilds())
-  end
-
-  def guilds do
+  def data do
     %{
       schemaVersion: 1,
       labelColor: "#9900ff",
@@ -16,6 +11,5 @@ defmodule ArtificerWeb.Controllers.Elixir do
       style: "flat-square",
       message: System.version
     }
-    |> Poison.encode!()
   end
 end

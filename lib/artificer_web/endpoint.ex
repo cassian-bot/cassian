@@ -16,12 +16,12 @@ defmodule ArtificerWeb.Endpoint do
   # Responsible for dispatching responses
   plug(:dispatch)
 
-  get "/guilds" do
-    apply(ArtificerWeb.Controllers.Guilds, :show, [conn])
+  get "/api/shields/guilds" do
+    apply(ArtificerWeb.Controllers.Api.Shields.Guilds, :show, [conn])
   end
 
-  get "/system" do
-    apply(ArtificerWeb.Controllers.Elixir, :show, [conn])
+  get "/api/shields/system" do
+    apply(ArtificerWeb.Controllers.Api.Shields.System, :show, [conn])
   end
 
   match _ do
