@@ -15,7 +15,7 @@ defmodule Artificer.Utils do
   It will be automaically converted to something Discord can use.
   """
   @spec put_color_on_embed(embed :: Embed, color :: String.t()) :: Embed
-  def put_color_on_embed(embed, color \\ "#6699ff") do
+  def put_color_on_embed(embed, color \\ "#6996ff") do
     {color, _} =
       color
       |> String.replace_leading("#", "")
