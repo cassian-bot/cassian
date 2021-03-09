@@ -34,4 +34,21 @@ defmodule Artificer do
   def command_prefix!(_server_id \\ nil) do
     @default_command_prefix
   end
+
+  @doc """
+  Get the user name of bot account.
+  """
+  @spec username! :: String.t()
+  def username! do
+    Me.get().username
+  end
+
+  @doc """
+  Get the username of the bot account.
+  """
+  @spec version! :: String.t()
+  def version! do
+    {:ok, vsn} = :application.get_key(:artificer, :vsn)
+    List.to_string(vsn)
+  end
 end

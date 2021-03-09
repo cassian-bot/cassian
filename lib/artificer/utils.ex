@@ -127,4 +127,25 @@ defmodule Artificer.Utils do
       play_when_ready!(link, guild_id)
     end
   end
+
+  @doc """
+  Check whether a link is a YouTube one.
+  """
+  @spec youtube_link?(url :: String.t()) :: :ok | :error
+  def youtube_link?(url) do
+    url =
+      "https://www.youtube.com/oembed?url=#{url}&format=json"
+
+    headers = [
+      "User-agent": "#{Artificer.username!()} #{Artificer.version!}",
+      "Accept": "Application/json; Charset=utf-8"
+    ]
+
+    case HTTPoison.get(url, headers) do
+      {:ok, %HTTPoison.Response{status_code: 200}} ->
+        :ok
+      _ ->
+        :error
+    end
+  end
 end
