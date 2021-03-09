@@ -27,11 +27,10 @@ defmodule Artificer.Commands.Help do
       Utils.create_empty_embed!()
       |> Embed.put_title("Help!")
       |> Embed.put_description("Help for all of the commands!")
-      |> Embed.put_thumbnail(Artificer.get_own_avatar)
 
     Enum.reduce(Artificer.commands!, embed, &add_command/2)
   end
 
   def add_command({caller, module}, embed), do:
-    Embed.put_field(embed, "#{Artificer.command_prefix!()}#{caller}", module.desc, true)
+    Embed.put_field(embed, "#{Artificer.command_prefix!()}#{caller}", module.desc, false)
 end
