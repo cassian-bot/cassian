@@ -78,10 +78,12 @@ defmodule Cassian.Servers.Queue do
 
   # Private API
 
+  @doc false
   def handle_call({:show}, _from, state) do
     {:reply, state, state}
   end
 
+  @doc false
   def handle_call({:pop}, _from, state) do
     {element, state} = List.pop_at(state, 0)
     {:reply, element, state}
