@@ -24,7 +24,12 @@ defmodule Cassian.Commands.Play do
     case VoiceUtils.get_sender_voice_id(message) do
       {:ok, {guild_id, voice_id}} ->
         if VoiceUtils.can_connect?(guild_id, voice_id) do
-          handle_voice(guild_id, voice_id, message, link, metadata)
+          if Nostrum.Voice.playing?(guild_id) do
+            Cassian.Servers.Queue.insert!(guild_id, link)
+            Nostrum.Api.create_message!(message.channel_id, embed: youtube_video_embed(metadata, link, "Enqueue", "The song will play as soon as the current is stopped."))
+          else
+            handle_voice(guild_id, voice_id, message, link, metadata)
+          end
         else
           Nostrum.Api.create_message!(message.channel_id, embed: no_perms_embed())
         end
@@ -41,11 +46,11 @@ defmodule Cassian.Commands.Play do
     Nostrum.Api.create_message!(message.channel_id, embed: youtube_video_embed(metadata, link))
   end
 
-  def youtube_video_embed(metadata, link) do
+  def youtube_video_embed(metadata, link, action \\ "Playing", description \\ "The music should start soon.") do
     EmbedUtils.create_empty_embed!()
     |> Cassian.Utils.Embed.put_color_on_embed("#ff0000")
-    |> Embed.put_title("Playing: #{metadata["title"]}")
-    |> Embed.put_description("The music should start now.")
+    |> Embed.put_title("#{action}: #{metadata["title"]}")
+    |> Embed.put_description(description)
     |> Embed.put_url(link)
   end
 
