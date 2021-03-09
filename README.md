@@ -1,11 +1,10 @@
 # Cassian
 
-![Cassian Banner](https://i.imgur.com/yuFUI9F.jpg)
-A Magical Bot for Discord Music
+![Cassian Banner](https://i.imgur.com/llT71oQ.png)
+
+A Discord bot for music written in Elixir
 
 ![Server count](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.gigalixirapp.com%2Fapi%2Fshields%2Fguilds) ![Elixir version](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.gigalixirapp.com%2Fapi%2Fshields%2Fsystem)
-
-Note: The main image for the bot is from [here](https://www.artstation.com/artwork/v10g8x) and belongs to [Otto Metzger](https://ottometzger.artstation.com/) so do support their art!
 
 ## Table of contents
 
