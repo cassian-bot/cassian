@@ -75,14 +75,15 @@ config :nostrum,
 config :artificer,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
   web_enabled: System.get_env("WEB_ENABLED"),
-  port: System.get_env("PORT") || "4000"
+  port: System.get_env("PORT") || "4000",
+  force_ssl: System.get_env("FORCE_SSL")
 ```
 
 Two required configs are `DISCORD_BOT_TOKEN` and `DEFAULT_BOT_PREFIX`.
 
 **[Depracation warning](##note-regarding-the-web-part)**
 
-You can start a small `plug_cowboy` server via `web_enabled`. This is used for shields.io. If `web_enabled` is set to false you don't have to worry about anything below it else just set the port or use the standard `4000` one.
+You can start a small `plug_cowboy` server via `web_enabled`. This is used for shields.io. If `web_enabled` is set to false you don't have to worry about anything below it else just set the port or use the standard `4000` one. `force_ssl` is there to, well, enforce SSL on request. This is meant more for services which give you certs like Heroku or Gigalixir.
 
 ## Up 'n' runnin'
 
@@ -115,7 +116,8 @@ gigalixir config:set FFMPEG_PATH=/app/vendor/ffmpeg/ffmpeg
 gigalixir config:set YTDL_PATH=/app/vendor/youtube-dl/bin/youtube-dl
 gigalixir config:set DEFAULT_BOT_PREFIX=${YOUR BOT PREFIX}
 gigalixir config:set DISCORD_BOT_TOKEN=${YOUR BOT TOKEN}
-gigalixir config:set WEB_ENABLED=${WEB_ENABLED} # If you want to use the endpoints...
+gigalixir config:set WEB_ENABLED=${WEB ENABLED} # If you want to use the endpoints...
+gigalixir config:set FORCE_SSL=${FORCE SSL} # Make all Gigalixir request use HTTPS/SSL
 ```
 
 After that just do:
@@ -125,7 +127,3 @@ git push gigalixir
 ```
 
 And you should be up 'n' runnin'!
-
-Note
-
-Currently the bot accepts both HTTP and HTTPS requests, so if you have some sensitive data use HTTPS...
