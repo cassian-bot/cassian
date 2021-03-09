@@ -13,6 +13,7 @@ defmodule ArtificerWeb.Controllers.Elixir do
       namedLogo: "Elixir",
       label: "Elixir",
       color: "#fff",
+      style: "flat-square",
       message: System.version
     }
     |> Poison.encode!()
