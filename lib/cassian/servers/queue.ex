@@ -19,7 +19,7 @@ defmodule Cassian.Servers.Queue do
   """
   @spec insert(guild_id :: Snowflake.t(), link :: String.t()) :: :ok
   def insert(guild_id, link) do
-    GenServer.cast(from_guild_id(guild_id), {:insert, link})
+    GenServer.cast(from_guild_id(guild_id), {:insert, [link]})
   end
 
   @doc """
@@ -27,10 +27,11 @@ defmodule Cassian.Servers.Queue do
   """
   @spec insert!(guild_id :: Snowflake.t(), link :: String.t()) :: :ok
   def insert!(guild_id, link) do
-    if exists?(guild_id), do:
+    unless exists?(guild_id) do
       start(guild_id, [link])
-
-    insert(guild_id, link)
+    else
+      insert(guild_id, link)
+    end
   end
 
   @doc """
@@ -46,7 +47,7 @@ defmodule Cassian.Servers.Queue do
   """
   @spec remove!(guild_id :: Snowflake.t(), link :: String.t()) :: :ok
   def remove!(guild_id, link) do
-    GenServer.cast(from_guild_id(guild_id), {:remove, link})
+    GenServer.cast(from_guild_id(guild_id), {:remove, [link]})
   end
 
   @doc """
@@ -70,7 +71,7 @@ defmodule Cassian.Servers.Queue do
   """
   @spec delete_if_empty(guild_id :: Snowflake.t()) :: :ok | :noop
   def delete_if_empty(guild_id) do
-    if Enum.empty?(show(guild_id)) do
+    if exists?(guild_id) do
       GenServer.stop(from_guild_id(guild_id))
     else
       :noop
@@ -79,9 +80,30 @@ defmodule Cassian.Servers.Queue do
 
   # Private API
 
+  def handle_call({:show}, _from, state) do
+    {:reply, state, state}
+  end
+
+  def handle_call({:pop}, _from, state) do
+    {element, state} = List.pop_at(state, 0)
+    {:reply, element, state}
+  end
+
+  @doc false
+  def handle_cast({:remove, link}, state) do
+    state = state -- link
+    {:noreply, state}
+  end
+
+  @doc false
+  def handle_cast({:insert, link}, state) do
+    state = state ++ link
+    {:noreply, state}
+  end
+
   @doc false
   def start(guild_id, links) do
-    GenServer.start(__MODULE__, links, name: from_guild_id(guild_id))
+    GenServer.start_link(__MODULE__, links, name: from_guild_id(guild_id))
   end
 
   @doc false
