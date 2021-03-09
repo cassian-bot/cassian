@@ -14,8 +14,8 @@ defmodule Cassian.Utils do
   @doc """
   Check whether a link is a YouTube one.
   """
-  @spec youtube_link?(url :: String.t()) :: boolean()
-  def youtube_link?(url) do
+  @spec youtube_metadata(url :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
+  def youtube_metadata(url) do
     url =
       "https://www.youtube.com/oembed?url=#{url}&format=json"
 
@@ -25,10 +25,10 @@ defmodule Cassian.Utils do
     ]
 
     case HTTPoison.get(url, headers) do
-      {:ok, %HTTPoison.Response{status_code: 200}} ->
-        true
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {true, body |> Poison.decode!()}
       _ ->
-        false
+        {false, :noop}
     end
   end
 end

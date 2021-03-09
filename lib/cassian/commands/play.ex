@@ -12,27 +12,41 @@ defmodule Cassian.Commands.Play do
   def execute(message, args) do
     link = Enum.fetch!(args, 0)
 
-    unless youtube_link?(link) do
-      Nostrum.Api.create_message!(message.channel_id, embed: not_valid_embed())
-    else
-      case VoiceUtils.get_sender_voice_id(message) do
-        {:ok, {guild_id, voice_id}} ->
-          if VoiceUtils.can_connect?(guild_id, voice_id) do
-            handle_voice(guild_id, voice_id, message, args)
-          else
-            Nostrum.Api.create_message!(message.channel_id, embed: no_perms_embed())
-          end
-        {:error, :noop} ->
-          Nostrum.Api.create_message!(message.channel_id, embed: no_channel_embed())
-      end
+    case youtube_metadata(link) do
+      {false, :noop} ->
+        Nostrum.Api.create_message!(message.channel_id, embed: not_valid_embed())
+      {true, metadata} ->
+        handle_song(message, link, metadata)
+    end
+  end
+
+  def handle_song(message, link, metadata) do
+    case VoiceUtils.get_sender_voice_id(message) do
+      {:ok, {guild_id, voice_id}} ->
+        if VoiceUtils.can_connect?(guild_id, voice_id) do
+          handle_voice(guild_id, voice_id, message, link, metadata)
+        else
+          Nostrum.Api.create_message!(message.channel_id, embed: no_perms_embed())
+        end
+      {:error, :noop} ->
+        Nostrum.Api.create_message!(message.channel_id, embed: no_channel_embed())
     end
   end
 
   alias Nostrum.Struct.Embed
 
-  def handle_voice(guild_id, voice_id, _message, args) do
+  def handle_voice(guild_id, voice_id, message, link, metadata) do
     VoiceUtils.join_or_switch_voice(guild_id, voice_id)
-    VoiceUtils.play_when_ready(Enum.fetch!(args, 0), guild_id, 50)
+    VoiceUtils.play_when_ready(link, guild_id, 50)
+    Nostrum.Api.create_message!(message.channel_id, embed: youtube_video_embed(metadata, link))
+  end
+
+  def youtube_video_embed(metadata, link) do
+    EmbedUtils.create_empty_embed!()
+    |> Cassian.Utils.Embed.put_color_on_embed("#ff0000")
+    |> Embed.put_title("Playing: #{metadata["title"]}")
+    |> Embed.put_description("The music should start now.")
+    |> Embed.put_url(link)
   end
 
   def not_valid_embed() do
