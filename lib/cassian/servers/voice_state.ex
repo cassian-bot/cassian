@@ -18,8 +18,7 @@ defmodule Cassian.Servers.VoiceState do
   """
   @spec delete(guild_id :: Snowflake.t()) :: :ok
   def delete(guild_id) do
-    if exists?(guild_id), do:
-      GenServer.stop(from_guild_id(guild_id))
+    if exists?(guild_id), do: GenServer.stop(from_guild_id(guild_id))
     :ok
   end
 

@@ -16,17 +16,17 @@ defmodule Cassian.Utils do
   """
   @spec youtube_metadata(url :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
   def youtube_metadata(url) do
-    url =
-      "https://www.youtube.com/oembed?url=#{url}&format=json"
+    url = "https://www.youtube.com/oembed?url=#{url}&format=json"
 
     headers = [
-      "User-agent": "#{Cassian.username!()} #{Cassian.version!}",
-      "Accept": "Application/json; Charset=utf-8"
+      "User-agent": "#{Cassian.username!()} #{Cassian.version!()}",
+      Accept: "Application/json; Charset=utf-8"
     ]
 
     case HTTPoison.get(url, headers) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {true, body |> Poison.decode!()}
+
       _ ->
         {false, :noop}
     end

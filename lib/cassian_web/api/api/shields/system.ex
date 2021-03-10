@@ -9,7 +9,7 @@ defmodule CassianWeb.Controllers.Api.Shields.System do
       label: "Elixir",
       color: "#fff",
       style: "flat-square",
-      message: System.version
+      message: System.version()
     }
   end
 end

@@ -1,5 +1,4 @@
 defmodule Cassian.Consumer do
-
   @moduledoc """
   The main consumer module. This handles all of the events
   from nostrum and redirects them to the modules which use them.
@@ -13,8 +12,8 @@ defmodule Cassian.Consumer do
 
   @doc false
   def handle_event({:MESSAGE_CREATE, message, _ws_state}) do
-    if (!message.author.bot and is_cassian_command? message), do:
-      Cassian.Consumers.Command.handle_message(message)
+    if !message.author.bot and is_cassian_command?(message),
+      do: Cassian.Consumers.Command.handle_message(message)
   end
 
   @dialyzer {:no_return, {:update_status, 3}}
@@ -46,7 +45,7 @@ defmodule Cassian.Consumer do
   def is_cassian_command?(message) do
     message.content
     |> String.trim_leading()
-    |> String.downcase
-    |> String.starts_with?(Cassian.command_prefix!)
+    |> String.downcase()
+    |> String.starts_with?(Cassian.command_prefix!())
   end
 end

@@ -18,7 +18,7 @@ defmodule Cassian.Utils.Embed do
   end
 
   def put_error_color_on_embed(embed) do
-    put_color(embed, 16711731)
+    put_color(embed, 16_711_731)
   end
 
   @doc """

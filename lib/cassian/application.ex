@@ -14,16 +14,17 @@ defmodule Cassian.Application do
   def add_children() do
     alias Cassian.Consumer
 
-    children = [
-      %{
-        id: Consumer,
-        start: {Consumer, :start_link, []}
-      },
-      %{
-        id: Cassian.CommandCache,
-        start: {ConCache, :start_link, [[name: :command_cache, ttl_check_interval: false]]}
-      }
-    ] ++ web_child!()
+    children =
+      [
+        %{
+          id: Consumer,
+          start: {Consumer, :start_link, []}
+        },
+        %{
+          id: Cassian.CommandCache,
+          start: {ConCache, :start_link, [[name: :command_cache, ttl_check_interval: false]]}
+        }
+      ] ++ web_child!()
 
     children
     |> Enum.each(fn child -> DynamicSupervisor.start_child(Cassian.Supervisor, child) end)

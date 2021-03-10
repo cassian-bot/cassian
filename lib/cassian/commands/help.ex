@@ -29,9 +29,9 @@ defmodule Cassian.Commands.Help do
       |> Embed.put_description("Help for all of the commands!")
       |> Embed.put_thumbnail(Cassian.get_own_avatar())
 
-    Enum.reduce(Cassian.commands!, embed, &add_command/2)
+    Enum.reduce(Cassian.commands!(), embed, &add_command/2)
   end
 
-  def add_command({caller, module}, embed), do:
-    Embed.put_field(embed, "`#{Cassian.command_prefix!()}#{caller}`", "#{module.desc}", false)
+  def add_command({caller, module}, embed),
+    do: Embed.put_field(embed, "`#{Cassian.command_prefix!()}#{caller}`", "#{module.desc}", false)
 end

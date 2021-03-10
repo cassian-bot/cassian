@@ -27,8 +27,7 @@ defmodule Cassian.Utils.Voice do
   """
   @spec can_connect?(guild_id :: Snowflake.t(), voice_id :: Snowflake.t()) :: boolean()
   def can_connect?(guild_id, voice_id) do
-    perms =
-      VoicePermissions.my_channel_permissions(guild_id, voice_id)
+    perms = VoicePermissions.my_channel_permissions(guild_id, voice_id)
 
     perms.administrator || perms.connect
   end
@@ -39,8 +38,10 @@ defmodule Cassian.Utils.Voice do
   Play the music with a max retry amount. If the retry amount is less than zero it will just fail automatically.
   Every retry approx lasts for approx. `100ms`.
   """
-  @spec play_when_ready(link :: String.t(), guild_id :: Snowflake.t(), max_retries :: integer()) :: {:ok, :ok | any()} | {:error, :failed_max}
-  def play_when_ready(link, guild_id, max_retries) when is_integer(max_retries) and max_retries > 0 do
+  @spec play_when_ready(link :: String.t(), guild_id :: Snowflake.t(), max_retries :: integer()) ::
+          {:ok, :ok | any()} | {:error, :failed_max}
+  def play_when_ready(link, guild_id, max_retries)
+      when is_integer(max_retries) and max_retries > 0 do
     if Nostrum.Voice.ready?(guild_id) do
       {:ok, Nostrum.Voice.play(guild_id, link, :ytdl)}
     else
@@ -70,7 +71,8 @@ defmodule Cassian.Utils.Voice do
   @doc """
   Safely the current voice id in which the user is. Also returns the guild id.
   """
-  @spec get_sender_voice_id(message :: Nostrum.Struct.Channel) :: {:ok, {guild_id :: String.t(), channel_id :: String.t()}} | {:error, :noop}
+  @spec get_sender_voice_id(message :: Nostrum.Struct.Channel) ::
+          {:ok, {guild_id :: String.t(), channel_id :: String.t()}} | {:error, :noop}
   def get_sender_voice_id(message) do
     voice_id =
       GuildCache.get!(message.guild_id)

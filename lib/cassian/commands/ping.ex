@@ -13,9 +13,9 @@ defmodule Cassian.Commands.Ping do
   def execute(message, _args) do
     {:ok, request_time, _} =
       message.timestamp
-      |> DateTime.from_iso8601
+      |> DateTime.from_iso8601()
 
-    recieved_time = DateTime.utc_now
+    recieved_time = DateTime.utc_now()
 
     request_recieved_diff =
       recieved_time

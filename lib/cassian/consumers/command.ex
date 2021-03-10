@@ -22,14 +22,18 @@ defmodule Cassian.Consumers.Command do
       {:ok, module} ->
         module.execute(message, args)
         :ok
+
       _ ->
         :noop
     end
   end
 
   # Filter the prefix from the command in the tuple.
-  @spec filter_command({command :: String.t(), args :: list(String.t())}) :: {command :: String.t(), args :: list(String.t())}
-  defp filter_command({command, args}), do: {String.replace_leading(command, Cassian.command_prefix!, "") |> String.downcase(), args}
+  @spec filter_command({command :: String.t(), args :: list(String.t())}) ::
+          {command :: String.t(), args :: list(String.t())}
+  defp filter_command({command, args}),
+    do:
+      {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
 
   @doc """
   Get the associated module for the command name. Has a safe tuple based return.
@@ -38,7 +42,7 @@ defmodule Cassian.Consumers.Command do
   def associated_module(name) do
     if(ConCache.get(:command_cache, :loaded_bot_commands) != nil) do
       module = ConCache.get(:command_cache, name)
-      {(if module, do: :ok, else: :error), module || :noop }
+      {if(module, do: :ok, else: :error), module || :noop}
     else
       load_modules_cache()
       associated_module(name)
@@ -51,8 +55,10 @@ defmodule Cassian.Consumers.Command do
 
     name_modules_map =
       modules
-      |> Enum.filter(fn module -> Cassian.Behaviours.Command in (module.module_info(:attributes)[:behaviour] || []) end)
-      |> Enum.filter(fn module -> if Mix.env == :prod, do: module.ship?, else: true end)
+      |> Enum.filter(fn module ->
+        Cassian.Behaviours.Command in (module.module_info(:attributes)[:behaviour] || [])
+      end)
+      |> Enum.filter(fn module -> if Mix.env() == :prod, do: module.ship?, else: true end)
       |> Enum.reduce(%{}, fn module, acc -> Map.merge(acc, %{module.caller => module}) end)
 
     name_modules_map

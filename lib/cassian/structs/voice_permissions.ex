@@ -1,5 +1,4 @@
 defmodule Cassian.Structs.VoicePermissions do
-
   @moduledoc """
   Struct for the permissions of the bot. Generally this should be
   used per channel...
@@ -13,11 +12,11 @@ defmodule Cassian.Structs.VoicePermissions do
   ]
 
   @type t() :: %__MODULE__{
-    administrator: boolean(),
-    view_channel: boolean(),
-    connect: boolean(),
-    speak: boolean()
-  }
+          administrator: boolean(),
+          view_channel: boolean(),
+          connect: boolean(),
+          speak: boolean()
+        }
 
   @typedoc "Permission whether the bot is an admin."
   @type administrator :: boolean()
@@ -58,7 +57,11 @@ defmodule Cassian.Structs.VoicePermissions do
   @doc """
   Get the permission for a channel in a guild.
   """
-  @spec channel_permission(user :: Nostrum.Struct.User, guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) ::__MODULE__.t()
+  @spec channel_permission(
+          user :: Nostrum.Struct.User,
+          guild_id :: Snowflake.t(),
+          channel_id :: Snowflake.t()
+        ) :: __MODULE__.t()
   def channel_permission(user, guild_id, channel_id) do
     Util.channel_permissions(user, guild_id, channel_id)
     |> from_number()
@@ -67,7 +70,8 @@ defmodule Cassian.Structs.VoicePermissions do
   @doc """
   Get the permission for a channel in a guild for this bot.
   """
-  @spec my_channel_permissions(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) ::__MODULE__.t()
-  def my_channel_permissions(guild_id, channel_id), do:
-    channel_permission(Nostrum.Cache.Me.get(), guild_id, channel_id)
+  @spec my_channel_permissions(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) ::
+          __MODULE__.t()
+  def my_channel_permissions(guild_id, channel_id),
+    do: channel_permission(Nostrum.Cache.Me.get(), guild_id, channel_id)
 end

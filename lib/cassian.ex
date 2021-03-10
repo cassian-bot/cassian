@@ -1,5 +1,4 @@
 defmodule Cassian do
-
   @moduledoc """
   General module for the bot. Has all high-level API calls
   which might as well be used from external apps.
@@ -13,15 +12,14 @@ defmodule Cassian do
   The a map containing all of the commands and their associated modules
   """
   @spec commands! :: %{String.t() => Module}
-  def commands!, do:
-    Cassian.Consumers.Command.commands!
+  def commands!, do: Cassian.Consumers.Command.commands!()
 
   @doc """
   Get the avatar of the bot itself.
   """
   @spec get_own_avatar() :: String.t()
   def get_own_avatar,
-    do: Cassian.Utils.user_avatar(Me.get)
+    do: Cassian.Utils.user_avatar(Me.get())
 
   @doc """
   Get the command prefix of the bot from a server. if no server

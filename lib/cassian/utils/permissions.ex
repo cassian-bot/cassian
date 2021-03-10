@@ -10,7 +10,11 @@ defmodule Cassian.Utils.Permissions do
   Get the channel permission for the bot. Doesn't give a struct but rather a flag-number
   which can be later used to extract the permissions bits from (is a bit really because it's hexadecimal but okay)
   """
-  @spec channel_permissions(user :: Nostrum.Struct.User, guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) :: integer()
+  @spec channel_permissions(
+          user :: Nostrum.Struct.User,
+          guild_id :: Snowflake.t(),
+          channel_id :: Snowflake.t()
+        ) :: integer()
   def channel_permissions(user, guild_id, channel_id) do
     user_id = user.id
     roles = GuildCache.get!(guild_id).members[user_id].roles ++ [guild_role(guild_id).id]
@@ -22,7 +26,9 @@ defmodule Cassian.Utils.Permissions do
       |> Enum.reduce(%{allows: [], denies: []}, &accumulate_overs/2)
 
     perms =
-      Enum.reduce(overs.denies, server_permissions(guild_id), fn deny, perms -> perms &&& (~~~deny) end)
+      Enum.reduce(overs.denies, server_permissions(guild_id), fn deny, perms ->
+        perms &&& ~~~deny
+      end)
 
     Enum.reduce(overs.allows, perms, fn allow, perms -> perms ||| allow end)
   end
@@ -35,6 +41,7 @@ defmodule Cassian.Utils.Permissions do
     case overwrite.type do
       :role ->
         overwrite.id in roles
+
       :member ->
         overwrite.id == user_id
     end

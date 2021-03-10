@@ -15,6 +15,7 @@ defmodule Cassian.Commands.Play do
     case youtube_metadata(link) do
       {false, :noop} ->
         Nostrum.Api.create_message!(message.channel_id, embed: not_valid_embed())
+
       {true, metadata} ->
         handle_song(message, link, metadata)
     end
@@ -26,13 +27,23 @@ defmodule Cassian.Commands.Play do
         if VoiceUtils.can_connect?(guild_id, voice_id) do
           if Nostrum.Voice.playing?(guild_id) do
             Cassian.Servers.Queue.insert!(guild_id, link)
-            Nostrum.Api.create_message!(message.channel_id, embed: youtube_video_embed(metadata, link, "Enqueue", "The song will play as soon as the current is stopped."))
+
+            Nostrum.Api.create_message!(message.channel_id,
+              embed:
+                youtube_video_embed(
+                  metadata,
+                  link,
+                  "Enqueue",
+                  "The song will play as soon as the current is stopped."
+                )
+            )
           else
             handle_voice(guild_id, voice_id, message, link, metadata)
           end
         else
           Nostrum.Api.create_message!(message.channel_id, embed: no_perms_embed())
         end
+
       {:error, :noop} ->
         Nostrum.Api.create_message!(message.channel_id, embed: no_channel_embed())
     end
@@ -46,7 +57,12 @@ defmodule Cassian.Commands.Play do
     Nostrum.Api.create_message!(message.channel_id, embed: youtube_video_embed(metadata, link))
   end
 
-  def youtube_video_embed(metadata, link, action \\ "Playing", description \\ "The music should start soon.") do
+  def youtube_video_embed(
+        metadata,
+        link,
+        action \\ "Playing",
+        description \\ "The music should start soon."
+      ) do
     EmbedUtils.create_empty_embed!()
     |> Cassian.Utils.Embed.put_color_on_embed("#ff0000")
     |> Embed.put_title("#{action}: #{metadata["title"]}")
@@ -58,7 +74,9 @@ defmodule Cassian.Commands.Play do
     EmbedUtils.create_empty_embed!()
     |> EmbedUtils.put_error_color_on_embed()
     |> Embed.put_title("There is an issue my friend...")
-    |> Embed.put_description("It looks like that song is not present in my library. Maybe you misswrote it?")
+    |> Embed.put_description(
+      "It looks like that song is not present in my library. Maybe you misswrote it?"
+    )
   end
 
   def no_channel_embed() do
@@ -72,6 +90,8 @@ defmodule Cassian.Commands.Play do
     EmbedUtils.create_empty_embed!()
     |> EmbedUtils.put_error_color_on_embed()
     |> Embed.put_title("I kind of can't... y'know?")
-    |> Embed.put_description("I don't have the permissions to join the voice channel. **I** don't have?! ***The audacity!***")
+    |> Embed.put_description(
+      "I don't have the permissions to join the voice channel. **I** don't have?! ***The audacity!***"
+    )
   end
 end

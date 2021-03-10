@@ -12,5 +12,4 @@ defmodule CassianWeb.Controllers.Api.Shields.Guilds do
       logoColor: "#fff"
     }
   end
-
 end
