@@ -21,7 +21,11 @@ defmodule Cassian.Consumers.VoiceEvent do
   def voice_speaking_update(_)
 
   def voice_speaking_update(%SpeakingUpdate{guild_id: guild_id, speaking: false}) do
-    VoiceState.get!(guild_id) |> Map.put(:status, :noop) |> VoiceServer.put()
+    VoiceState.get!(guild_id)
+      |> Map.put(:status, :noop)
+      |> Map.put(:metadata, %Cassian.Structs.Metadata{})
+      |> VoiceServer.put()
+
     QueueManager.play_if_needed(guild_id)
   end
 
