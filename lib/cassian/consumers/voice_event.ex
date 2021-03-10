@@ -8,6 +8,8 @@ defmodule Cassian.Consumers.VoiceEvent do
   alias Cassian.Structs.VoiceState
   alias Cassian.Servers.VoiceState, as: VoiceServer
 
+  alias Cassian.Managers.QueueManager
+
   require Logger
 
   # For voice speaking
@@ -16,16 +18,11 @@ defmodule Cassian.Consumers.VoiceEvent do
   Handle the :VOICE_SPEAKING_UPDATE event. Pattern match when the bot
   stops speaking to delete the queue.
   """
+  def voice_speaking_update(_)
+
   def voice_speaking_update(%SpeakingUpdate{guild_id: guild_id, speaking: false}) do
     VoiceState.get!(guild_id) |> Map.put(:status, :noop) |> VoiceServer.put()
-
-    if Cassian.Servers.Queue.exists?(guild_id) do
-      handle_queue(guild_id, Cassian.Servers.Queue.empty?(guild_id))
-    end
-  end
-
-  def voice_speaking_update(%SpeakingUpdate{guild_id: guild_id, speaking: true}) do
-    VoiceState.get!(guild_id) |> VoiceState.play_and_save!()
+    QueueManager.play_if_needed(guild_id)
   end
 
   @doc false
@@ -49,14 +46,5 @@ defmodule Cassian.Consumers.VoiceEvent do
   @doc false
   def voice_state_update(_) do
     :noop
-  end
-
-  # General logic which is called by patterns
-
-  defp handle_queue(guild_id, true), do: Cassian.Servers.Queue.delete(guild_id)
-
-  defp handle_queue(guild_id, false) do
-    link = Cassian.Servers.Queue.pop!(guild_id)
-    Cassian.Utils.Voice.play_when_ready!(link, guild_id)
   end
 end

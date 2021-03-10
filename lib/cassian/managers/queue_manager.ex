@@ -11,14 +11,18 @@ defmodule Cassian.Managers.QueueManager do
   def play_if_needed(guild_id) do
     state = VoiceState.get!(guild_id)
 
-    if(state.status == :noop) do
-      metadata = Queue.pop!(guild_id)
-      Voice.play_when_ready!(metadata.youtube_link, guild_id)
+    if state.status == :noop and Queue.exists?(guild_id) do
+      unless Queue.show(guild_id) == [] do
+        metadata = Queue.pop!(guild_id)
+        Voice.play_when_ready!(metadata.youtube_link, guild_id)
 
-      state
-      |> Map.put(:metadata, metadata)
-      |> Map.put(:status, :playing)
-      |> VoiceState.put()
+        state
+        |> Map.put(:metadata, metadata)
+        |> Map.put(:status, :playing)
+        |> VoiceState.put()
+      else
+        Queue.delete(guild_id)
+      end
     end
   end
 end
