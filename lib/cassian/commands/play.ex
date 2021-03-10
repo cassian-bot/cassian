@@ -66,7 +66,7 @@ defmodule Cassian.Commands.Play do
   """
   def handle_connect(message, voice_id, metadata) do
     VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
-    QueueManager.insert!(message.guild_id, metadata)
+    QueueManager.insert!(message.guild_id, message.channel_id, metadata)
     QueueManager.play_if_needed(message.guild_id)
   end
 
