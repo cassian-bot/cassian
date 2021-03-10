@@ -25,6 +25,9 @@ defmodule Cassian.Structs.VoiceState do
   @typedoc "Integer representing at how many seconds a song was paused at"
   @type pause_seconds :: integer()
 
+  @doc """
+  Create a Struct connecting to this module. Metada is optional, it will be used for pausing.
+  """
   @spec create!(guild_id :: Snowflake.t(), metadata :: Map) :: __MODULE__.t()
   def create!(guild_id, metadata \\ %{}) do
     %__MODULE__{
@@ -39,6 +42,10 @@ defmodule Cassian.Structs.VoiceState do
 
   defdelegate get!(guild_id), to: VoiceState
 
+  @doc """
+  Update the status to playing and save.
+  """
+  @spec play_and_save!(state :: %__MODULE__{}) :: :ok
   def play_and_save!(state) do
     state |> Map.put(:status, :playing) |> VoiceState.put()
   end
