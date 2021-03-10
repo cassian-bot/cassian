@@ -26,24 +26,12 @@ defmodule Cassian.Consumer do
 
   @doc false
   def handle_event({:VOICE_SPEAKING_UPDATE, data, _}) do
-    guild_id = data.guild_id
-    unless data.speaking do
-      if Cassian.Servers.Queue.exists?(guild_id) do
-        unless Cassian.Servers.Queue.empty?(guild_id) do
-          link = Cassian.Servers.Queue.pop!(guild_id)
-          Cassian.Utils.Voice.play_when_ready!(link, guild_id)
-        else
-          Cassian.Servers.Queue.delete(guild_id)
-        end
-      end
-    end
+    Cassian.Consumers.VoiceEvent.voice_speaking_update(data)
   end
 
   @doc false
   def handle_event({:VOICE_STATE_UPDATE, data, _}) do
-    if !data.channel_id and data.member.user_id == Cassian.own_id() do
-      Cassian.Servers.Queue.delete(data.guild_id)
-    end
+    Cassian.Consumers.VoiceEvent.voice_state_update(data)
   end
 
   @doc false
