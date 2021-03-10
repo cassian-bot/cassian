@@ -8,13 +8,13 @@ A Discord bot for music written in Elixir.
 
 ## Table of contents
 
-- [About](##about)
-- [Note regarding Nostrum](##note-regarding-nostrm)
-- [Note regarding the web part](##note-regarding-the-web-part)
-- [System requirements](##system-requirements)
-- [Configuration](##configuration)
-- [Up 'n' runnin'](##up-'n'-runnin')
-- [Deploy to Gigalixir](##deploy-to-gigalixir)
+- [About](#about)
+- [Note regarding Nostrum](#note-regarding-nostrm)
+- [Note regarding the web part](#note-regarding-the-web-part)
+- [System requirements](#system-requirements)
+- [Configuration](#configuration)
+- [Up 'n' runnin'](#up-'n'-runnin')
+- [Deploy to Gigalixir](#deploy-to-gigalixir)
 
 ## About
 
