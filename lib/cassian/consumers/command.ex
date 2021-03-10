@@ -1,7 +1,12 @@
 defmodule Cassian.Consumers.Command do
+  @moduledoc """
+  Main logic for any command for this bot. Dynamically loads commands, caches them, matches them
+  and if it should, execute them. It's made in a way that you don't have to register new commands here
+  but rather it auto-detects.
+  """
+
   @doc """
   Handle the mssage. A message has been filtered which is for the bot.
-
   Dynamically find which module should be used for the command and continue on with that.
   """
   @spec handle_message(message :: Nostrum.Struct.Message) :: :ok | :noop
