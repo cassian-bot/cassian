@@ -7,7 +7,7 @@ defmodule Cassian.Servers.VoiceState do
 
   require Logger
 
-  @timeout 5_000
+  @timeout 60_000
 
   use GenServer
 
@@ -60,7 +60,7 @@ defmodule Cassian.Servers.VoiceState do
   @doc false
   def handle_cast({:put, new}, _state) do
     Logger.debug("Putting new value #{Poison.encode!(new)}")
-    {:reply, new, new, @timeout}
+    {:noreply, new, @timeout}
   end
 
   @doc false
@@ -84,6 +84,10 @@ defmodule Cassian.Servers.VoiceState do
     Logger.debug("Clossing #{Poison.encode!(state)}")
     Cassian.Utils.Voice.join_or_switch_voice(state.guild_id, nil)
     {:shutdown, :afk}
+  end
+
+  def terminate(:normal, _) do
+    :normal
   end
 
   @doc false

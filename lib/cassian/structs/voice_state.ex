@@ -34,4 +34,12 @@ defmodule Cassian.Structs.VoiceState do
       pause_seconds: 0
     }
   end
+
+  alias Cassian.Servers.VoiceState
+
+  defdelegate get!(guild_id), to: VoiceState
+
+  def play_and_save!(state) do
+    state |> Map.put(:status, :playing) |> VoiceState.put()
+  end
 end

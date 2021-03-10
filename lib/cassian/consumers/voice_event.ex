@@ -5,6 +5,11 @@ defmodule Cassian.Consumers.VoiceEvent do
 
   alias Nostrum.Struct.Event.SpeakingUpdate
 
+  alias Cassian.Structs.VoiceState
+  alias Cassian.Servers.VoiceState, as: VoiceServer
+
+  require Logger
+
   # For voice speaking
 
   @doc """
@@ -12,10 +17,15 @@ defmodule Cassian.Consumers.VoiceEvent do
   stops speaking to delete the queue.
   """
   def voice_speaking_update(%SpeakingUpdate{guild_id: guild_id, speaking: false}) do
-    if Cassian.Servers.Queue.exists?(guild_id),
-      do: handle_queue(guild_id, Cassian.Servers.Queue.empty?(guild_id))
+    VoiceState.get!(guild_id) |> Map.put(:status, :noop) |> VoiceServer.put()
 
-    :ok
+    if Cassian.Servers.Queue.exists?(guild_id) do
+      handle_queue(guild_id, Cassian.Servers.Queue.empty?(guild_id))
+    end
+  end
+
+  def voice_speaking_update(%SpeakingUpdate{guild_id: guild_id, speaking: true}) do
+    VoiceState.get!(guild_id) |> VoiceState.play_and_save!()
   end
 
   @doc false
@@ -29,7 +39,10 @@ defmodule Cassian.Consumers.VoiceEvent do
   Pattern match the current voice state.
   """
   def voice_state_update(%{channel_id: nil, guild_id: guild_id, user_id: user_id}) do
-    if user_id == Cassian.own_id(), do: Cassian.Servers.Queue.delete(guild_id)
+    if user_id == Cassian.own_id() do
+      Cassian.Servers.Queue.delete(guild_id)
+      VoiceServer.delete(guild_id)
+    end
     :ok
   end
 
