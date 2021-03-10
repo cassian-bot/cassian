@@ -4,7 +4,7 @@ defmodule Cassian.Commands.Play do
   import Cassian.Utils
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
-  alias Cassian.Servers.{VoiceState, Queue}
+  alias Cassian.Managers.QueueManager
 
   alias Nostrum.Api
 
@@ -66,16 +66,8 @@ defmodule Cassian.Commands.Play do
   """
   def handle_connect(message, voice_id, metadata) do
     VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
-    VoiceState.get!(message.guild_id) # not using return of this, just creating.
-    enqueue(message, metadata)
-  end
-
-  @doc """
-  Enqueue the song. Afterwards send a message to (TODO: A process) to start with the song.
-  """
-  def enqueue(message, metadata) do
-    Queue.insert!(message.guild_id, metadata)
-    # TODO: notify process to play the song.
+    QueueManager.insert!(message.guild_id, metadata)
+    QueueManager.play_if_needed(message.guild_id)
   end
 
   # Error handlers
