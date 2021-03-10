@@ -29,4 +29,11 @@ defmodule Cassian.Utils.Embed do
     %Nostrum.Struct.Embed{}
     |> put_color_on_embed()
   end
+
+  def generate_error_embed(title, description) do
+    create_empty_embed!()
+    |> put_error_color_on_embed()
+    |> Embed.put_title(title)
+    |> Embed.put_description(description)
+  end
 end

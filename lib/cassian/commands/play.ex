@@ -4,6 +4,7 @@ defmodule Cassian.Commands.Play do
   import Cassian.Utils
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
+  alias Cassian.Servers.{VoiceState, Queue}
 
   alias Nostrum.Api
 
@@ -11,139 +12,99 @@ defmodule Cassian.Commands.Play do
   def caller, do: "play"
   def desc, do: "Play music in your voice channel!"
 
+  # Main logic pipe
+
   def execute(message, args) do
-    link = Enum.fetch!(args, 0)
+    handle_request(message, args)
+  end
 
-    case youtube_metadata(link) do
-      {true, metadata} ->
-        VoiceUtils.get_sender_voice_id(message)
-        |> handle_request(message: message, link: link, metadata: metadata)
+  @doc """
+  Handle the request. Continues with the rest of the logic pipe or
+  sends an embed message that the user isn't connected to channel.
+  """
+  def handle_request(message, args) do
+    case VoiceUtils.get_sender_voice_id(message) do
+      {:ok, {_guild_id, voice_id}} ->
+        handle_connect_possibility(message, voice_id, args)
 
-      {false, :noop} ->
-        Api.create_message!(message.channel_id, embed: not_valid_embed())
+      # THe user is not in a voice channel...
+      {:error, :noop} ->
+        no_channel_error(message)
     end
   end
 
-  # Handle connect request
+  @doc """
+  Determine whether you have the possiblity to connect. Continues
+  with the rest of the logic pipe or sends an embed message
+  that the bot doesn't have permission to connect.
+  """
+  def handle_connect_possibility(message, voice_id, args) do
+    if VoiceUtils.can_connect?(message.guild_id, voice_id), do:
+      handle_metadata(message, voice_id, args),
+    else:
+      no_permissions_error(message)
+  end
 
   @doc """
-  Handle the request for the command. The first argument is pattern-matched whether
-  someone is in a channel. See `Cassian.Utils.Voice.get_sender_voice_id/1`
-  for info about the first argument.
-
-  It either continues with the request or notifies the user that
-  they can't play music if they're not in a voice channel..
+  It is determined that the caller user is in a voice channel and that the bot has permissions
+  to connect. Awesome. Now check if the link metadata is correct. If it is correct, continue with the
+  logic pipe or send an embed that the link is not correct.
   """
-  def handle_request({:ok, {guild_id, voice_id}}, values) do
-    values = values ++ [guild_id: guild_id, voice_id: voice_id]
+  def handle_metadata(message, voice_id, args) do
+    case youtube_metadata(Enum.fetch!(args, 0)) do
+      {true, metadata} ->
+        handle_connect(message, voice_id, metadata)
 
-    VoiceUtils.can_connect?(guild_id, voice_id)
-    |> handle_connect(values)
+      {false, link} ->
+        invalid_link_error(message, link)
+    end
   end
-
-  @doc false
-  def handle_request({:error, :noop}, values), do:
-    Nostrum.Api.create_message!(extract(values, :message).channel_id, embed: no_channel_embed())
 
   @doc """
-  Try to play the song if you have permissions. First argument is meant whether
-  you have permissions to play in the voice channel.
+  Everything is A-ok. You can connect and the link is valid. Connect to the voice channel and
+  cache the voice state. Continue wth the pipeline.
   """
-  def handle_connect(true, values) do
-    Nostrum.Voice.playing?(extract(values, :guild_id))
-    |> handle_play(values)
+  def handle_connect(message, voice_id, metadata) do
+    VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
+    VoiceState.get!(message.guild_id) # not using return of this, just creating.
+    enqueue(message, metadata)
   end
-
-  @doc false
-  def handle_connect(false, values), do:
-    Api.create_message!(extract(values, :message).channel_id, embed: no_perms_embed())
-
-  # Handle play
 
   @doc """
-  Play or enqueue the song.
+  Enqueue the song. Afterwards send a message to (TODO: A process) to start with the song.
   """
-  def handle_play(false, values) do
-    handle_voice(values)
+  def enqueue(message, metadata) do
+    Queue.insert!(message.guild_id, metadata)
+    # TODO: notify process to play the song.
   end
 
-  @doc false
-  def handle_play(true, values) do
-    Cassian.Servers.Queue.insert!(extract(values, :guild_id), extract(values, :link))
+  # Error handlers
 
-    Api.create_message!(extract(values, :message).channel_id,
-      embed:
-        youtube_video_embed(
-          extract(values, :metadata),
-          extract(values, :link),
-          "Enqueue",
-          "The song will play as soon as the current is stopped."
-        )
+  defp send_embed(embed, message) do
+    Api.create_message(message.channel_id, embed: embed)
+  end
+
+  def no_channel_error(message) do
+    EmbedUtils.generate_error_embed(
+      "Hey you... You're not in a voice channel.",
+      "I can't play any music if you're not a voice channel. Join one first."
     )
+    |> send_embed(message)
   end
 
-  #
-
-  alias Nostrum.Struct.Embed
-
-  def handle_voice(values) do
-    VoiceUtils.join_or_switch_voice(
-      extract(values, :guild_id),
-      extract(values, :voice_id)
+  def no_permissions_error(message) do
+    EmbedUtils.generate_error_embed(
+      "And how do you think that's possible?",
+      "I don't have the permissions to play music there... Fix it up first."
     )
-    VoiceUtils.play_when_ready!(
-      extract(values, :link),
-      extract(values, :guild_id)
+    |> send_embed(message)
+  end
+
+  def invalid_link_error(message, _link) do
+    EmbedUtils.generate_error_embed(
+      "Yeah, that won't work.",
+      "The link you tried to provide me isn't working. Recheck it."
     )
-    Api.create_message!(
-      extract(values, :message).channel_id,
-      embed: youtube_video_embed(
-        extract(values, :metadata),
-        extract(values, :link)
-      )
-    )
-  end
-
-  def youtube_video_embed(
-        metadata,
-        link,
-        action \\ "Playing",
-        description \\ "The music should start soon."
-      ) do
-    EmbedUtils.create_empty_embed!()
-    |> Cassian.Utils.Embed.put_color_on_embed("#ff0000")
-    |> Embed.put_title("#{action}: #{metadata["title"]}")
-    |> Embed.put_description(description)
-    |> Embed.put_url(link)
-  end
-
-  def not_valid_embed() do
-    EmbedUtils.create_empty_embed!()
-    |> EmbedUtils.put_error_color_on_embed()
-    |> Embed.put_title("There is an issue my friend...")
-    |> Embed.put_description(
-      "It looks like that song is not present in my library. Maybe you misswrote it?"
-    )
-  end
-
-  def no_channel_embed() do
-    EmbedUtils.create_empty_embed!()
-    |> EmbedUtils.put_error_color_on_embed()
-    |> Embed.put_title("Hold it right there!")
-    |> Embed.put_description("You're not in a voice channel! You won't bamboozle _me_ this time!")
-  end
-
-  def no_perms_embed() do
-    EmbedUtils.create_empty_embed!()
-    |> EmbedUtils.put_error_color_on_embed()
-    |> Embed.put_title("I kind of can't... y'know?")
-    |> Embed.put_description(
-      "I don't have the permissions to join the voice channel. **I** don't have?! ***The audacity!***"
-    )
-  end
-
-  @doc false
-  defp extract(values, atom) do
-    Keyword.fetch!(values, atom)
+    |> send_embed(message)
   end
 end
