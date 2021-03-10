@@ -21,7 +21,7 @@ defmodule Cassian.Consumer do
 
   @doc false
   def handle_event({:READY, _, _}) do
-    Nostrum.Api.update_status("Spotify", "spotify music", 1)
+    Nostrum.Api.update_status("", "music 🎶", 2)
   end
 
   @doc false
