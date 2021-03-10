@@ -55,8 +55,8 @@ defmodule Cassian.Commands.Play do
       {true, metadata} ->
         handle_connect(message, voice_id, metadata)
 
-      {false, link} ->
-        invalid_link_error(message, link)
+      {false, :noop} ->
+        invalid_link_error(message)
     end
   end
 
@@ -80,10 +80,14 @@ defmodule Cassian.Commands.Play do
 
   # Error handlers
 
+  @doc false
   defp send_embed(embed, message) do
     Api.create_message(message.channel_id, embed: embed)
   end
 
+  @doc """
+  Generate and send the embed for when a user isn't in a voice channel.
+  """
   def no_channel_error(message) do
     EmbedUtils.generate_error_embed(
       "Hey you... You're not in a voice channel.",
@@ -92,6 +96,10 @@ defmodule Cassian.Commands.Play do
     |> send_embed(message)
   end
 
+  @doc """
+  Generate and send the embed for when the bot doesn't have permissions to view, connect or
+  speak in a channel.
+  """
   def no_permissions_error(message) do
     EmbedUtils.generate_error_embed(
       "And how do you think that's possible?",
@@ -100,7 +108,10 @@ defmodule Cassian.Commands.Play do
     |> send_embed(message)
   end
 
-  def invalid_link_error(message, _link) do
+  @doc """
+  Tell the user that the link is not valid.
+  """
+  def invalid_link_error(message) do
     EmbedUtils.generate_error_embed(
       "Yeah, that won't work.",
       "The link you tried to provide me isn't working. Recheck it."
