@@ -5,6 +5,8 @@ defmodule Cassian.Commands.Play do
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
 
+  alias Nostrum.Api
+
   def ship?, do: true
   def caller, do: "play"
   def desc, do: "Play music in your voice channel!"
@@ -13,48 +15,77 @@ defmodule Cassian.Commands.Play do
     link = Enum.fetch!(args, 0)
 
     case youtube_metadata(link) do
-      {false, :noop} ->
-        Nostrum.Api.create_message!(message.channel_id, embed: not_valid_embed())
-
       {true, metadata} ->
-        handle_song(message, link, metadata)
+        VoiceUtils.get_sender_voice_id(message)
+        |> handle_request(message: message, link: link, metadata: metadata)
+
+      {false, :noop} ->
+        Api.create_message!(message.channel_id, embed: not_valid_embed())
     end
   end
 
-  def handle_song(message, link, metadata) do
-    case VoiceUtils.get_sender_voice_id(message) do
-      {:ok, {guild_id, voice_id}} ->
-        if VoiceUtils.can_connect?(guild_id, voice_id) do
-          if Nostrum.Voice.playing?(guild_id) do
-            Cassian.Servers.Queue.insert!(guild_id, link)
+  # Handle connect request
 
-            Nostrum.Api.create_message!(message.channel_id,
-              embed:
-                youtube_video_embed(
-                  metadata,
-                  link,
-                  "Enqueue",
-                  "The song will play as soon as the current is stopped."
-                )
-            )
-          else
-            handle_voice(guild_id, voice_id, message, link, metadata)
-          end
-        else
-          Nostrum.Api.create_message!(message.channel_id, embed: no_perms_embed())
-        end
+  def handle_request({:ok, {guild_id, voice_id}}, values) do
+    values = values ++ [guild_id: guild_id, voice_id: voice_id]
 
-      {:error, :noop} ->
-        Nostrum.Api.create_message!(message.channel_id, embed: no_channel_embed())
-    end
+    VoiceUtils.can_connect?(guild_id, voice_id)
+    |> handle_connect(values)
   end
+
+  def handle_request({:error, :noop}, values), do:
+    Nostrum.Api.create_message!(extract(values, :message).channel_id, embed: no_channel_embed())
+
+  # Able to connect
+
+  def handle_connect(true, values) do
+    Nostrum.Voice.playing?(extract(values, :guild_id))
+    |> handle_play(values)
+  end
+
+  def handle_connect(false, values), do:
+    Api.create_message!(extract(values, :message).channel_id, embed: no_perms_embed())
+
+  # Handle play
+
+  def handle_play(true, values) do
+    Cassian.Servers.Queue.insert!(extract(values, :guild_id), extract(values, :link))
+
+    Api.create_message!(extract(values, :message).channel_id,
+      embed:
+        youtube_video_embed(
+          extract(values, :metadata),
+          extract(values, :link),
+          "Enqueue",
+          "The song will play as soon as the current is stopped."
+        )
+    )
+  end
+
+  def handle_play(false, values) do
+    handle_voice(values)
+  end
+
+  #
 
   alias Nostrum.Struct.Embed
 
-  def handle_voice(guild_id, voice_id, message, link, metadata) do
-    VoiceUtils.join_or_switch_voice(guild_id, voice_id)
-    VoiceUtils.play_when_ready(link, guild_id, 50)
-    Nostrum.Api.create_message!(message.channel_id, embed: youtube_video_embed(metadata, link))
+  def handle_voice(values) do
+    VoiceUtils.join_or_switch_voice(
+      extract(values, :guild_id),
+      extract(values, :voice_id)
+    )
+    VoiceUtils.play_when_ready!(
+      extract(values, :link),
+      extract(values, :guild_id)
+    )
+    Api.create_message!(
+      extract(values, :voice_id),
+      embed: youtube_video_embed(
+        extract(values, :metadata),
+        extract(values, :link)
+      )
+    )
   end
 
   def youtube_video_embed(
@@ -93,5 +124,10 @@ defmodule Cassian.Commands.Play do
     |> Embed.put_description(
       "I don't have the permissions to join the voice channel. **I** don't have?! ***The audacity!***"
     )
+  end
+
+  @doc false
+  defp extract(values, atom) do
+    Keyword.fetch!(values, atom)
   end
 end
