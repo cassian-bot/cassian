@@ -9,7 +9,7 @@ A Discord bot for music written in Elixir.
 ## Table of contents
 
 - [About](#about)
-- [Note regarding Nostrum](#note-regarding-nostrm)
+- [Note regarding Nostrum](#note-regarding-nostrum)
 - [Note regarding the web part](#note-regarding-the-web-part)
 - [System requirements](#system-requirements)
 - [Configuration](#configuration)
