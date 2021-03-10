@@ -11,12 +11,14 @@ defmodule Cassian.Utils do
     "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png"
   end
 
+  alias Cassian.Structs.Metadata
+
   @doc """
   Check whether a link is a YouTube one.
   """
-  @spec youtube_metadata(url :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
-  def youtube_metadata(url) do
-    url = "https://www.youtube.com/oembed?url=#{url}&format=json"
+  @spec youtube_metadata(link :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
+  def youtube_metadata(link) do
+    url = "https://www.youtube.com/oembed?url=#{link}&format=json"
 
     headers = [
       "User-agent": "#{Cassian.username!()} #{Cassian.version!()}",
@@ -25,7 +27,7 @@ defmodule Cassian.Utils do
 
     case HTTPoison.get(url, headers) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {true, body |> Poison.decode!()}
+        {true, body |> Poison.decode!() |> Metadata.from_youtube_hash(link)}
 
       _ ->
         {false, :noop}
