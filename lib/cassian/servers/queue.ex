@@ -1,9 +1,10 @@
 defmodule Cassian.Servers.Queue do
   @moduledoc """
-  A GenServer representing a queue for a guild.
+  A GenServer representing a queue for a guild. Stores song metadatas to access details later.
   """
 
   use GenServer
+  alias Cassian.Structs.Metadata
 
   @doc """
   Check is a Queue exists for a guild.
@@ -14,46 +15,46 @@ defmodule Cassian.Servers.Queue do
   end
 
   @doc """
-  Insert link into a queue, won't work if the Queue doesn't
+  Insert metadata into a queue, won't work if the Queue doesn't
   exist.
   """
-  @spec insert(guild_id :: Snowflake.t(), link :: String.t()) :: :ok
-  def insert(guild_id, link) do
-    GenServer.cast(from_guild_id(guild_id), {:insert, [link]})
+  @spec insert(guild_id :: Snowflake.t(), metadata :: %Metadata{}) :: :ok
+  def insert(guild_id, metadata) do
+    GenServer.cast(from_guild_id(guild_id), {:insert, metadata})
   end
 
   @doc """
-  Insert a link into a queue. If the queue doesn't exist, start it.
+  Insert a metdata into a queue. If the queue doesn't exist, start it.
   """
-  @spec insert!(guild_id :: Snowflake.t(), link :: String.t()) :: :ok
-  def insert!(guild_id, link) do
+  @spec insert!(guild_id :: Snowflake.t(), metadata :: %Metadata{}) :: :ok
+  def insert!(guild_id, metadata) do
     unless exists?(guild_id) do
-      start(guild_id, [link])
+      start(guild_id, metadata)
     else
-      insert(guild_id, link)
+      insert(guild_id, metadata)
     end
   end
 
   @doc """
-  Pop a link out of the queue.
+  Pop a metadata out of the queue.
   """
-  @spec pop!(guild_id :: Snowflake.t()) :: String.t()
+  @spec pop!(guild_id :: Snowflake.t()) :: %Metadata{}
   def pop!(guild_id) do
     GenServer.call(from_guild_id(guild_id), {:pop})
   end
 
   @doc """
-  Remove a specific link out of the queue.
+  Remove a metadata out of the queue.
   """
-  @spec remove!(guild_id :: Snowflake.t(), link :: String.t()) :: :ok
+  @spec remove!(guild_id :: Snowflake.t(), metadata :: %Metadata{}) :: :ok
   def remove!(guild_id, link) do
     GenServer.cast(from_guild_id(guild_id), {:remove, [link]})
   end
 
   @doc """
-  Show all of the songs in the queue.
+  Show all of the metadatas in the queue.
   """
-  @spec show(guild_id :: Snowflake.t()) :: list(String.t())
+  @spec show(guild_id :: Snowflake.t()) :: list(%Metadata{})
   def show(guild_id) do
     GenServer.call(from_guild_id(guild_id), {:show})
   end
@@ -84,25 +85,25 @@ defmodule Cassian.Servers.Queue do
 
   @doc false
   def handle_call({:pop}, _from, state) do
-    {element, state} = List.pop_at(state, 0)
-    {:reply, element, state}
+    {metadata, state} = List.pop_at(state, 0)
+    {:reply, metadata, state}
   end
 
   @doc false
-  def handle_cast({:remove, link}, state) do
-    state = state -- link
+  def handle_cast({:remove, metadata}, state) do
+    state = state -- [metadata]
     {:noreply, state}
   end
 
   @doc false
-  def handle_cast({:insert, link}, state) do
-    state = state ++ link
+  def handle_cast({:insert, metadata}, state) do
+    state = state ++ [metadata]
     {:noreply, state}
   end
 
   @doc false
-  def start(guild_id, links) do
-    GenServer.start_link(__MODULE__, links, name: from_guild_id(guild_id))
+  def start(guild_id, metadata) do
+    GenServer.start_link(__MODULE__, [metadata], name: from_guild_id(guild_id))
   end
 
   @doc false
