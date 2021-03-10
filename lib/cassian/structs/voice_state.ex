@@ -25,8 +25,8 @@ defmodule Cassian.Structs.VoiceState do
   @typedoc "Integer representing at how many seconds a song was paused at"
   @type pause_seconds :: integer()
 
-  @spec create_new(guild_id :: Snowflake.t(), metadata :: Map) :: __MODULE__.t()
-  def create_new(guild_id, metadata \\ %{}) do
+  @spec create!(guild_id :: Snowflake.t(), metadata :: Map) :: __MODULE__.t()
+  def create!(guild_id, metadata \\ %{}) do
     %__MODULE__{
       guild_id: guild_id,
       metadata: metadata,
