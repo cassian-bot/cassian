@@ -26,6 +26,14 @@ defmodule Cassian.Commands.Play do
 
   # Handle connect request
 
+  @doc """
+  Handle the request for the command. The first argument is pattern-matched whether
+  someone is in a channel. See `Cassian.Utils.Voice.get_sender_voice_id/1`
+  for info about the first argument.
+
+  It either continues with the request or notifies the user that
+  they can't play music if they're not in a voice channel..
+  """
   def handle_request({:ok, {guild_id, voice_id}}, values) do
     values = values ++ [guild_id: guild_id, voice_id: voice_id]
 
@@ -33,21 +41,33 @@ defmodule Cassian.Commands.Play do
     |> handle_connect(values)
   end
 
+  @doc false
   def handle_request({:error, :noop}, values), do:
     Nostrum.Api.create_message!(extract(values, :message).channel_id, embed: no_channel_embed())
 
-  # Able to connect
-
+  @doc """
+  Try to play the song if you have permissions. First argument is meant whether
+  you have permissions to play in the voice channel.
+  """
   def handle_connect(true, values) do
     Nostrum.Voice.playing?(extract(values, :guild_id))
     |> handle_play(values)
   end
 
+  @doc false
   def handle_connect(false, values), do:
     Api.create_message!(extract(values, :message).channel_id, embed: no_perms_embed())
 
   # Handle play
 
+  @doc """
+  Play or enqueue the song.
+  """
+  def handle_play(false, values) do
+    handle_voice(values)
+  end
+
+  @doc false
   def handle_play(true, values) do
     Cassian.Servers.Queue.insert!(extract(values, :guild_id), extract(values, :link))
 
@@ -60,10 +80,6 @@ defmodule Cassian.Commands.Play do
           "The song will play as soon as the current is stopped."
         )
     )
-  end
-
-  def handle_play(false, values) do
-    handle_voice(values)
   end
 
   #
@@ -80,7 +96,7 @@ defmodule Cassian.Commands.Play do
       extract(values, :guild_id)
     )
     Api.create_message!(
-      extract(values, :voice_id),
+      extract(values, :message).channel_id,
       embed: youtube_video_embed(
         extract(values, :metadata),
         extract(values, :link)
