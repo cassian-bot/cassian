@@ -1,8 +1,7 @@
 defmodule Cassian.Commands.Stop do
   use Cassian.Behaviours.Command
   alias Cassian.Managers.{QueueManager, MessageManager}
-  alias Cassian.Servers.VoiceState
-  alias Cassian.Structs.Metadata
+  alias Cassian.Structs.{Metadata, VoiceState}
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Nostrum.Struct.Embed
 

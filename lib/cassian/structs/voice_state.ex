@@ -48,12 +48,7 @@ defmodule Cassian.Structs.VoiceState do
   alias Cassian.Servers.VoiceState
 
   defdelegate get!(guild_id), to: VoiceState
-
-  @doc """
-  Update the status to playing and save.
-  """
-  @spec play_and_save!(state :: %__MODULE__{}) :: :ok
-  def play_and_save!(state) do
-    state |> Map.put(:status, :playing) |> VoiceState.put()
-  end
+  defdelegate get(guild_id), to: VoiceState
+  defdelegate put(state), to: VoiceState
+  defdelegate delete(guild_id), to: VoiceState
 end
