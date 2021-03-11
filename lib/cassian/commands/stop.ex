@@ -21,6 +21,7 @@ defmodule Cassian.Commands.Stop do
         Nostrum.Voice.stop(message.guild_id)
 
         notify_stopped(message)
+
       {:error, :noop} ->
         notify_not_playing(message)
     end

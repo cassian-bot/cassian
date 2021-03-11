@@ -34,6 +34,7 @@ defmodule Cassian.Managers.MessageManager do
     case Nostrum.Api.create_message(channel_id, embed: embed) do
       {:ok, _message} ->
         :ok
+
       _ ->
         :noop
     end
