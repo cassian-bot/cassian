@@ -55,9 +55,19 @@ defmodule Cassian.Structs.Playlist do
   defdelegate unshuffle(guild_id), to: Playlist
   defdelegate put(playlist), to: Playlist
 
+  defp reverse_magick(%__MODULE__{reverse: false, index: index}, sorted) do
+    {index, sorted}
+  end
+
+  defp reverse_magick(%__MODULE__{index: index}, sorted) do
+    sorted = Enum.reverse(sorted)
+    index = length(sorted) - 1 - index
+    {index, sorted}
+  end
+
   @doc """
   Order the playlist. Returns the ordered list with the index of the current song.
-  It doesn't reverse the list. Reversing has to be handled on the usage side.
+  It doesn't reverse the list.
   """
   @spec order_playlist(playlist :: %__MODULE__{}) :: {integer(), list(%Metadata{})}
   def order_playlist(playlist),
@@ -72,7 +82,7 @@ defmodule Cassian.Structs.Playlist do
         extract_metadatas_ordered(playlist.elements)
       end
 
-    {playlist.index, sorted}
+    reverse_magick(playlist, sorted)
   end
 
   @doc """
