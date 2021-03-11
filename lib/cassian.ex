@@ -12,7 +12,7 @@ defmodule Cassian do
   The a map containing all of the commands and their associated modules
   """
   @spec commands! :: %{String.t() => Module}
-  def commands!, do: Cassian.Consumers.Command.commands!()
+  def commands!, do: Cassian.Managers.CommandManager.commands!()
 
   @doc """
   Get the avatar of the bot itself.
