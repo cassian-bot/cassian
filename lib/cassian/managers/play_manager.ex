@@ -69,7 +69,6 @@ defmodule Cassian.Managers.PlayManager do
           notifiy_playing(state.channel_id, metadata)
 
           state
-          |> Map.put(:metadata, metadata)
           |> Map.put(:status, :playing)
           |> VoiceState.put()
 
