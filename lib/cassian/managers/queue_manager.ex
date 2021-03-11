@@ -85,4 +85,6 @@ defmodule Cassian.Managers.QueueManager do
 
     MessageManager.send_dissapearing_embed(embed, channel_id)
   end
+
+  defdelegate show(guild_id), to: Queue
 end
