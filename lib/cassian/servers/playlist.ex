@@ -1,13 +1,14 @@
-defmodule Cassian.Servers.Queue do
+defmodule Cassian.Servers.Playlist do
   @moduledoc """
-  A GenServer representing a queue for a guild. Stores song metadatas to access details later.
+  A GenServer representing a playlist for a guild.
   """
 
   use GenServer
-  alias Cassian.Structs.Metadata
+
+  alias Cassian.Structs.{Metadata, Playlist}
 
   @doc """
-  Check is a Queue exists for a guild.
+  Check is a playlist exists for a guild.
   """
   @spec exists?(guild_id :: Snowflake.t()) :: boolean()
   def exists?(guild_id) do
@@ -15,16 +16,16 @@ defmodule Cassian.Servers.Queue do
   end
 
   @doc """
-  Insert metadata into a queue, won't work if the Queue doesn't
+  Insert metadata into a playlist, won't work if the playlist doesn't
   exist.
   """
   @spec insert(guild_id :: Snowflake.t(), metadata :: %Metadata{}) :: :ok
   def insert(guild_id, metadata) do
-    GenServer.cast(from_guild_id(guild_id), {:insert, metadata})
+    GenServer.cast(from_guild_id(guild_id), {:insert, {metadata, nil}})
   end
 
   @doc """
-  Insert a metdata into a queue. If the queue doesn't exist, start it.
+  Insert a metdata into a playlist. If the queue doesn't exist, start it.
   """
   @spec insert!(guild_id :: Snowflake.t(), metadata :: %Metadata{}) :: :ok
   def insert!(guild_id, metadata) do
