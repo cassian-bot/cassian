@@ -3,20 +3,21 @@ defmodule Cassian.Managers.QueueManager do
   Manager for queues.
   """
 
-  alias Cassian.Servers.{Queue,VoiceState}
+  alias Cassian.Servers.{Queue, VoiceState}
   alias Cassian.Utils.Voice
 
   def insert!(guild_id, channel_id, metadata) do
     Queue.insert!(guild_id, metadata)
 
     VoiceState.get!(guild_id)
-      |> Map.put(:channel_id, channel_id)
-      |> notify_enqueued(metadata)
-      |> VoiceState.put()
+    |> Map.put(:channel_id, channel_id)
+    |> notify_enqueued(metadata)
+    |> VoiceState.put()
   end
 
   def play_if_needed(guild_id) do
     state = VoiceState.get!(guild_id)
+
     if state.status == :noop and Queue.exists?(guild_id) do
       unless Queue.show(guild_id) == [] do
         metadata = Queue.pop!(guild_id)

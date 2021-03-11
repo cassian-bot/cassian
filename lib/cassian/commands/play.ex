@@ -39,10 +39,9 @@ defmodule Cassian.Commands.Play do
   that the bot doesn't have permission to connect.
   """
   def handle_connect_possibility(message, voice_id, args) do
-    if VoiceUtils.can_connect?(message.guild_id, voice_id), do:
-      handle_metadata(message, voice_id, args),
-    else:
-      no_permissions_error(message)
+    if VoiceUtils.can_connect?(message.guild_id, voice_id),
+      do: handle_metadata(message, voice_id, args),
+      else: no_permissions_error(message)
   end
 
   @doc """
