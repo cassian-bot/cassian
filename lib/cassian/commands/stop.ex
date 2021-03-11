@@ -1,7 +1,7 @@
 defmodule Cassian.Commands.Stop do
   use Cassian.Behaviours.Command
-  alias Cassian.Managers.{QueueManager, MessageManager}
-  alias Cassian.Structs.{Metadata, VoiceState}
+  alias Cassian.Managers.{PlayManager, MessageManager}
+  alias Cassian.Structs.{Playlist}
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Nostrum.Struct.Embed
 
@@ -10,16 +10,10 @@ defmodule Cassian.Commands.Stop do
   def ship?, do: true
 
   def execute(message, _args) do
-    case VoiceState.get(message.guild_id) do
-      {:ok, state} ->
-        QueueManager.clear!(message.guild_id)
-
-        state
-        |> Map.put(:metadata, %Metadata{})
-        |> VoiceState.put()
-
+    case Playlist.show(message.guild_id) do
+      {:ok, _} ->
+        PlayManager.clear!(message.guild_id)
         Nostrum.Voice.stop(message.guild_id)
-
         notify_stopped(message)
 
       {:error, :noop} ->

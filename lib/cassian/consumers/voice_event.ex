@@ -22,7 +22,6 @@ defmodule Cassian.Consumers.VoiceEvent do
   def voice_speaking_update(%SpeakingUpdate{guild_id: guild_id, speaking: false}) do
     VoiceState.get!(guild_id)
     |> Map.put(:status, :noop)
-    |> Map.put(:metadata, %Cassian.Structs.Metadata{})
     |> VoiceState.put()
 
     PlayManager.alter_index(guild_id)
