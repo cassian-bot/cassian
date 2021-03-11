@@ -5,9 +5,9 @@ defmodule Cassian.Consumers.VoiceEvent do
 
   alias Nostrum.Struct.Event.SpeakingUpdate
 
-  alias Cassian.Structs.VoiceState
+  alias Cassian.Structs.{VoiceState, Playlist}
 
-  alias Cassian.Managers.QueueManager
+  alias Cassian.Managers.PlayManager
 
   require Logger
 
@@ -25,7 +25,8 @@ defmodule Cassian.Consumers.VoiceEvent do
     |> Map.put(:metadata, %Cassian.Structs.Metadata{})
     |> VoiceState.put()
 
-    QueueManager.play_if_needed(guild_id)
+    PlayManager.alter_index(guild_id)
+    PlayManager.play_if_needed(guild_id)
   end
 
   @doc false
@@ -40,7 +41,7 @@ defmodule Cassian.Consumers.VoiceEvent do
   """
   def voice_state_update(%{channel_id: nil, guild_id: guild_id, user_id: user_id}) do
     if user_id == Cassian.own_id() do
-      Cassian.Servers.Queue.delete(guild_id)
+      Playlist.delete(guild_id)
       VoiceState.delete(guild_id)
     end
 
