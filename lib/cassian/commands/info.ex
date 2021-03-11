@@ -1,6 +1,6 @@
 defmodule Cassian.Commands.Show do
   use Cassian.Behaviours.Command
-  alias Cassian.Structs.{VoiceState, Playlist}
+  alias Cassian.Structs.Playlist
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Nostrum.Struct.Embed
   alias Cassian.Managers.MessageManager
@@ -42,18 +42,27 @@ defmodule Cassian.Commands.Show do
       playlist
       |> Playlist.order_playlist()
 
-    queue =
+    description =
       sorted
-      |> Enum.reduce([], fn metadata, acc -> acc ++ [metadata.title] end)
-      |> replace_playing(index)
+      |> Enum.with_index()
+      |> Enum.reduce([], &filter(&1, &2, index))
       |> Enum.join("\n")
 
+
     embed
-    |> Embed.put_description(queue)
+    |> Embed.put_description(description)
     |> MessageManager.send_embed(message.channel_id)
   end
 
-  defp replace_playing(map, index) do
-    List.replace_at(map, index, "**Now playing:** #{Enum.at(map, index)}")
+  defp filter({metadata, current_index}, acc, index) do
+    acc ++ ["#{replace_playing(current_index, index)}#{current_index + 1}: #{metadata.title}#{replace_playing(current_index, index)}"]
+  end
+
+  defp replace_playing(current_index, index) when current_index == index do
+    "**"
+  end
+
+  defp replace_playing(_current_index, _index) do
+    ""
   end
 end
