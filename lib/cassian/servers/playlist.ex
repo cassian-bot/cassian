@@ -91,7 +91,7 @@ defmodule Cassian.Servers.Playlist do
   """
   @spec put(playlist :: %Playlist{}) :: :ok | :noop
   def put(playlist) do
-    if exists?(playlist) do
+    if exists?(playlist.guild_id) do
       GenServer.cast(from_guild_id(playlist.guild_id), {:put, playlist})
       :ok
     else

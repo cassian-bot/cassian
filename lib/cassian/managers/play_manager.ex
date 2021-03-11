@@ -29,7 +29,6 @@ defmodule Cassian.Managers.PlayManager do
         playlist
         |> Map.put(:index, index)
         |> Playlist.put()
-
       {:error, :noop} ->
         nil
     end
