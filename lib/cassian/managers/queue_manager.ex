@@ -7,6 +7,9 @@ defmodule Cassian.Managers.QueueManager do
   alias Cassian.Utils.Voice
   alias Cassian.Managers.MessageManager
 
+  @doc """
+  Insert metadata into the queue.
+  """
   def insert!(guild_id, channel_id, metadata) do
     Queue.insert!(guild_id, metadata)
 
@@ -16,10 +19,17 @@ defmodule Cassian.Managers.QueueManager do
     |> VoiceState.put()
   end
 
+  @doc """
+  Clear/delete the queue for a guild_id.
+  """
   def clear!(guild_id) do
     Queue.delete(guild_id)
   end
 
+  @doc """
+  Play a song if needed. Deletes the queue if it determines
+  it should.
+  """
   def play_if_needed(guild_id) do
     state = VoiceState.get!(guild_id)
 
@@ -40,6 +50,9 @@ defmodule Cassian.Managers.QueueManager do
     end
   end
 
+  @doc """
+  Notify state a song is enqueued. Will be moved.
+  """
   def notify_enqueued(state, metadata) do
     unless state.status == :noop do
       alias Cassian.Utils.Embed, as: EmbedUtils
@@ -57,6 +70,9 @@ defmodule Cassian.Managers.QueueManager do
     state
   end
 
+  @doc """
+  Notify that a song is currently playing. Will be moved.
+  """
   def notifiy_playing(channel_id, metadata) do
     alias Cassian.Utils.Embed, as: EmbedUtils
     alias Nostrum.Struct.Embed
