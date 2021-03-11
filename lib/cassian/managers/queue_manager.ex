@@ -15,6 +15,10 @@ defmodule Cassian.Managers.QueueManager do
     |> VoiceState.put()
   end
 
+  def clear!(guild_id) do
+    Queue.delete(guild_id)
+  end
+
   def play_if_needed(guild_id) do
     state = VoiceState.get!(guild_id)
 

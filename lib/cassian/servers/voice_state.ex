@@ -29,6 +29,18 @@ defmodule Cassian.Servers.VoiceState do
   end
 
   @doc """
+  Get the `VoiceState` from voice. Uses a safe-return tuple.
+  """
+  @spec get(guild_id :: Snowflake.t()) :: {:ok, %VoiceState{}} | {:error, :noop}
+  def get(guild_id) do
+    if exists?(guild_id) do
+      {:ok, GenServer.call(from_guild_id(guild_id), {:get})}
+    else
+      {:error, :noop}
+    end
+  end
+
+  @doc """
   Get the `VoiceState` from voice. Returns an existing or creates and stores in the GenServer.
   """
   @spec get!(guild_id :: Snowflake.t()) :: %VoiceState{}
