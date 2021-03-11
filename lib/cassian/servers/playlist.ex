@@ -86,11 +86,29 @@ defmodule Cassian.Servers.Playlist do
     end
   end
 
+  @doc """
+  Put the new playlist.
+  """
+  @spec put(playlist :: %Playlist{}) :: :ok | :noop
+  def put(playlist) do
+    if exists?(playlist) do
+      GenServer.cast(from_guild_id(playlist.guild_id), {:put, playlist})
+      :ok
+    else
+      :error
+    end
+  end
+
   # Private API
 
   @doc false
   def handle_call(:show, _from, state) do
     {:reply, state, state}
+  end
+
+  @doc false
+  def handle_cast({:put, playlist}, _state) do
+    {:noreply, playlist}
   end
 
   @doc false
@@ -155,7 +173,7 @@ defmodule Cassian.Servers.Playlist do
 
   @doc false
   def start(guild_id, metadata) do
-    GenServer.start(__MODULE__, %Playlist{elements: [{metadata, nil}]}, name: from_guild_id(guild_id))
+    GenServer.start(__MODULE__, %Playlist{elements: [{metadata, nil}], guild_id: guild_id}, name: from_guild_id(guild_id))
   end
 
   @doc false

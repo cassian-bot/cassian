@@ -1,17 +1,17 @@
-defmodule Cassian.Managers.QueueManager do
+defmodule Cassian.Managers.PlayManager do
   @moduledoc """
   Manager for queues.
   """
 
-  alias Cassian.Servers.{Queue, VoiceState}
+  alias Cassian.Structs.{VoiceState, Playlist}
   alias Cassian.Utils.Voice
   alias Cassian.Managers.MessageManager
 
   @doc """
-  Insert metadata into the queue.
+  Add a song to the playlist.
   """
   def insert!(guild_id, channel_id, metadata) do
-    Queue.insert!(guild_id, metadata)
+    Playlist.insert!(guild_id, metadata)
 
     VoiceState.get!(guild_id)
     |> Map.put(:channel_id, channel_id)
@@ -20,10 +20,33 @@ defmodule Cassian.Managers.QueueManager do
   end
 
   @doc """
+  """
+  def alter_index(guild_id) do
+    case Playlist.show(guild_id) do
+      {:ok, playlist} ->
+        index = playlist.index + if playlist.reverse, do: -1, else: 1
+
+        playlist
+        |> Map.put(:index, index)
+        |> Playlist.put()
+
+      {:error, :noop} ->
+        nil
+    end
+  end
+
+  # Keep the index in bounds, loops around.
+  defp keep_in_bounds(index, ordered) do
+    size = length(ordered)
+    index = if index >= size, do: 0, else: index
+    if index < 0, do: size - 1, else: index
+  end
+
+  @doc """
   Clear/delete the queue for a guild_id.
   """
   def clear!(guild_id) do
-    Queue.delete(guild_id)
+    Playlist.delete(guild_id)
   end
 
   @doc """
@@ -33,19 +56,26 @@ defmodule Cassian.Managers.QueueManager do
   def play_if_needed(guild_id) do
     state = VoiceState.get!(guild_id)
 
-    if state.status == :noop and Queue.exists?(guild_id) do
-      unless Queue.show(guild_id) == [] do
-        metadata = Queue.pop!(guild_id)
-        Voice.play_when_ready!(metadata.youtube_link, guild_id)
+    if state.status == :noop and Playlist.exists?(guild_id) do
+      case Playlist.show(guild_id) do
+        {:ok, playlist} ->
+          {index, ordered} = Playlist.order_playlist(playlist)
 
-        notifiy_playing(state.channel_id, metadata)
+          index = keep_in_bounds(index, ordered)
 
-        state
-        |> Map.put(:metadata, metadata)
-        |> Map.put(:status, :playing)
-        |> VoiceState.put()
-      else
-        Queue.delete(guild_id)
+          metadata = Enum.at(ordered, index)
+
+          Voice.play_when_ready!(metadata.youtube_link, guild_id)
+
+          notifiy_playing(state.channel_id, metadata)
+
+          state
+          |> Map.put(:metadata, metadata)
+          |> Map.put(:status, :playing)
+          |> VoiceState.put()
+
+        _ ->
+          nil
       end
     end
   end
@@ -85,6 +115,4 @@ defmodule Cassian.Managers.QueueManager do
 
     MessageManager.send_dissapearing_embed(embed, channel_id)
   end
-
-  defdelegate show(guild_id), to: Queue
 end

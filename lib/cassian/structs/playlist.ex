@@ -7,10 +7,11 @@ defmodule Cassian.Structs.Playlist do
   alias Cassian.Structs.Metadata
 
   defstruct [
+    :guild_id,
     shuffle: false,
     reverse: false,
     elements: [],
-    index: 0
+    index: 0,
   ]
 
   @type t() :: %__MODULE__{
@@ -18,6 +19,7 @@ defmodule Cassian.Structs.Playlist do
           reverse: boolean(),
           elements: list({%Metadata{}, integer() | nil}),
           index: integer(),
+          guild_id: Snowflake.t()
         }
 
   @typedoc "A boolean representing whether it is shuffling."
@@ -40,12 +42,18 @@ defmodule Cassian.Structs.Playlist do
   """
   @type reverse :: boolean()
 
+  @typedoc """
+  The ID of the associated guild.
+  """
+  @type guild_id :: Snowflake.t()
+
   defdelegate exists?(guild_id), to: Playlist
   defdelegate show(guild_id), to: Playlist
   defdelegate insert!(guild_id, metadata), to: Playlist
   defdelegate delete(guild_id), to: Playlist
   defdelegate shuffle(guild_id), to: Playlist
   defdelegate unshuffle(guild_id), to: Playlist
+  defdelegate put(playlist), to: Playlist
 
   @doc """
   Order the playlist. Returns the ordered list with the index of the current song.
