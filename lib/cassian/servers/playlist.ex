@@ -73,8 +73,7 @@ defmodule Cassian.Servers.Playlist do
   end
 
   @doc """
-  Get metas with their index. The returned list is sorted depending on the current
-  playlist options.
+  Safe get the ordered list from the current GenServer state.
   """
   @spec get_ordered_playlist(guild_id :: Snowflake.t()) :: {:ok, {integer(), list(%Metadata{})}} | {:error, :noop}
   def get_ordered_playlist(guild_id) do
@@ -83,33 +82,8 @@ defmodule Cassian.Servers.Playlist do
         {:error, :noop}
 
       {:ok, playlist} ->
-        {:ok, indexed_sorted(playlist)}
+        {:ok, Playlist.order_playlist(playlist)}
     end
-  end
-
-  @doc false
-  defp indexed_sorted(playlist) do
-    if playlist.shuffle do
-      {playlist.index, shuffle_sort(playlist)}
-    else
-      {playlist.index, extract_metadatas_ordered(playlist.elements)}
-    end
-  end
-
-  @doc """
-  Sort the playlist to how it should play when it is being shuffled.
-  """
-  @spec shuffle_sort(playlist :: %Playlist{}) :: list(%Metadata{})
-  def shuffle_sort(playlist) do
-    Enum.sort_by(playlist.elements, fn {_metadata, index} -> index end)
-    |> extract_metadatas_ordered()
-  end
-
-  @doc """
-  Extract the metadatas from an already-ordered list.
-  """
-  def extract_metadatas_ordered(elements) do
-    Enum.reduce(elements, [], fn {metadata, _index}, acc -> acc ++ [metadata] end)
   end
 
   # Private API
