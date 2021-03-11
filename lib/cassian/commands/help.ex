@@ -1,6 +1,8 @@
 defmodule Cassian.Commands.Help do
   use Cassian.Behaviours.Command
 
+  alias Cassian.Managers.MessageManager
+
   @moduledoc """
   The help command. Shows a menu of commands.
   """
@@ -11,10 +13,8 @@ defmodule Cassian.Commands.Help do
 
   @doc false
   def execute(message, _args) do
-    Nostrum.Api.create_message(
-      message.channel_id,
-      embed: generate_help_embed!()
-    )
+    generate_help_embed!()
+    |> MessageManager.send_embed(message.channel_id)
 
     :ok
   end

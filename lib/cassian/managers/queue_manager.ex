@@ -5,6 +5,7 @@ defmodule Cassian.Managers.QueueManager do
 
   alias Cassian.Servers.{Queue, VoiceState}
   alias Cassian.Utils.Voice
+  alias Cassian.Managers.MessageManager
 
   def insert!(guild_id, channel_id, metadata) do
     Queue.insert!(guild_id, metadata)
@@ -50,7 +51,7 @@ defmodule Cassian.Managers.QueueManager do
         |> Embed.put_url(metadata.youtube_link)
         |> Embed.put_title("Enqueued: #{metadata.title}")
 
-      Nostrum.Api.create_message(state.channel_id, embed: embed)
+      MessageManager.send_dissapearing_embed(embed, state.channel_id)
     end
 
     state
@@ -66,6 +67,6 @@ defmodule Cassian.Managers.QueueManager do
       |> Embed.put_url(metadata.youtube_link)
       |> Embed.put_title("Now playing: #{metadata.title}")
 
-    Nostrum.Api.create_message(channel_id, embed: embed)
+    MessageManager.send_dissapearing_embed(embed, channel_id)
   end
 end

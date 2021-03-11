@@ -1,0 +1,63 @@
+defmodule Cassian.Managers.MessageManager do
+  @timeout 5_000
+
+  alias Nostrum.Struct.Embed
+  alias Nostrum.Struct.Message
+
+  require Logger
+
+  @moduledoc """
+  Manager for messages and disapperaring messages.
+  """
+
+  @doc """
+  Disable embed for a link. It's still a WIP.
+  """
+  @spec disable_embed(message :: %Message{}) :: :ok | :noop
+  def disable_embed(message) do
+    case Nostrum.Api.edit_message(message, embed: nil) do
+      {:ok, _message} ->
+        :ok
+
+      {:error, error} ->
+        Logger.warn(error |> Poison.encode!())
+        :nnop
+    end
+  end
+
+  @doc """
+  Safely send a message embed to a chennl.
+  """
+  # @spec send_embed(embed :: %Nostrum.Struct,Embed{}, channel_id :: Snowflake.t()) :: :ok | :noop
+  @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) :: :ok | :noop
+  def send_embed(embed, channel_id) do
+    case Nostrum.Api.create_message(channel_id, embed: embed) do
+      {:ok, _message} ->
+        :ok
+      _ ->
+        :noop
+    end
+  end
+
+  @doc """
+  Safely send a disapearring message. Starts a non-blocking delayed task
+  to dissaper the mssage.
+  """
+  @spec send_dissapearing_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) :: :ok | :noop
+  def send_dissapearing_embed(embed, channel_id) do
+    case Nostrum.Api.create_message(channel_id, embed: embed) do
+      {:ok, message} ->
+        spawn(fn -> dissapear(message) end)
+        :ok
+
+      _ ->
+        :noop
+    end
+  end
+
+  # Delete a message after `@timeout`.
+  defp dissapear(message) do
+    :timer.sleep(@timeout)
+    Nostrum.Api.delete_message(message)
+  end
+end

@@ -4,9 +4,7 @@ defmodule Cassian.Commands.Play do
   import Cassian.Utils
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
-  alias Cassian.Managers.QueueManager
-
-  alias Nostrum.Api
+  alias Cassian.Managers.{QueueManager, MessageManager}
 
   def ship?, do: true
   def caller, do: "play"
@@ -67,14 +65,10 @@ defmodule Cassian.Commands.Play do
     VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
     QueueManager.insert!(message.guild_id, message.channel_id, metadata)
     QueueManager.play_if_needed(message.guild_id)
+    MessageManager.disable_embed(message)
   end
 
   # Error handlers
-
-  @doc false
-  defp send_embed(embed, message) do
-    Api.create_message(message.channel_id, embed: embed)
-  end
 
   @doc """
   Generate and send the embed for when a user isn't in a voice channel.
@@ -84,7 +78,7 @@ defmodule Cassian.Commands.Play do
       "Hey you... You're not in a voice channel.",
       "I can't play any music if you're not a voice channel. Join one first."
     )
-    |> send_embed(message)
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
 
   @doc """
@@ -96,7 +90,7 @@ defmodule Cassian.Commands.Play do
       "And how do you think that's possible?",
       "I don't have the permissions to play music there... Fix it up first."
     )
-    |> send_embed(message)
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
 
   @doc """
@@ -107,6 +101,6 @@ defmodule Cassian.Commands.Play do
       "Yeah, that won't work.",
       "The link you tried to provide me isn't working. Recheck it."
     )
-    |> send_embed(message)
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
 end

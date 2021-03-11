@@ -1,6 +1,8 @@
 defmodule Cassian.Commands.Ping do
   use Cassian.Behaviours.Command
 
+  alias Cassian.Managers.MessageManager
+
   @moduledoc """
   The ping command. Shows how many ms was needed to perform the request.
   """
@@ -21,10 +23,8 @@ defmodule Cassian.Commands.Ping do
       recieved_time
       |> DateTime.diff(request_time, :millisecond)
 
-    Nostrum.Api.create_message(
-      message.channel_id,
-      embed: generate_ping_embed!(request_recieved_diff)
-    )
+    generate_ping_embed!(request_recieved_diff)
+    |> MessageManager.send_embed(message.channel_id)
 
     :ok
   end
