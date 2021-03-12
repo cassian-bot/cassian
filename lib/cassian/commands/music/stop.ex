@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.Stop do
+defmodule Cassian.Commands.Music.Stop do
   use Cassian.Behaviours.Command
   alias Cassian.Managers.{PlayManager, MessageManager}
   alias Cassian.Structs.{Playlist}

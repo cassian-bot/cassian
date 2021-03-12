@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.Play do
+defmodule Cassian.Commands.Music.Play do
   use Cassian.Behaviours.Command
 
   import Cassian.Utils
