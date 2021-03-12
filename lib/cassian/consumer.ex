@@ -34,6 +34,11 @@ defmodule Cassian.Consumer do
   end
 
   @doc false
+  def handle_event({:MESSAGE_REACTION_ADD, data, _}) do
+    Cassian.Consumers.ReactionEvent.handle_event(data)
+  end
+
+  @doc false
   def handle_event(_) do
     :noop
   end
