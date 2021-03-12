@@ -13,7 +13,17 @@ defmodule Cassian.Consumers.ReactionEvent do
   @repeat_one "🔂"
   @forwards "➡️"
 
-  @reactions [@backwards, @previous, @play_pause, @stop, @next, @shuffle, @repeat, @repeat_one, @forwards]
+  @reactions [
+    @backwards,
+    @previous,
+    @play_pause,
+    @stop,
+    @next,
+    @shuffle,
+    @repeat,
+    @repeat_one,
+    @forwards
+  ]
 
   # Handlers as the consumers
 
@@ -24,8 +34,7 @@ defmodule Cassian.Consumers.ReactionEvent do
         guild_id = Nostrum.Api.get_channel!(data.channel_id).guild_id
 
         if message.author.id == Cassian.own_id(),
-          do: handle_emoji(emoji, Map.put(message, :guild_id ,guild_id))
-
+          do: handle_emoji(emoji, Map.put(message, :guild_id, guild_id))
       rescue
         Nostrum.Error.ApiError ->
           nil

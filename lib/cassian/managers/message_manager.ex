@@ -31,7 +31,8 @@ defmodule Cassian.Managers.MessageManager do
   @doc """
   Safely send a message embed to a channel.
   """
-  @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) :: {:ok, %Message{}} | {:error, any()}
+  @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) ::
+          {:ok, %Message{}} | {:error, any()}
   def send_embed(embed, channel_id) do
     Nostrum.Api.create_message(channel_id, embed: embed)
   end
@@ -67,7 +68,8 @@ defmodule Cassian.Managers.MessageManager do
       @command_reactions
       |> Enum.with_index()
       |> Enum.each(fn {reaction, index} ->
-        :timer.sleep(0 + (index + 1)*100)
+        :timer.sleep(0 + (index + 1) * 100)
+
         Nostrum.Api.create_reaction!(
           message.channel_id,
           message.id,
@@ -79,7 +81,7 @@ defmodule Cassian.Managers.MessageManager do
         EmbedUtils.generate_error_embed(
           "I couldn't manage to add reactions.",
           "I use reactions for better control. Check if my permissions are okay."
-          )
+        )
     end
   end
 end

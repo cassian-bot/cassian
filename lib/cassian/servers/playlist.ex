@@ -21,8 +21,8 @@ defmodule Cassian.Servers.Playlist do
   @spec show(guild_id :: Snowflake.t()) :: {:ok, %Playlist{}} | {:error, :noop}
   def show(guild_id) do
     if exists?(guild_id),
-    do: {:ok, GenServer.call(from_guild_id(guild_id), :show)},
-    else: {:error, :noop}
+      do: {:ok, GenServer.call(from_guild_id(guild_id), :show)},
+      else: {:error, :noop}
   end
 
   @doc """
@@ -75,7 +75,8 @@ defmodule Cassian.Servers.Playlist do
   @doc """
   Safe get the ordered list from the current GenServer state.
   """
-  @spec get_ordered_playlist(guild_id :: Snowflake.t()) :: {:ok, {integer(), list(%Metadata{})}} | {:error, :noop}
+  @spec get_ordered_playlist(guild_id :: Snowflake.t()) ::
+          {:ok, {integer(), list(%Metadata{})}} | {:error, :noop}
   def get_ordered_playlist(guild_id) do
     case show(guild_id) do
       {:error, :noop} ->
@@ -127,14 +128,14 @@ defmodule Cassian.Servers.Playlist do
     # Generating indexes for the new shuffle
 
     shuffled_indexes =
-      0..(size)
+      0..size
       |> Enum.to_list()
       |> Enum.shuffle()
 
     # Update all of the elements with a new shuffle index
 
     new_elements =
-      0..(size)
+      0..size
       |> Enum.map(&extract_reshuffled(&1, state, shuffled_indexes))
 
     # Extract the new index of the current song playing
@@ -173,7 +174,9 @@ defmodule Cassian.Servers.Playlist do
 
   @doc false
   def start(guild_id, metadata) do
-    GenServer.start(__MODULE__, %Playlist{elements: [{metadata, nil}], guild_id: guild_id}, name: from_guild_id(guild_id))
+    GenServer.start(__MODULE__, %Playlist{elements: [{metadata, nil}], guild_id: guild_id},
+      name: from_guild_id(guild_id)
+    )
   end
 
   @doc false

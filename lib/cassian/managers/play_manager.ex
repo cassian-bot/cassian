@@ -38,12 +38,12 @@ defmodule Cassian.Managers.PlayManager do
 
             :all ->
               keep_in_bounds(index, playlist.elements)
-
           end
 
         playlist
         |> Map.put(:index, index)
         |> Playlist.put()
+
       {:error, :noop} ->
         nil
     end
@@ -138,6 +138,7 @@ defmodule Cassian.Managers.PlayManager do
     case MessageManager.send_embed(embed, channel_id) do
       {:ok, message} ->
         MessageManager.add_control_reactions(message)
+
       _ ->
         nil
     end
@@ -148,7 +149,11 @@ defmodule Cassian.Managers.PlayManager do
   setting the repeat to the current repeat will set it to `:none`, else
   it will just set it to the specific value.
   """
-  @spec change_repeat(guild_id :: Snowflake.t(), type :: :none | :one | :all, allow_update :: boolean()) :: {:ok, :none | :all | :one} | {:error, :noop}
+  @spec change_repeat(
+          guild_id :: Snowflake.t(),
+          type :: :none | :one | :all,
+          allow_update :: boolean()
+        ) :: {:ok, :none | :all | :one} | {:error, :noop}
   def change_repeat(guild_id, type, allow_update \\ false) do
     case Playlist.show(guild_id) do
       {:ok, playlist} ->
@@ -180,6 +185,7 @@ defmodule Cassian.Managers.PlayManager do
         playlist
         |> Map.put(:reverse, reverse)
         |> Playlist.put()
+
         :ok
 
       {:error, :noop} ->
@@ -190,7 +196,8 @@ defmodule Cassian.Managers.PlayManager do
   @doc """
   Chaange the direction of the playlist and send a notification.
   """
-  @spec change_direction_with_notification(message :: %Message{}, reverse :: boolean()) :: :ok | :noop
+  @spec change_direction_with_notification(message :: %Message{}, reverse :: boolean()) ::
+          :ok | :noop
   def change_direction_with_notification(message, reverse) do
     title_part = if reverse, do: "in reverse", else: "normally"
 
@@ -213,7 +220,11 @@ defmodule Cassian.Managers.PlayManager do
   Change the direction of the playlist and send a notification. If the type of
   repeat is the same as the current one, it will be set to :none unless you set `allow_update` to true.
   """
-  @spec change_repeat_with_notification(message :: %Message{}, type :: :none | :one | :all, allow_update :: boolean()) :: :ok | :noop
+  @spec change_repeat_with_notification(
+          message :: %Message{},
+          type :: :none | :one | :all,
+          allow_update :: boolean()
+        ) :: :ok | :noop
   def change_repeat_with_notification(message, type, allow_update \\ false) do
     case change_repeat(message.guild_id, type, allow_update) do
       {:ok, type} ->
@@ -258,8 +269,8 @@ defmodule Cassian.Managers.PlayManager do
           new_index = playlist.index + if playlist.reverse, do: 2, else: -2
 
           playlist
-              |> Map.put(:index, new_index)
-              |> Playlist.put()
+          |> Map.put(:index, new_index)
+          |> Playlist.put()
         end
 
         Nostrum.Voice.stop(guild_id)

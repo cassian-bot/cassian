@@ -12,7 +12,7 @@ defmodule Cassian.Structs.Playlist do
     reverse: false,
     elements: [],
     index: 0,
-    repeat: :none,
+    repeat: :none
   ]
 
   @type t() :: %__MODULE__{

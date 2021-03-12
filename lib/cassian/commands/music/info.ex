@@ -48,14 +48,18 @@ defmodule Cassian.Commands.Music.Show do
       |> Enum.reduce([], &filter(&1, &2, index))
       |> Enum.join("\n")
 
-
     embed
     |> Embed.put_description(description)
     |> MessageManager.send_embed(message.channel_id)
   end
 
   defp filter({metadata, current_index}, acc, index) do
-    acc ++ ["#{replace_playing(current_index, index)}#{current_index + 1}: #{metadata.title}#{replace_playing(current_index, index)}"]
+    acc ++
+      [
+        "#{replace_playing(current_index, index)}#{current_index + 1}: #{metadata.title}#{
+          replace_playing(current_index, index)
+        }"
+      ]
   end
 
   defp replace_playing(current_index, index) when current_index == index do
