@@ -12,6 +12,7 @@ defmodule Cassian.Structs.Playlist do
     reverse: false,
     elements: [],
     index: 0,
+    repeat: :none,
   ]
 
   @type t() :: %__MODULE__{
@@ -19,7 +20,8 @@ defmodule Cassian.Structs.Playlist do
           reverse: boolean(),
           elements: list({%Metadata{}, integer() | nil}),
           index: integer(),
-          guild_id: Snowflake.t()
+          guild_id: Snowflake.t(),
+          repeat: :none | :one | :all
         }
 
   @typedoc "A boolean representing whether it is shuffling."
@@ -46,6 +48,11 @@ defmodule Cassian.Structs.Playlist do
   The ID of the associated guild.
   """
   @type guild_id :: Snowflake.t()
+
+  @typedoc """
+  Set whether the playlist should repeat or not.
+  """
+  @type repeat :: :one | :none | :all
 
   defdelegate exists?(guild_id), to: Playlist
   defdelegate show(guild_id), to: Playlist

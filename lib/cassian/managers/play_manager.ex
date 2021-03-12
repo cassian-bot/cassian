@@ -36,6 +36,11 @@ defmodule Cassian.Managers.PlayManager do
     end
   end
 
+  defp in_bound?(index, ordered) do
+    index = index + 1
+    index >= length(ordered) and index <= length(ordered)
+  end
+
   # Keep the index in bounds, loops around.
   defp keep_in_bounds(index, ordered) do
     size = length(ordered)
@@ -62,17 +67,21 @@ defmodule Cassian.Managers.PlayManager do
         {:ok, playlist} ->
           {index, ordered} = Playlist.order_playlist(playlist)
 
-          index = keep_in_bounds(index, ordered)
+          should_play? = !(IO.inspect(playlist.repeat == :none, label: "none") and IO.inspect(!in_bound?(index, ordered), label: "in bound")) |> IO.inspect(label: "All")
 
-          metadata = Enum.at(ordered, index)
+          if should_play? do
+            index = keep_in_bounds(index, ordered)
 
-          Voice.play_when_ready!(metadata.youtube_link, guild_id)
+            metadata = Enum.at(ordered, index)
 
-          notifiy_playing(state.channel_id, metadata)
+            Voice.play_when_ready!(metadata.youtube_link, guild_id)
 
-          state
-          |> Map.put(:status, :playing)
-          |> VoiceState.put()
+            notifiy_playing(state.channel_id, metadata)
+
+            state
+            |> Map.put(:status, :playing)
+            |> VoiceState.put()
+          end
 
         _ ->
           nil
@@ -121,7 +130,26 @@ defmodule Cassian.Managers.PlayManager do
     end
   end
 
-  #
+  def change_repeat(guild_id, type, allow_update \\ false) do
+    case Playlist.show(guild_id) do
+      {:ok, playlist} ->
+        new_status =
+          if playlist.repeat == type and !allow_update do
+            :none
+          else
+            type
+          end
+
+        playlist
+        |> Map.put(:repeat, new_status)
+        |> Playlist.put()
+
+        {:ok, new_status}
+
+      {:error, :noop} ->
+        :error
+    end
+  end
 
   @doc """
   Change the direction of the playlist. Safely return if this is done.
@@ -151,12 +179,45 @@ defmodule Cassian.Managers.PlayManager do
       :ok ->
         EmbedUtils.create_empty_embed!()
         |> Embed.put_title("Playing #{title_part}.")
-        |> Embed.put_description("The current playlist will play #{title_part}")
+        |> Embed.put_description("The current playlist will play #{title_part}.")
 
       :noop ->
         EmbedUtils.generate_error_embed(
           "There is no playlist.",
           "I can't change the direction of the playlist if it doesn't exist."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  end
+
+  @doc """
+  Change the direction of the playlist and send a notification. If the type of
+  repeat is the same as the current one, it will be set to :none unless you set `allow_update` to true.
+  """
+  @spec change_repeat_with_notification(message :: %Message{}, type :: :none | :one | :all, allow_update :: boolean()) :: :ok | :noop
+  def change_repeat_with_notification(message, type, allow_update \\ false) do
+    case change_repeat(message.guild_id, type, allow_update) do
+      {:ok, type} ->
+        {message, description} =
+          case type do
+            :none ->
+              {"Not repeating the playlist.", "The playlist will not be repeated."}
+
+            :one ->
+              {"Repeating one.", "Only the current song will be repeated."}
+
+            :all ->
+              {"Repeating is on.", "The whole playlist will be repeated."}
+          end
+
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title(message)
+        |> Embed.put_description(description)
+
+      :error ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "I can't change the repeat of the playlist if it doesn't exist."
         )
     end
     |> MessageManager.send_dissapearing_embed(message.channel_id)

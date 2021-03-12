@@ -63,12 +63,12 @@ defmodule Cassian.Consumers.ReactionEvent do
     Logger.info("Shufling / Disabling shuffle")
   end
 
-  defp handle_emoji(@repeat, _message) do
-    Logger.info("Playing on repeat")
+  defp handle_emoji(@repeat, message) do
+    PlayManager.change_repeat_with_notification(message, :all)
   end
 
-  defp handle_emoji(@repeat_one, _message) do
-    Logger.info("Repeating one")
+  defp handle_emoji(@repeat_one, message) do
+    PlayManager.change_repeat_with_notification(message, :one)
   end
 
   defp handle_emoji(@forwards, message) do
