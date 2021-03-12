@@ -67,7 +67,7 @@ defmodule Cassian.Consumers.ReactionEvent do
   end
 
   defp handle_emoji(@shuffle, _message) do
-    Logger.info("Shufling / Disabling shuffle")
+
   end
 
   defp handle_emoji(@repeat, message) do
