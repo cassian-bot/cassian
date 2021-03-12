@@ -28,6 +28,19 @@ defmodule Cassian.Managers.PlayManager do
       {:ok, playlist} ->
         index = playlist.index + if playlist.reverse, do: -1, else: 1
 
+        index =
+          case playlist.repeat do
+            :none ->
+              index
+
+            :one ->
+              playlist.index
+
+            :all ->
+              keep_in_bounds(index, playlist.elements)
+
+          end
+
         playlist
         |> Map.put(:index, index)
         |> Playlist.put()
