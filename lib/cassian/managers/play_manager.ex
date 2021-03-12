@@ -80,7 +80,8 @@ defmodule Cassian.Managers.PlayManager do
         {:ok, playlist} ->
           {index, ordered} = Playlist.order_playlist(playlist)
 
-          should_play? = playlist.repeat == :none and !in_bound?(index, ordered)
+          should_play? = !((playlist.repeat == :none) and (!in_bound?(index, ordered)))
+
 
           if should_play? do
             index = keep_in_bounds(index, ordered)
@@ -296,6 +297,42 @@ defmodule Cassian.Managers.PlayManager do
         EmbedUtils.generate_error_embed(
           "There is no playlist.",
           "You can't change songs if there is no playlist."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  end
+
+  @doc """
+  Stop the playlist. Deletes the playlist and then stops the audio on the bot.
+  """
+  @spec stop(guild_id :: Snowflake.t()) :: :ok | :error
+  def stop(guild_id) do
+    case Playlist.show(guild_id) do
+      {:ok, _} ->
+        Playlist.delete(guild_id)
+        Nostrum.Voice.stop(guild_id)
+        :ok
+
+      {:error, :noop} ->
+        :error
+    end
+  end
+
+  @doc """
+  Stop the playlist. Deletes the playlist and then stops the audio on the bot.
+  Also sends an embed notification.
+  """
+  @spec stop_and_notify(message :: %Message{}) :: :ok | :noop
+  def stop_and_notify(message) do
+    case stop(message.guild_id) do
+      :ok ->
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title("Stopped the music.")
+
+      :error ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "You can't stop the playlist if none exists."
         )
     end
     |> MessageManager.send_dissapearing_embed(message.channel_id)

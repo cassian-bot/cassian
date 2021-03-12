@@ -58,8 +58,8 @@ defmodule Cassian.Consumers.ReactionEvent do
 
   end
 
-  defp handle_emoji(@stop, _message) do
-
+  defp handle_emoji(@stop, message) do
+    PlayManager.stop_and_notify(message)
   end
 
   defp handle_emoji(@next, message) do
