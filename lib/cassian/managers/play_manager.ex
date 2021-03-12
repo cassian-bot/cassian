@@ -5,7 +5,9 @@ defmodule Cassian.Managers.PlayManager do
 
   alias Cassian.Structs.{VoiceState, Playlist}
   alias Cassian.Utils.Voice
+  alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Managers.MessageManager
+  alias Nostrum.Struct.{Message, Embed}
 
   @doc """
   Add a song to the playlist.
@@ -117,5 +119,46 @@ defmodule Cassian.Managers.PlayManager do
       _ ->
         nil
     end
+  end
+
+  #
+
+  @doc """
+  Change the direction of the playlist. Safely return if this is done.
+  """
+  @spec change_direction(guild_id :: Snowflake.t(), reverse :: boolean()) :: :ok | :noop
+  def change_direction(guild_id, reverse) do
+    case Playlist.show(guild_id) do
+      {:ok, playlist} ->
+        playlist
+        |> Map.put(:reverse, reverse)
+        |> Playlist.put()
+        :ok
+
+      {:error, :noop} ->
+        :noop
+    end
+  end
+
+  @doc """
+  Chaange the direction of the playlist and send a notification.
+  """
+  @spec change_direction_with_notification(message :: %Message{}, reverse :: boolean()) :: :ok | :noop
+  def change_direction_with_notification(message, reverse) do
+    title_part = if reverse, do: "in reverse", else: "normally"
+
+    case change_direction(message.guild_id, reverse) do
+      :ok ->
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title("Playing #{title_part}.")
+        |> Embed.put_description("The current playlist will play #{title_part}")
+
+      :noop ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "I can't change the direction of the playlist if it doesn't exist."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
 end

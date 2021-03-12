@@ -1,6 +1,7 @@
 defmodule Cassian.Consumers.ReactionEvent do
-  #alias Cassian.Structs.Playlist
   require Logger
+
+  alias Cassian.Managers.PlayManager
 
   @backwards "⬅️"
   @previous "⏮️"
@@ -17,13 +18,18 @@ defmodule Cassian.Consumers.ReactionEvent do
   # Handlers as the consumers
 
   def handle_event(%{emoji: %{name: emoji}} = data) when emoji in @reactions do
-    try do
-      message = Nostrum.Api.get_channel_message!(data.channel_id, data.message_id)
-      if message.author.id == Cassian.own_id(),
-        do: handle_emoji(emoji, message)
-    rescue
-      Nostrum.Error.ApiError ->
-        nil
+    unless data.user_id == Cassian.own_id() do
+      try do
+        message = Nostrum.Api.get_channel_message!(data.channel_id, data.message_id)
+        guild_id = Nostrum.Api.get_channel!(data.channel_id).guild_id
+
+        if message.author.id == Cassian.own_id(),
+          do: handle_emoji(emoji, Map.put(message, :guild_id ,guild_id))
+
+      rescue
+        Nostrum.Error.ApiError ->
+          nil
+      end
     end
   end
 
@@ -33,8 +39,8 @@ defmodule Cassian.Consumers.ReactionEvent do
 
   # Emoji action handlers
 
-  defp handle_emoji(@backwards, _message) do
-    Logger.info("Playing backwards")
+  defp handle_emoji(@backwards, message) do
+    PlayManager.change_direction_with_notification(message, true)
   end
 
   defp handle_emoji(@previous, _message) do
@@ -65,8 +71,7 @@ defmodule Cassian.Consumers.ReactionEvent do
     Logger.info("Repeating one")
   end
 
-  defp handle_emoji(@forwards, _message) do
-    Logger.info("Playing forwards")
+  defp handle_emoji(@forwards, message) do
+    PlayManager.change_direction_with_notification(message, false)
   end
-
 end
