@@ -80,7 +80,7 @@ defmodule Cassian.Managers.PlayManager do
         {:ok, playlist} ->
           {index, ordered} = Playlist.order_playlist(playlist)
 
-          should_play? = !(IO.inspect(playlist.repeat == :none, label: "none") and IO.inspect(!in_bound?(index, ordered), label: "in bound")) |> IO.inspect(label: "All")
+          should_play? = playlist.repeat == :none and !in_bound?(index, ordered)
 
           if should_play? do
             index = keep_in_bounds(index, ordered)
@@ -143,6 +143,12 @@ defmodule Cassian.Managers.PlayManager do
     end
   end
 
+  @doc """
+  Change the repeat of the playlist. If `allow_update` is false, then
+  setting the repeat to the current repeat will set it to `:none`, else
+  it will just set it to the specific value.
+  """
+  @spec change_repeat(guild_id :: Snowflake.t(), type :: :none | :one | :all, allow_update :: boolean()) :: {:ok, :none | :all | :one} | {:error, :noop}
   def change_repeat(guild_id, type, allow_update \\ false) do
     case Playlist.show(guild_id) do
       {:ok, playlist} ->
@@ -231,6 +237,54 @@ defmodule Cassian.Managers.PlayManager do
         EmbedUtils.generate_error_embed(
           "There is no playlist.",
           "I can't change the repeat of the playlist if it doesn't exist."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  end
+
+  @doc """
+  Switch to the next or previous song.
+  """
+  @spec switch_song(guild_id :: Snowflake.t(), next :: boolean()) :: :ok | :noop
+  def switch_song(guild_id, next) do
+    case Playlist.show(guild_id) do
+      {:ok, playlist} ->
+        # Next song is automatically handled when the bot stops playing music
+        # so we only have to worry about going to the previous song.
+        unless next do
+          # So in normal mode to play the previous song you have to decrement
+          # by two to play the previous one. I guess in in reverse mode you then
+          # have to do the negative, i.e. increment it by two?
+          new_index = playlist.index + if playlist.reverse, do: 2, else: -2
+
+          playlist
+              |> Map.put(:index, new_index)
+              |> Playlist.put()
+        end
+
+        Nostrum.Voice.stop(guild_id)
+
+      {:error, :noop} ->
+        :error
+    end
+  end
+
+  @doc """
+  Switch to the next or previous song. Also send notification to the channel.
+  """
+  @spec switch_song_with_notification(message :: %Message{}, next :: boolean()) :: :ok | :noop
+  def switch_song_with_notification(message, next) do
+    title_part = if next, do: "next", else: "previous"
+
+    case switch_song(message.guild_id, next) do
+      :ok ->
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title("Playing #{title_part} song.")
+
+      :noop ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "You can't change songs if there is no playlist."
         )
     end
     |> MessageManager.send_dissapearing_embed(message.channel_id)

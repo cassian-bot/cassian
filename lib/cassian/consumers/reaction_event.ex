@@ -43,8 +43,8 @@ defmodule Cassian.Consumers.ReactionEvent do
     PlayManager.change_direction_with_notification(message, true)
   end
 
-  defp handle_emoji(@previous, _message) do
-    Logger.info("Playing previous")
+  defp handle_emoji(@previous, message) do
+    PlayManager.switch_song_with_notification(message, false)
   end
 
   defp handle_emoji(@play_pause, _message) do
@@ -55,8 +55,8 @@ defmodule Cassian.Consumers.ReactionEvent do
     Logger.info("Stopping music")
   end
 
-  defp handle_emoji(@next, _message) do
-    Logger.info("Playing next")
+  defp handle_emoji(@next, message) do
+    PlayManager.switch_song_with_notification(message, true)
   end
 
   defp handle_emoji(@shuffle, _message) do
