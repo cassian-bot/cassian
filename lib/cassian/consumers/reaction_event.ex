@@ -57,7 +57,7 @@ defmodule Cassian.Consumers.ReactionEvent do
   end
 
   defp handle_emoji(@play_pause, _message) do
-    Logger.info("Pllay/Pause")
+    Logger.info("Play/Pause")
   end
 
   defp handle_emoji(@stop, _message) do
