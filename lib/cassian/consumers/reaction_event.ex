@@ -1,6 +1,4 @@
 defmodule Cassian.Consumers.ReactionEvent do
-  require Logger
-
   alias Cassian.Managers.PlayManager
 
   @backwards "⬅️"
@@ -57,11 +55,11 @@ defmodule Cassian.Consumers.ReactionEvent do
   end
 
   defp handle_emoji(@play_pause, _message) do
-    Logger.info("Play/Pause")
+
   end
 
   defp handle_emoji(@stop, _message) do
-    Logger.info("Stopping music")
+
   end
 
   defp handle_emoji(@next, message) do
