@@ -3,6 +3,9 @@ defmodule Cassian.Managers.MessageManager do
 
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Message
+  alias Cassian.Utils.Embed, as: EmbedUtils
+
+  @command_reactions ["⬅️", "⏮️", "⏯️", "⏹️", "⏭️", "🔀", "🔁", "🔂", "➡️"]
 
   require Logger
 
@@ -26,18 +29,11 @@ defmodule Cassian.Managers.MessageManager do
   end
 
   @doc """
-  Safely send a message embed to a chennl.
+  Safely send a message embed to a channel.
   """
-  # @spec send_embed(embed :: %Nostrum.Struct,Embed{}, channel_id :: Snowflake.t()) :: :ok | :noop
-  @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) :: :ok | :noop
+  @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) :: {:ok, %Message{}} | {:error, any()}
   def send_embed(embed, channel_id) do
-    case Nostrum.Api.create_message(channel_id, embed: embed) do
-      {:ok, _message} ->
-        :ok
-
-      _ ->
-        :noop
-    end
+    Nostrum.Api.create_message(channel_id, embed: embed)
   end
 
   @doc """
@@ -60,5 +56,30 @@ defmodule Cassian.Managers.MessageManager do
   defp dissapear(message) do
     :timer.sleep(@timeout)
     Nostrum.Api.delete_message(message)
+  end
+
+  @doc """
+  Add roles used for controlling the bot and audio.
+  """
+  @spec add_control_reactions(message :: %Message{}) :: :ok
+  def add_control_reactions(message) do
+    try do
+      @command_reactions
+      |> Enum.with_index()
+      |> Enum.each(fn {reaction, index} ->
+        :timer.sleep(0 + (index + 1)*100)
+        Nostrum.Api.create_reaction!(
+          message.channel_id,
+          message.id,
+          %Nostrum.Struct.Emoji{name: reaction}
+        )
+      end)
+    rescue
+      _ ->
+        EmbedUtils.generate_error_embed(
+          "I couldn't manage to add reactions.",
+          "I use reactions for better control. Check if my permissions are okay."
+          )
+    end
   end
 end

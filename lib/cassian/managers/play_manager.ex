@@ -99,7 +99,7 @@ defmodule Cassian.Managers.PlayManager do
   end
 
   @doc """
-  Notify that a song is currently playing. Will be moved.
+  Notify that a song is currently playing.
   """
   def notifiy_playing(channel_id, metadata) do
     alias Cassian.Utils.Embed, as: EmbedUtils
@@ -111,6 +111,11 @@ defmodule Cassian.Managers.PlayManager do
       |> Embed.put_url(metadata.youtube_link)
       |> Embed.put_title("Now playing: #{metadata.title}")
 
-    MessageManager.send_dissapearing_embed(embed, channel_id)
+    case MessageManager.send_embed(embed, channel_id) do
+      {:ok, message} ->
+        MessageManager.add_control_reactions(message)
+      _ ->
+        nil
+    end
   end
 end
