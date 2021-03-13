@@ -8,6 +8,7 @@ defmodule Cassian.Commands.Music.Show do
   def ship?, do: true
   def caller, do: "info"
   def desc, do: "Information the current song and some of the others in the playlist."
+  def example, do: "info"
 
   def execute(message, _args) do
     case Playlist.show(message.guild_id) do

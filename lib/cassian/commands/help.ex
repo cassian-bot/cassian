@@ -10,6 +10,7 @@ defmodule Cassian.Commands.Help do
   def ship?, do: true
   def caller, do: "help"
   def desc, do: "Show this menu!"
+  def example, do: "help"
 
   @doc false
   def execute(message, _args) do
@@ -32,6 +33,6 @@ defmodule Cassian.Commands.Help do
     Enum.reduce(Cassian.commands!(), embed, &add_command/2)
   end
 
-  def add_command({caller, module}, embed),
-    do: Embed.put_field(embed, "`#{Cassian.command_prefix!()}#{caller}`", "#{module.desc}", false)
+  def add_command({_caller, module}, embed),
+    do: Embed.put_field(embed, "`#{Cassian.command_prefix!()}#{module.example}`", "#{module.desc}", false)
 end

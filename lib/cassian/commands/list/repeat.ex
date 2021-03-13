@@ -5,8 +5,9 @@ defmodule Cassian.Commands.List.Repeat do
   import Cassian.Utils.Embed
 
   def ship?, do: true
-  def caller, do: "list:repeat [one, none, all]"
+  def caller, do: "list:repeat"
   def desc, do: "Play the playlst in forward order!"
+  def example, do: "list:repeat [one, none, all]"
 
   def execute(message, args) do
     type = Enum.at(args, 0)

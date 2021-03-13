@@ -5,6 +5,7 @@ defmodule Cassian.Commands.Music.Stop do
   def caller, do: "stop"
   def desc, do: "Stop the musing playing."
   def ship?, do: true
+  def example, do: "stop"
 
   def execute(message, _args) do
     PlayManager.stop_and_notify(message)

@@ -1,5 +1,5 @@
 defmodule Cassian.Managers.MessageManager do
-  @timeout 1_500
+  @timeout 5_000
 
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Message

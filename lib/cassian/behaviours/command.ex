@@ -24,6 +24,11 @@ defmodule Cassian.Behaviours.Command do
   """
   @callback ship? :: boolean()
 
+  @doc """
+  A given example for a command in the help meny
+  """
+  @callback example :: String.t() | nil
+
   defmacro __using__(_) do
     quote do
       defmacro handle_command(message, args), do: execute(message, args)
