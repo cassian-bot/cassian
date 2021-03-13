@@ -2,6 +2,13 @@ defmodule Cassian.Servers.Playlist do
   @moduledoc """
   A GenServer representing a playlist for a guild.
   """
+  [
+    "https://www.youtube.com/watch?v=wHK1q8srtMo",
+    "https://www.youtube.com/watch?v=SaC0YVaIMno",
+    "https://www.youtube.com/watch?v=xxIsmbVZuSI",
+    "https://www.youtube.com/watch?v=cjzgpsfz4E8",
+    "https://www.youtube.com/watch?v=O-gc9oFc6BU"
+  ]
 
   use GenServer
 
@@ -141,10 +148,17 @@ defmodule Cassian.Servers.Playlist do
       |> Enum.to_list()
       |> Enum.shuffle()
 
+    index =
+      if state.shuffle do
+        Enum.at(state.shuffle_indexes, state.index)
+      else
+        state.index
+      end
+
     # Find the index of the current song.
     new_index =
       shuffled_indexes
-      |> Enum.find_index(fn si -> si == state.index end)
+      |> Enum.find_index(fn si -> si == index end)
 
     state =
       state
