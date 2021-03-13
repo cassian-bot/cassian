@@ -28,19 +28,16 @@ defmodule Cassian.Commands.Music.Show do
   end
 
   def send_metadata(message, playlist) do
-    {metadata, _} = Enum.at(playlist.elements, playlist.index)
+    {index, sorted} =
+      playlist
+      |> Playlist.order_playlist()
+
+    metadata = Enum.at(sorted, index)
 
     embed =
       EmbedUtils.create_empty_embed!()
       |> EmbedUtils.put_color_on_embed(metadata.provider_color)
       |> Embed.put_title("Showing the current playlist.")
-      |> Embed.put_url(metadata.youtube_link)
-
-    {:ok, playlist} = Playlist.show(message.guild_id)
-
-    {index, sorted} =
-      playlist
-      |> Playlist.order_playlist()
 
     description =
       sorted
