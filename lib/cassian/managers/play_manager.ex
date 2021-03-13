@@ -269,12 +269,24 @@ defmodule Cassian.Managers.PlayManager do
           # have to do the negative, i.e. increment it by two?
           new_index = playlist.index + if playlist.reverse, do: 2, else: -2
 
+          # Edit: I was right, mostly... In cases where index > 1 then it works. When index is
+          # 0 or 1 in normal mode this bugs...
+          new_index =
+            if playlist.reverse do
+              # I honestly have no clue if this works. I'll have to test it first.
+              new_index
+            else
+              # ... This will set the index to be minimaly -1, it iwll be later incremented to zero.
+              max(-1, new_index)
+            end
+
           playlist
           |> Map.put(:index, new_index)
           |> Playlist.put()
         end
 
-        Nostrum.Voice.stop(guild_id)
+        if Nostrum.Voice.playing?(guild_id),
+          do: Nostrum.Voice.stop(guild_id)
 
       {:error, :noop} ->
         :error
