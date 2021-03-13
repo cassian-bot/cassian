@@ -2,13 +2,6 @@ defmodule Cassian.Servers.Playlist do
   @moduledoc """
   A GenServer representing a playlist for a guild.
   """
-  [
-    "https://www.youtube.com/watch?v=wHK1q8srtMo",
-    "https://www.youtube.com/watch?v=SaC0YVaIMno",
-    "https://www.youtube.com/watch?v=xxIsmbVZuSI",
-    "https://www.youtube.com/watch?v=cjzgpsfz4E8",
-    "https://www.youtube.com/watch?v=O-gc9oFc6BU"
-  ]
 
   use GenServer
 
