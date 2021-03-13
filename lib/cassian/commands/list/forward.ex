@@ -3,10 +3,21 @@ defmodule Cassian.Commands.List.Forward do
 
   alias Cassian.Managers.PlayManager
 
-  def ship?, do: true
-  def caller, do: "list:forward"
-  def desc, do: "Play the playlst in forward order!"
-  def example, do: "list:forward"
+  @doc """
+  List command sub-module. Play the list forward.
+  """
+
+  def example do
+    "list forward"
+  end
+
+  def short_desc do
+    "Play the list forward."
+  end
+
+  def long_desc do
+    "Play the list forward. This is the default setting for lists."
+  end
 
   def execute(message, _args) do
     PlayManager.change_direction_with_notification(message, false)

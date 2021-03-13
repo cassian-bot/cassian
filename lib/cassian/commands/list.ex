@@ -1,15 +1,24 @@
 defmodule Cassian.Commands.List do
   use Cassian.Behaviours.Command
 
+  alias Cassian.{Managers.MessageManager, Commands.List}
+  import Cassian.Utils.Embed
+
   @moduledoc """
   General module for handling list sub-commands. List by itself doesn't do much.
   """
 
-  alias Cassian.Commands.List
+  def example do
+    "list [backward|forward|next|previous|repeat|shuffle|unshuffle]"
+  end
 
-  alias Nostrum.Struct.Message
+  def short_desc do
+    "General commands for playlists."
+  end
 
-  @callback execute(message :: %Message{}, list(String.t())) :: any()
+  def long_desc do
+    "General commands for playlists."
+  end
 
   def execute(message, args) do
     case Enum.at(args, 0) do
@@ -33,6 +42,17 @@ defmodule Cassian.Commands.List do
 
       "unshuffle" ->
         List.Unshuffle.execute(message, args)
+
+      _ ->
+        notify_unknown(message)
     end
+  end
+
+  defp notify_unknown(message) do
+    generate_error_embed(
+      "Unknown command.",
+      "The specified sub-command wasn't found. Try `#{}help list for more info,"
+      )
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
 end

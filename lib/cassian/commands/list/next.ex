@@ -3,10 +3,21 @@ defmodule Cassian.Commands.List.Next do
 
   alias Cassian.Managers.PlayManager
 
-  def ship?, do: true
-  def caller, do: "list:next"
-  def desc, do: "Play the next song in the playlist!"
-  def example, do: "list:next"
+  @doc """
+  List command sub-module. Play the next song in the list.
+  """
+
+  def example do
+    "list next"
+  end
+
+  def short_desc do
+    "Play the next song in the list."
+  end
+
+  def long_desc do
+    short_desc()
+  end
 
   def execute(message, _args) do
     PlayManager.switch_song_with_notification(message, true)

@@ -3,10 +3,21 @@ defmodule Cassian.Commands.List.Backward do
 
   alias Cassian.Managers.PlayManager
 
-  def ship?, do: true
-  def caller, do: "list:backward"
-  def desc, do: "Play the playlst in backward order!"
-  def example, do: "list:backward"
+  @doc """
+  List command sub-module. Play the list backwards.
+  """
+
+  def example do
+    "list backwards"
+  end
+
+  def short_desc do
+    "Play the list backwards."
+  end
+
+  def long_desc do
+    "Play the list backwards. Newly added songs will play first."
+  end
 
   def execute(message, _args) do
     PlayManager.change_direction_with_notification(message, true)

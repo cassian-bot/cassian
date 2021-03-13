@@ -2,12 +2,24 @@ defmodule Cassian.Commands.List.Repeat do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.{PlayManager, MessageManager}
+
   import Cassian.Utils.Embed
 
-  def ship?, do: true
-  def caller, do: "list:repeat"
-  def desc, do: "Play the playlst in forward order!"
-  def example, do: "list:repeat [one, none, all]"
+  @doc """
+  List command sub-module. Repeat the song.
+  """
+
+  def example do
+    "list repeat [one|none|all]"
+  end
+
+  def short_desc do
+    "Repeat the playlist."
+  end
+
+  def long_desc do
+    "Set what type of repeating you want. You can repeat one song, all songs or none to disable repeat."
+  end
 
   def execute(message, args) do
     type = Enum.at(args, 0)

@@ -3,10 +3,21 @@ defmodule Cassian.Commands.List.Unshuffle do
 
   alias Cassian.Managers.PlayManager
 
-  def ship?, do: true
-  def caller, do: "list:unshuffle"
-  def desc, do: "Play the playlst in forward order!"
-  def example, do: "list:unshuffle"
+  @doc """
+  List command sub-module. Unshuffle.
+  """
+
+  def example do
+    "list unshuffle"
+  end
+
+  def short_desc do
+    "Unshuffle the playlist."
+  end
+
+  def long_desc do
+    "You can unshuffle the playlist this way."
+  end
 
   def execute(message, _args) do
     PlayManager.unshuffle_and_notify(message)
