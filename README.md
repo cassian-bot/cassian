@@ -15,6 +15,7 @@ A Discord bot for music written in Elixir.
 - [Configuration](#configuration)
 - [Up 'n' runnin'](#up-'n'-runnin')
 - [Deploy to Gigalixir](#deploy-to-gigalixir)
+- [Deploy to Heroku](#deploy-to-heroku)
 
 ## About
 
@@ -80,9 +81,9 @@ config :cassian,
 
 Two required configs are `DISCORD_BOT_TOKEN` and `DEFAULT_BOT_PREFIX`.
 
-**[Depracation warning](##note-regarding-the-web-part)**
+**[Depracation warning](#note-regarding-the-web-part)**
 
-You can start a small `plug_cowboy` server via `web_enabled`. This is used for shields.io. If `web_enabled` is set to false you don't have to worry about anything below it else just set the port or use the standard `4000` one. `force_ssl` is there to, well, enforce SSL on request. This is meant more for services which give you certs like Heroku or [Gigalixir](##deploy-to-gigalixir).
+You can start a small `plug_cowboy` server via `web_enabled`. This is used for shields.io. If `web_enabled` is set to false you don't have to worry about anything below it else just set the port or use the standard `4000` one. `force_ssl` is there to, well, enforce SSL on request. This is meant more for services which give you certs like [Heroku](#deploy-to-heroku) or [Gigalixir](#deploy-to-gigalixir).
 
 ## Up 'n' runnin'
 
@@ -102,8 +103,6 @@ mix --no-halt
 
 ## Deploy to Gigalixir
 
-**Note**: As Heroku as the same config of buildpacks as Gigalixir, this could theoretically be deployed on Heroku the same way.
-
 Gigalixir uses buildpacks just like Heroku. Currently the bot has buildpacks set and it is almost ready to be deployed. You'll just have to set a couple of variables. It's easy to set them. You can either set them via the the panel on Gigalixir or:
 
 ```bash
@@ -120,5 +119,9 @@ After that just do:
 ```bash
 git push gigalixir
 ```
+
+## Deploy to Heroku
+
+Add all of the buildpacks in `.buildpacks` on Heroku and see [Deploy to Gigalixir](#deploy-to-gigalixir) for the configuration. The Heroku app should automatically pick the Heroku-18 stack. If that doesn't work, just set the stack to 18 manually and the app will deploy!
 
 And you should be up 'n' runnin'!
