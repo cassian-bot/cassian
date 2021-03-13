@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.List.Previous do
+defmodule Cassian.Commands.Music.Playlist.Previous do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.PlayManager

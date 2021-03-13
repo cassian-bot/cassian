@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.List.Unshuffle do
+defmodule Cassian.Commands.Music.Playlist.Unshuffle do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.PlayManager

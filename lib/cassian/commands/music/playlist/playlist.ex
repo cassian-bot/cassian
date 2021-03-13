@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.Music.Playlist do
+defmodule Cassian.Commands.Music.Playlist.Playlist do
   use Cassian.Behaviours.Command
   alias Cassian.Structs.Playlist
   alias Cassian.Utils.Embed, as: EmbedUtils

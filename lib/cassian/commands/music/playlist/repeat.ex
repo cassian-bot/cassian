@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.List.Repeat do
+defmodule Cassian.Commands.Music.Playlist.Repeat do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.{PlayManager, MessageManager}
