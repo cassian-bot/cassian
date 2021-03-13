@@ -106,7 +106,7 @@ defmodule Cassian.Managers.PlayManager do
             state
             |> Map.put(:status, :playing)
             |> VoiceState.put()
-          else
+          end
         _ ->
           nil
       end
