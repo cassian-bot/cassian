@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.Music.Playlist.Repeat do
+defmodule Cassian.Commands.Playback.Repeat do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.{PlayManager, MessageManager}
@@ -6,20 +6,8 @@ defmodule Cassian.Commands.Music.Playlist.Repeat do
   import Cassian.Utils.Embed
 
   @doc """
-  List command sub-module. Repeat the song.
+  Set the type of repeat for a song.
   """
-
-  def example do
-    "repeat [one|none|all]"
-  end
-
-  def short_desc do
-    "Repeat the playlist."
-  end
-
-  def long_desc do
-    "Set what type of repeating you want. You can repeat one song, all songs or none to disable repeat."
-  end
 
   def execute(message, args) do
     type = Enum.at(args, 0)

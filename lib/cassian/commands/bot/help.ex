@@ -7,18 +7,6 @@ defmodule Cassian.Commands.Bot.Help do
   The help command. Shows a menu of commands.
   """
 
-  def example do
-    "help <part>"
-  end
-
-  def short_desc do
-    "This command!"
-  end
-
-  def long_desc do
-    nil
-  end
-
   @doc false
   def execute(message, _args) do
     generate_help_embed!()
@@ -31,21 +19,13 @@ defmodule Cassian.Commands.Bot.Help do
   alias Nostrum.Struct.Embed
 
   def generate_help_embed!() do
-    embed =
-      create_empty_embed!()
-      |> Embed.put_title("Help!")
-      |> Embed.put_description("Help for all of the commands!")
-      |> Embed.put_thumbnail(Cassian.get_own_avatar())
-
-    Enum.reduce(Cassian.commands!(), embed, &add_command/2)
+    create_empty_embed!()
+    |> Embed.put_title("Yo! Thanks for adding me to the server!")
+    |> Embed.put_description(
+      "I currently don't have a propper help command as I'm a WIP. Though once it has been created it will be linked here so "
+      <>
+      "you can see all of my commands. Although you can start playing music with `#{Cassian.command_prefix!()}play`."
+    )
+    |> Embed.put_thumbnail(Cassian.get_own_avatar())
   end
-
-  def add_command({_caller, module}, embed),
-    do:
-      Embed.put_field(
-        embed,
-        "`#{Cassian.command_prefix!()}#{module.example}`",
-        "#{module.short_desc}",
-        false
-      )
 end

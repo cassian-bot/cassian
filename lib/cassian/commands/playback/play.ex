@@ -1,22 +1,10 @@
-defmodule Cassian.Commands.Music.Play do
+defmodule Cassian.Commands.Playback.Play do
   use Cassian.Behaviours.Command
 
   import Cassian.Utils
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
   alias Cassian.Managers.{MessageManager, PlayManager}
-
-  def example do
-    "play"
-  end
-
-  def short_desc do
-    "Play or add a song to the playlist."
-  end
-
-  def long_desc do
-    short_desc()
-  end
 
   # Main logic pipe
 

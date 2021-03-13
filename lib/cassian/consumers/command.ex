@@ -34,36 +34,35 @@ defmodule Cassian.Consumers.Command do
     {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
 
   defp associated_module(command) do
-    alias Cassian.Commands
+    alias Cassian.Commands.{Bot, Playback}
 
     case command do
       "help" ->
-        #Commands.Bot.Help
-        nil
+        Bot.Help
 
       "ping" ->
-        Commands.Bot.Ping
+        Bot.Ping
 
       "backward" ->
-        Commands.Music.Playlist.Backward
+        Playback.Backward
 
       "forward" ->
-        Commands.Music.Playlist.Forward
+        Playback.Forward
 
       "next" ->
-        Commands.Music.Playlist.Next
+        Playback.Next
 
       "playlist" ->
-        Commands.Music.Playlist.Playlist
+        Playback.Playlist
 
       "repeat" ->
-        Commands.Music.Playlist.Repeat
+        Playback.Repeat
 
       "shuffle" ->
-        Commands.Music.Playlist.Shuffle
+        Playback.Shuffle
 
       "unshuffle" ->
-        Commands.Music.Playlist.Unshuffle
+        Playback.Unshuffle
 
       "play" ->
         Commands.Music.Play

@@ -4,20 +4,8 @@ defmodule Cassian.Commands.Music.Playlist.Unshuffle do
   alias Cassian.Managers.PlayManager
 
   @doc """
-  List command sub-module. Unshuffle.
+  Unshuffle music for the playlist.
   """
-
-  def example do
-    "unshuffle"
-  end
-
-  def short_desc do
-    "Unshuffle the playlist."
-  end
-
-  def long_desc do
-    "You can unshuffle the playlist this way."
-  end
 
   def execute(message, _args) do
     PlayManager.unshuffle_and_notify(message)
