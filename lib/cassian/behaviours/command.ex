@@ -9,6 +9,21 @@ defmodule Cassian.Behaviours.Command do
   """
   @callback execute(message :: Nostrum.Struct.Message.t(), args :: List.t()) :: :ok
 
+  @doc """
+  Used to show a small example for the command.
+  """
+  @callback example :: String.t()
+
+  @doc """
+  Write a short description of the command.
+  """
+  @callback short_desc :: String.t()
+
+  @doc """
+  @rite a long description of the command.
+  """
+  @callback long_desc :: String.t()
+
   defmacro __using__(_) do
     quote do
       defmacro handle_command(message, args), do: execute(message, args)
