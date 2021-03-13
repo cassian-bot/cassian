@@ -168,11 +168,6 @@ defmodule Cassian.Servers.Playlist do
     {:noreply, state}
   end
 
-  defp extract_reshuffled(index, state, shuffled_indexes) do
-    {metadata, _index} = Enum.at(state.elements, index)
-    {metadata, Enum.at(shuffled_indexes, index)}
-  end
-
   @doc false
   def start(guild_id, metadata) do
     GenServer.start(__MODULE__, %Playlist{elements: [{metadata, nil}], guild_id: guild_id},
