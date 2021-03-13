@@ -11,6 +11,7 @@ defmodule Cassian.Structs.Playlist do
     shuffle: false,
     reverse: false,
     elements: [],
+    shuffle_indexes: [],
     index: 0,
     repeat: :none
   ]
@@ -18,21 +19,20 @@ defmodule Cassian.Structs.Playlist do
   @type t() :: %__MODULE__{
           shuffle: boolean(),
           reverse: boolean(),
-          elements: list({%Metadata{}, integer() | nil}),
+          elements: list(%Metadata{}),
           index: integer(),
           guild_id: Snowflake.t(),
-          repeat: :none | :one | :all
+          repeat: :none | :one | :all,
+          shuffle_indexes: list(integer())
         }
 
   @typedoc "A boolean representing whether it is shuffling."
   @type shuffle :: boolean()
 
   @typedoc """
-  Elements in the playlist. Is a list of the `{%Metadata{}, integer()}` tuple.
-  The first element is the metadata of the song while the other is the index
-  when shuffling.
+  Elements in the playlist.
   """
-  @type elements :: list({%Metadata{}, integer()})
+  @type elements :: list(%Metadata{})
 
   @typedoc """
   The current index in the playlist.
@@ -54,6 +54,11 @@ defmodule Cassian.Structs.Playlist do
   """
   @type repeat :: :one | :none | :all
 
+  @typedoc """
+  The indexes of the songs in shuffled regime
+  """
+  @type shuffle_indexes :: list(integer())
+
   defdelegate exists?(guild_id), to: Playlist
   defdelegate show(guild_id), to: Playlist
   defdelegate insert!(guild_id, metadata), to: Playlist
@@ -62,49 +67,30 @@ defmodule Cassian.Structs.Playlist do
   defdelegate unshuffle(guild_id), to: Playlist
   defdelegate put(playlist), to: Playlist
 
-  defp reverse_magick(%__MODULE__{reverse: false, index: index}, sorted) do
+  @doc """
+  Order the playlist. Returns the ordered list with the index of the current song.
+  """
+  @spec order_playlist(playlist :: %__MODULE__{}) :: {integer(), list(%Metadata{})}
+  def order_playlist(playlist) do
+    index = playlist.index
+
+    sorted =
+      if playlist.shuffle do
+        Enum.map(playlist.shuffle_indexes, fn index -> Enum.at(playlist.elements, index) end)
+      else
+        playlist.elements
+      end
+
+    reverse_magick(index, sorted, playlist.reverse)
+  end
+
+  defp reverse_magick(index, sorted, false) do
     {index, sorted}
   end
 
-  defp reverse_magick(%__MODULE__{index: index}, sorted) do
+  defp reverse_magick(index, sorted, _) do
     sorted = Enum.reverse(sorted)
     index = length(sorted) - 1 - index
     {index, sorted}
-  end
-
-  @doc """
-  Order the playlist. Returns the ordered list with the index of the current song.
-  It doesn't reverse the list.
-  """
-  @spec order_playlist(playlist :: %__MODULE__{}) :: {integer(), list(%Metadata{})}
-  def order_playlist(playlist),
-    do: indexed_sorted(playlist)
-
-  @doc false
-  defp indexed_sorted(playlist) do
-    sorted =
-      if playlist.shuffle do
-        shuffle_sort(playlist)
-      else
-        extract_metadatas_ordered(playlist.elements)
-      end
-
-    reverse_magick(playlist, sorted)
-  end
-
-  @doc """
-  Sort the playlist to how it should play when it is being shuffled.
-  """
-  @spec shuffle_sort(playlist :: %__MODULE__{}) :: list(%Metadata{})
-  def shuffle_sort(playlist) do
-    Enum.sort_by(playlist.elements, fn {_metadata, index} -> index end)
-    |> extract_metadatas_ordered()
-  end
-
-  @doc """
-  Extract the metadatas from an already-ordered list.
-  """
-  def extract_metadatas_ordered(elements) do
-    Enum.reduce(elements, [], fn {metadata, _index}, acc -> acc ++ [metadata] end)
   end
 end

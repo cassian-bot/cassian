@@ -55,7 +55,6 @@ defmodule Cassian.Consumers.ReactionEvent do
   end
 
   defp handle_emoji(@play_pause, _message) do
-
   end
 
   defp handle_emoji(@stop, message) do
@@ -67,7 +66,6 @@ defmodule Cassian.Consumers.ReactionEvent do
   end
 
   defp handle_emoji(@shuffle, _message) do
-
   end
 
   defp handle_emoji(@repeat, message) do

@@ -114,67 +114,77 @@ defmodule Cassian.Servers.Playlist do
 
   @doc false
   def handle_cast({:insert, metadata}, state) do
+    # Doing this so that if it is shuffled, the shuffle index is added as well
+    # and the song is displayed.
     state =
-      state
-      |> Map.put(:elements, state.elements ++ [{metadata, nil}])
+      if state.shuffle do
+        Map.put(state, :shuffle_indexes, state.shuffle_indexes ++ [length(state.elements)])
+      else
+        state
+      end
+      |> Map.put(:elements, state.elements ++ [metadata])
 
     {:noreply, state}
   end
 
   @doc false
   def handle_cast(:shuffle, state) do
+    # This is where the fun being and the real utilization of the
+    # data structure...
+
     size = length(state.elements) - 1
 
-    # Generating indexes for the new shuffle
-
+    # New shuffle indexes which take priority in
+    # shuffle mode.
     shuffled_indexes =
       0..size
       |> Enum.to_list()
       |> Enum.shuffle()
 
-    # Update all of the elements with a new shuffle index
+    index =
+      if state.shuffle do
+        Enum.at(state.shuffle_indexes, state.index)
+      else
+        state.index
+      end
 
-    new_elements =
-      0..size
-      |> Enum.map(&extract_reshuffled(&1, state, shuffled_indexes))
-
-    # Extract the new index of the current song playing
-
-    {_metadata, new_index} = Enum.at(new_elements, state.index)
-
-    # Set the current index to the new shuflfed one
-    # Set all of the elements to the new ones
+    # Find the index of the current song.
+    new_index =
+      shuffled_indexes
+      |> Enum.find_index(fn si -> si == index end)
 
     state =
       state
       |> Map.put(:index, new_index)
-      |> Map.put(:elements, new_elements)
+      |> Map.put(:shuffle_indexes, shuffled_indexes)
       |> Map.put(:shuffle, true)
 
     {:noreply, state}
   end
 
-  def handle_cast(:unshuffle, state) do
-    current_meta_index =
-      state.elements
-      |> Enum.find_index(fn {_meta, index} -> index == state.index end)
+  @doc false
+  def handle_cast(:unshuffle, state) when state.shuffle do
+    new_index =
+      state.shuffle_indexes
+      |> Enum.at(state.index)
 
     state =
       state
+      |> Map.put(:shuffle_indexes, [])
       |> Map.put(:shuffle, false)
-      |> Map.put(:index, current_meta_index)
+      |> Map.put(:index, new_index)
 
     {:noreply, state}
   end
 
-  defp extract_reshuffled(index, state, shuffled_indexes) do
-    {metadata, _index} = Enum.at(state.elements, index)
-    {metadata, Enum.at(shuffled_indexes, index)}
+  @doc false
+  def handle_cast(:unshuffle, state) do
+    {:noreply, state}
   end
 
   @doc false
   def start(guild_id, metadata) do
-    GenServer.start(__MODULE__, %Playlist{elements: [{metadata, nil}], guild_id: guild_id},
+    GenServer.start(__MODULE__, %Playlist{elements: [metadata], guild_id: guild_id},
       name: from_guild_id(guild_id)
     )
   end

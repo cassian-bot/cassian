@@ -49,13 +49,12 @@ defmodule Cassian.Managers.PlayManager do
     end
   end
 
-  defp in_bound?(index, ordered) do
-    index = index + 1
-    index >= length(ordered) and index <= length(ordered)
+  def in_bound?(index, ordered) do
+    index >= 0 and index < length(ordered)
   end
 
   # Keep the index in bounds, loops around.
-  defp keep_in_bounds(index, ordered) do
+  def keep_in_bounds(index, ordered) do
     size = length(ordered)
     index = if index >= size, do: 0, else: index
     if index < 0, do: size - 1, else: index
@@ -78,10 +77,18 @@ defmodule Cassian.Managers.PlayManager do
     if state.status == :noop and Playlist.exists?(guild_id) do
       case Playlist.show(guild_id) do
         {:ok, playlist} ->
-          {index, ordered} = Playlist.order_playlist(playlist)
+          {old_index, ordered} = Playlist.order_playlist(playlist)
 
-          should_play? = !((playlist.repeat == :none) and (!in_bound?(index, ordered)))
+          index =
+            if playlist.shuffle do
+              Enum.at(playlist.shuffle_indexes, old_index)
+            else
+              old_index
+            end
 
+          should_play? = !(playlist.repeat == :none and !in_bound?(index, ordered))
+
+          index = old_index
 
           if should_play? do
             index = keep_in_bounds(index, ordered)
@@ -269,12 +276,24 @@ defmodule Cassian.Managers.PlayManager do
           # have to do the negative, i.e. increment it by two?
           new_index = playlist.index + if playlist.reverse, do: 2, else: -2
 
+          # Edit: I was right, mostly... In cases where index > 1 then it works. When index is
+          # 0 or 1 in normal mode this bugs...
+          new_index =
+            if playlist.reverse do
+              # I honestly have no clue if this works. I'll have to test it first.
+              new_index
+            else
+              # ... This will set the index to be minimaly -1, it iwll be later incremented to zero.
+              max(-1, new_index)
+            end
+
           playlist
           |> Map.put(:index, new_index)
           |> Playlist.put()
         end
 
-        Nostrum.Voice.stop(guild_id)
+        if Nostrum.Voice.playing?(guild_id),
+          do: Nostrum.Voice.stop(guild_id)
 
       {:error, :noop} ->
         :error
