@@ -129,32 +129,27 @@ defmodule Cassian.Servers.Playlist do
 
   @doc false
   def handle_cast(:shuffle, state) do
+    # This is where the fun being and the real utilization of the
+    # data structure...
+
     size = length(state.elements) - 1
 
-    # Generating indexes for the new shuffle
-
+    # New shuffle indexes which take priority in
+    # shuffle mode.
     shuffled_indexes =
       0..size
       |> Enum.to_list()
       |> Enum.shuffle()
 
-    # Update all of the elements with a new shuffle index
-
-    new_elements =
-      0..size
-      |> Enum.map(&extract_reshuffled(&1, state, shuffled_indexes))
-
-    # Extract the new index of the current song playing
-
-    {_metadata, new_index} = Enum.at(new_elements, state.index)
-
-    # Set the current index to the new shuflfed one
-    # Set all of the elements to the new ones
+    # Find the index of the current song.
+    new_index =
+      shuffled_indexes
+      |> Enum.find_index(fn si -> si == state.index end)
 
     state =
       state
       |> Map.put(:index, new_index)
-      |> Map.put(:elements, new_elements)
+      |> Map.put(:shuffle_indexes, shuffled_indexes)
       |> Map.put(:shuffle, true)
 
     {:noreply, state}
