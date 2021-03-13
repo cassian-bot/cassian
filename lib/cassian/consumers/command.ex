@@ -65,10 +65,10 @@ defmodule Cassian.Consumers.Command do
         Playback.Unshuffle
 
       "play" ->
-        Commands.Music.Play
+        Playback.Play
 
       "stop" ->
-        Commands.Music.Stop
+        Playback.Stop
 
       _ ->
         nil
