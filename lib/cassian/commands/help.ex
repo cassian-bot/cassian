@@ -7,10 +7,17 @@ defmodule Cassian.Commands.Help do
   The help command. Shows a menu of commands.
   """
 
-  def ship?, do: true
-  def caller, do: "help"
-  def desc, do: "Show this menu!"
-  def example, do: "help"
+  def example do
+    "help <part>"
+  end
+
+  def short_desc do
+    "This command!"
+  end
+
+  def long_desc do
+    nil
+  end
 
   @doc false
   def execute(message, _args) do
@@ -38,7 +45,7 @@ defmodule Cassian.Commands.Help do
       Embed.put_field(
         embed,
         "`#{Cassian.command_prefix!()}#{module.example}`",
-        "#{module.desc}",
+        "#{module.short_desc}",
         false
       )
 end
