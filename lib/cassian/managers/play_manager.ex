@@ -143,13 +143,7 @@ defmodule Cassian.Managers.PlayManager do
       |> Embed.put_url(metadata.youtube_link)
       |> Embed.put_title("Now playing: #{metadata.title}")
 
-    case MessageManager.send_embed(embed, channel_id) do
-      {:ok, message} ->
-        MessageManager.add_control_reactions(message)
-
-      _ ->
-        nil
-    end
+    MessageManager.send_embed(embed, channel_id)
   end
 
   @doc """
