@@ -8,6 +8,7 @@ defmodule Cassian.Commands.Music.Show do
   def ship?, do: true
   def caller, do: "info"
   def desc, do: "Information the current song and some of the others in the playlist."
+  def example, do: "info"
 
   def execute(message, _args) do
     case Playlist.show(message.guild_id) do
@@ -34,10 +35,26 @@ defmodule Cassian.Commands.Music.Show do
 
     metadata = Enum.at(sorted, index)
 
+    emojis =
+      [if(playlist.reverse, do: ":arrow_backward:", else: ":arrow_forward:")] ++
+        if(playlist.shuffle, do: [":twisted_rightwards_arrows:"], else: []) ++
+        case playlist.repeat do
+          :one ->
+            [":repeat_one:"]
+
+          :all ->
+            [":repeat:"]
+
+          :none ->
+            []
+        end
+
+    emojis = "#{Enum.join(emojis, " ")}  "
+
     embed =
       EmbedUtils.create_empty_embed!()
       |> EmbedUtils.put_color_on_embed(metadata.provider_color)
-      |> Embed.put_title("Showing the current playlist.")
+      |> Embed.put_title("#{emojis}Showing the current playlist:")
 
     description =
       sorted

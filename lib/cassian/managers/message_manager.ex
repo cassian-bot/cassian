@@ -1,11 +1,8 @@
 defmodule Cassian.Managers.MessageManager do
-  @timeout 1_500
+  @timeout 5_000
 
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Message
-  alias Cassian.Utils.Embed, as: EmbedUtils
-
-  @command_reactions ["⬅️", "⏮️", "⏯️", "⏹️", "⏭️", "🔀", "🔁", "🔂", "➡️"]
 
   require Logger
 
@@ -57,31 +54,5 @@ defmodule Cassian.Managers.MessageManager do
   defp dissapear(message) do
     :timer.sleep(@timeout)
     Nostrum.Api.delete_message(message)
-  end
-
-  @doc """
-  Add roles used for controlling the bot and audio.
-  """
-  @spec add_control_reactions(message :: %Message{}) :: :ok
-  def add_control_reactions(message) do
-    try do
-      @command_reactions
-      |> Enum.with_index()
-      |> Enum.each(fn {reaction, index} ->
-        :timer.sleep(0 + (index + 1) * 100)
-
-        Nostrum.Api.create_reaction!(
-          message.channel_id,
-          message.id,
-          %Nostrum.Struct.Emoji{name: reaction}
-        )
-      end)
-    rescue
-      _ ->
-        EmbedUtils.generate_error_embed(
-          "I couldn't manage to add reactions.",
-          "I use reactions for better control. Check if my permissions are okay."
-        )
-    end
   end
 end

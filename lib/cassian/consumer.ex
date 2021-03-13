@@ -6,6 +6,8 @@ defmodule Cassian.Consumer do
 
   use Nostrum.Consumer
 
+  alias Cassian.Consumers.{Command, VoiceEvent}
+
   def start_link do
     Consumer.start_link(__MODULE__)
   end
@@ -13,7 +15,7 @@ defmodule Cassian.Consumer do
   @doc false
   def handle_event({:MESSAGE_CREATE, message, _ws_state}) do
     if !message.author.bot and is_cassian_command?(message),
-      do: Cassian.Consumers.Command.handle_message(message)
+      do: Command.handle_message(message)
   end
 
   @dialyzer {:no_return, {:update_status, 3}}
@@ -25,17 +27,12 @@ defmodule Cassian.Consumer do
 
   @doc false
   def handle_event({:VOICE_SPEAKING_UPDATE, data, _}) do
-    Cassian.Consumers.VoiceEvent.voice_speaking_update(data)
+    VoiceEvent.voice_speaking_update(data)
   end
 
   @doc false
   def handle_event({:VOICE_STATE_UPDATE, data, _}) do
-    Cassian.Consumers.VoiceEvent.voice_state_update(data)
-  end
-
-  @doc false
-  def handle_event({:MESSAGE_REACTION_ADD, data, _}) do
-    Cassian.Consumers.ReactionEvent.handle_event(data)
+    VoiceEvent.voice_state_update(data)
   end
 
   @doc false

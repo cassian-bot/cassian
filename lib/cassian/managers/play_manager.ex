@@ -143,13 +143,7 @@ defmodule Cassian.Managers.PlayManager do
       |> Embed.put_url(metadata.youtube_link)
       |> Embed.put_title("Now playing: #{metadata.title}")
 
-    case MessageManager.send_embed(embed, channel_id) do
-      {:ok, message} ->
-        MessageManager.add_control_reactions(message)
-
-      _ ->
-        nil
-    end
+    MessageManager.send_embed(embed, channel_id)
   end
 
   @doc """
@@ -352,6 +346,82 @@ defmodule Cassian.Managers.PlayManager do
         EmbedUtils.generate_error_embed(
           "There is no playlist.",
           "You can't stop the playlist if none exists."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  end
+
+  @doc """
+  Shuffle the playlist.
+  """
+  @spec shuffle(guild_id :: Snowflake.t()) :: :ok | :noop
+  def shuffle(guild_id) do
+    if Playlist.exists?(guild_id) do
+      Playlist.shuffle(guild_id)
+      :ok
+    else
+      :noop
+    end
+  end
+
+  @doc """
+  Shuffle the playlist and notify a channel that is has been shuffled.
+  """
+  @spec shuffle_and_notify(message :: %Message{}) :: :ok | :noop
+  def shuffle_and_notify(message) do
+    case shuffle(message.guild_id) do
+      :ok ->
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title("Shuffled the music.")
+
+      :error ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "You can't shuffle the playlist if none exists."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  end
+
+  @doc """
+  Unshuffle the playlist.
+  """
+  @spec unshuffle(guild_id :: Snowflake.t()) :: :ok | :noop | :no
+  def unshuffle(guild_id) do
+    case Playlist.show(guild_id) do
+      {:ok, playlist} ->
+        if playlist.shuffle do
+          Playlist.unshuffle(guild_id)
+          :ok
+        else
+          :no
+        end
+
+      {:error, :noop} ->
+        :noop
+    end
+  end
+
+  @doc """
+  Unshuffle the playlist and notify a channel that is has been shuffled.
+  """
+  @spec unshuffle_and_notify(message :: %Message{}) :: :ok | :noop
+  def unshuffle_and_notify(message) do
+    case unshuffle(message.guild_id) do
+      :ok ->
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title("Unshuffled the music.")
+
+      :noop ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "You can't unshuffle the playlist if none exists."
+        )
+
+      :no ->
+        EmbedUtils.generate_error_embed(
+          "Not shuffled.",
+          "You can't unshuffle the playlist which isn't shuffled."
         )
     end
     |> MessageManager.send_dissapearing_embed(message.channel_id)

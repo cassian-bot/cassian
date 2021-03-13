@@ -9,6 +9,7 @@ defmodule Cassian.Commands.Music.Play do
   def ship?, do: true
   def caller, do: "play"
   def desc, do: "Play music in your voice channel!"
+  def example, do: "play"
 
   # Main logic pipe
 
