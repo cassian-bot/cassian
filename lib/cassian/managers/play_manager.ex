@@ -382,4 +382,48 @@ defmodule Cassian.Managers.PlayManager do
     end
     |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
+
+  @doc """
+  Unshuffle the playlist.
+  """
+  @spec unshuffle(guild_id :: Snowflake.t()) :: :ok | :noop | :no
+  def unshuffle(guild_id) do
+    case Playlist.show(guild_id) do
+      {:ok, playlist} ->
+        if playlist.shuffle do
+          Playlist.unshuffle(guild_id)
+          :ok
+        else
+          :no
+        end
+
+      {:error, :noop} ->
+        :noop
+    end
+  end
+
+  @doc """
+  Unshuffle the playlist and notify a channel that is has been shuffled.
+  """
+  @spec unshuffle_and_notify(message :: %Message{}) :: :ok | :noop
+  def unshuffle_and_notify(message) do
+    case unshuffle(message.guild_id) do
+      :ok ->
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title("Unshuffled the music.")
+
+      :noop ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "You can't unshuffle the playlist if none exists."
+        )
+
+      :no ->
+        EmbedUtils.generate_error_embed(
+          "Not shuffled.",
+          "You can't unshuffle the playlist which isn't shuffled."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  end
 end
