@@ -35,10 +35,28 @@ defmodule Cassian.Commands.Music.Show do
 
     metadata = Enum.at(sorted, index)
 
+    emojis =
+      [(if playlist.reverse, do: ":arrow_backward:", else: ":arrow_forward:")] ++
+      ((if playlist.shuffle, do: [":twisted_rightwards_arrows:"], else: [])) ++
+      (
+        case playlist.repeat do
+          :one ->
+            [":repeat_one:"]
+
+          :all ->
+            [":repeat:"]
+
+          :none ->
+            []
+        end
+      )
+
+    emojis = "#{Enum.join(emojis, " ")}  "
+
     embed =
       EmbedUtils.create_empty_embed!()
       |> EmbedUtils.put_color_on_embed(metadata.provider_color)
-      |> Embed.put_title("Showing the current playlist.")
+      |> Embed.put_title("#{emojis}Showing the current playlist:")
 
     description =
       sorted
