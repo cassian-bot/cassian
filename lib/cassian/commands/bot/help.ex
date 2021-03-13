@@ -22,9 +22,10 @@ defmodule Cassian.Commands.Bot.Help do
     create_empty_embed!()
     |> Embed.put_title("Yo! Thanks for adding me to the server!")
     |> Embed.put_description(
-      "I currently don't have a propper help command as I'm a WIP. Though once it has been created it will be linked here so "
-      <>
-      "you can see all of my commands. Although you can start playing music with `#{Cassian.command_prefix!()}play`."
+      "I currently don't have a propper help command as I'm a WIP. Though once it has been created it will be linked here so " <>
+        "you can see all of my commands. Although you can start playing music with `#{
+          Cassian.command_prefix!()
+        }play`."
     )
     |> Embed.put_thumbnail(Cassian.get_own_avatar())
   end

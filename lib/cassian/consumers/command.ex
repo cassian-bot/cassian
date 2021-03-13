@@ -26,12 +26,12 @@ defmodule Cassian.Consumers.Command do
     end
   end
 
-    # Filter the prefix from the command in the tuple.
-    @spec filter_command({command :: String.t(), args :: list(String.t())}) ::
-      {command :: String.t(), args :: list(String.t())}
-    defp filter_command({command, args}),
+  # Filter the prefix from the command in the tuple.
+  @spec filter_command({command :: String.t(), args :: list(String.t())}) ::
+          {command :: String.t(), args :: list(String.t())}
+  defp filter_command({command, args}),
     do:
-    {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
+      {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
 
   defp associated_module(command) do
     alias Cassian.Commands.{Bot, Playback}
