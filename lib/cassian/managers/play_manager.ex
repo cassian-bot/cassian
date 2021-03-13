@@ -86,11 +86,7 @@ defmodule Cassian.Managers.PlayManager do
               old_index
             end
 
-          IO.inspect(playlist.repeat == :none, label: "Is none")
-          IO.inspect(in_bound?(index, ordered), label: "In bounds")
-
           should_play? = !((playlist.repeat == :none) and (!in_bound?(index, ordered)))
-          |> IO.inspect(label: "Should play")
 
           index = old_index
 
