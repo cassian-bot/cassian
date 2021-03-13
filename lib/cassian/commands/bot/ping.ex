@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.Ping do
+defmodule Cassian.Commands.Bot.Ping do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.MessageManager
@@ -7,10 +7,7 @@ defmodule Cassian.Commands.Ping do
   The ping command. Shows how many ms was needed to perform the request.
   """
 
-  def ship?, do: true
-  def caller, do: "ping"
-  def desc, do: "Show the delay!"
-  def example, do: "ping"
+  def call, do: "ping"
 
   @doc false
   def execute(message, _args) do

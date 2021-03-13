@@ -9,12 +9,6 @@ defmodule Cassian do
   @default_command_prefix Application.get_env(:cassian, :prefix)
 
   @doc """
-  The a map containing all of the commands and their associated modules
-  """
-  @spec commands! :: %{String.t() => Module}
-  def commands!, do: Cassian.Managers.CommandManager.commands!()
-
-  @doc """
   Get the avatar of the bot itself.
   """
   @spec get_own_avatar() :: String.t()

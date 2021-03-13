@@ -3,8 +3,6 @@ defmodule Cassian.Consumers.Command do
   Main consumer for the command event of the bot. Redirects it to other commands.
   """
 
-  import Cassian.Managers.CommandManager
-
   @doc """
   Handle the mssage. A message has been filtered which is for the bot.
   Dynamically find which module should be used for the command and continue on with that.
@@ -19,12 +17,12 @@ defmodule Cassian.Consumers.Command do
       |> filter_command()
 
     case associated_module(command) do
-      {:ok, module} ->
+      nil ->
+        :noop
+
+      module ->
         module.execute(message, args)
         :ok
-
-      _ ->
-        :noop
     end
   end
 
@@ -34,4 +32,46 @@ defmodule Cassian.Consumers.Command do
   defp filter_command({command, args}),
     do:
       {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
+
+  defp associated_module(command) do
+    alias Cassian.Commands.{Bot, Playback}
+
+    case command do
+      "help" ->
+        Bot.Help
+
+      "ping" ->
+        Bot.Ping
+
+      "backward" ->
+        Playback.Backward
+
+      "forward" ->
+        Playback.Forward
+
+      "next" ->
+        Playback.Next
+
+      "playlist" ->
+        Playback.Playlist
+
+      "repeat" ->
+        Playback.Repeat
+
+      "shuffle" ->
+        Playback.Shuffle
+
+      "unshuffle" ->
+        Playback.Unshuffle
+
+      "play" ->
+        Commands.Music.Play
+
+      "stop" ->
+        Commands.Music.Stop
+
+      _ ->
+        nil
+    end
+  end
 end

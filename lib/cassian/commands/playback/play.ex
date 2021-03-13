@@ -1,15 +1,10 @@
-defmodule Cassian.Commands.Music.Play do
+defmodule Cassian.Commands.Playback.Play do
   use Cassian.Behaviours.Command
 
   import Cassian.Utils
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
   alias Cassian.Managers.{MessageManager, PlayManager}
-
-  def ship?, do: true
-  def caller, do: "play"
-  def desc, do: "Play music in your voice channel!"
-  def example, do: "play"
 
   # Main logic pipe
 
