@@ -23,7 +23,6 @@ defmodule Cassian.MixProject do
   defp deps do
     [
       {:nostrum, git: "https://github.com/Kraigie/nostrum.git"},
-      {:con_cache, "~> 0.13"},
       {:cowlib, "~> 2.9.1", override: true},
       {:plug_cowboy, "~> 2.4"},
       {:poison, "~> 4.0", override: true}
