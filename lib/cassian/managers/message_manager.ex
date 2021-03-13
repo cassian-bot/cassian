@@ -3,7 +3,6 @@ defmodule Cassian.Managers.MessageManager do
 
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Message
-  alias Cassian.Utils.Embed, as: EmbedUtils
 
   require Logger
 
