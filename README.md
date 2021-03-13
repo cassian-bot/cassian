@@ -4,7 +4,7 @@
 
 A Discord bot for music written in Elixir.
 
-![Server count](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.gigalixirapp.com%2Fapi%2Fshields%2Fguilds) ![Elixir version](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.gigalixirapp.com%2Fapi%2Fshields%2Fsystem)
+![Server count](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.herokuapp.com%2Fapi%2Fshields%2Fguilds) ![Elixir version](https://img.shields.io/endpoint?url=https%3A%2F%2Fcassian.herokuapp.com%2Fapi%2Fshields%2Fsystem)
 
 ## Table of contents
 
