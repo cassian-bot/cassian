@@ -156,14 +156,14 @@ defmodule Cassian.Servers.Playlist do
   end
 
   def handle_cast(:unshuffle, state) do
-    current_meta_index =
-      state.elements
-      |> Enum.find_index(fn {_meta, index} -> index == state.index end)
+    new_index =
+      state.shuffle_indexes
+      |> Enum.at(state.index)
 
     state =
       state
       |> Map.put(:shuffle, false)
-      |> Map.put(:index, current_meta_index)
+      |> Map.put(:index, new_index)
 
     {:noreply, state}
   end
