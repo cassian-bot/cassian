@@ -177,6 +177,7 @@ defmodule Cassian.Servers.Playlist do
 
       state =
         state
+        |> Map.put(:shuffle_indexes, [])
         |> Map.put(:shuffle, false)
         |> Map.put(:index, new_index)
 
