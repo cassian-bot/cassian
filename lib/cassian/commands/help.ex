@@ -34,5 +34,11 @@ defmodule Cassian.Commands.Help do
   end
 
   def add_command({_caller, module}, embed),
-    do: Embed.put_field(embed, "`#{Cassian.command_prefix!()}#{module.example}`", "#{module.desc}", false)
+    do:
+      Embed.put_field(
+        embed,
+        "`#{Cassian.command_prefix!()}#{module.example}`",
+        "#{module.desc}",
+        false
+      )
 end

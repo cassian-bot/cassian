@@ -36,9 +36,8 @@ defmodule Cassian.Commands.Music.Show do
     metadata = Enum.at(sorted, index)
 
     emojis =
-      [(if playlist.reverse, do: ":arrow_backward:", else: ":arrow_forward:")] ++
-      ((if playlist.shuffle, do: [":twisted_rightwards_arrows:"], else: [])) ++
-      (
+      [if(playlist.reverse, do: ":arrow_backward:", else: ":arrow_forward:")] ++
+        if(playlist.shuffle, do: [":twisted_rightwards_arrows:"], else: []) ++
         case playlist.repeat do
           :one ->
             [":repeat_one:"]
@@ -49,7 +48,6 @@ defmodule Cassian.Commands.Music.Show do
           :none ->
             []
         end
-      )
 
     emojis = "#{Enum.join(emojis, " ")}  "
 
