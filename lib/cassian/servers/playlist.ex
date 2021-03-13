@@ -155,22 +155,28 @@ defmodule Cassian.Servers.Playlist do
     {:noreply, state}
   end
 
-  def handle_cast(:unshuffle, state) do
-    new_index =
-      state.shuffle_indexes
-      |> Enum.at(state.index)
+  @doc false
+  def handle_cast(:unshuffle, state) when state.shuffle do
+      new_index =
+        state.shuffle_indexes
+        |> Enum.at(state.index)
 
-    state =
-      state
-      |> Map.put(:shuffle, false)
-      |> Map.put(:index, new_index)
+      state =
+        state
+        |> Map.put(:shuffle, false)
+        |> Map.put(:index, new_index)
 
     {:noreply, state}
   end
 
   @doc false
+  def handle_cast(:unshuffle, state) do
+    {:noreply, state}
+  end
+
+  @doc false
   def start(guild_id, metadata) do
-    GenServer.start(__MODULE__, %Playlist{elements: [{metadata, nil}], guild_id: guild_id},
+    GenServer.start(__MODULE__, %Playlist{elements: [metadata], guild_id: guild_id},
       name: from_guild_id(guild_id)
     )
   end
