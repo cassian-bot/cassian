@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.Help do
+defmodule Cassian.Commands.Bot.Help do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.MessageManager

@@ -3,8 +3,6 @@ defmodule Cassian.Consumers.Command do
   Main consumer for the command event of the bot. Redirects it to other commands.
   """
 
-  import Cassian.Managers.CommandManager
-
   @doc """
   Handle the mssage. A message has been filtered which is for the bot.
   Dynamically find which module should be used for the command and continue on with that.
@@ -19,19 +17,62 @@ defmodule Cassian.Consumers.Command do
       |> filter_command()
 
     case associated_module(command) do
-      {:ok, module} ->
+      nil ->
+        :noop
+
+      module ->
         module.execute(message, args)
         :ok
-
-      _ ->
-        :noop
     end
   end
 
-  # Filter the prefix from the command in the tuple.
-  @spec filter_command({command :: String.t(), args :: list(String.t())}) ::
-          {command :: String.t(), args :: list(String.t())}
-  defp filter_command({command, args}),
+    # Filter the prefix from the command in the tuple.
+    @spec filter_command({command :: String.t(), args :: list(String.t())}) ::
+      {command :: String.t(), args :: list(String.t())}
+    defp filter_command({command, args}),
     do:
-      {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
+    {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
+
+  defp associated_module(command) do
+    alias Cassian.Commands
+
+    case command do
+      "help" ->
+        #Commands.Bot.Help
+        nil
+
+      "ping" ->
+        Commands.Bot.Ping
+
+      "backward" ->
+        Commands.Music.Playlist.Backward
+
+      "forward" ->
+        Commands.Music.Playlist.Forward
+
+      "next" ->
+        Commands.Music.Playlist.Next
+
+      "playlist" ->
+        Commands.Music.Playlist.Playlist
+
+      "repeat" ->
+        Commands.Music.Playlist.Repeat
+
+      "shuffle" ->
+        Commands.Music.Playlist.Shuffle
+
+      "unshuffle" ->
+        Commands.Music.Playlist.Unshuffle
+
+      "play" ->
+        Commands.Music.Play
+
+      "stop" ->
+        Commands.Music.Stop
+
+      _ ->
+        nil
+    end
+  end
 end

@@ -11,8 +11,34 @@ defmodule Cassian do
   @doc """
   The a map containing all of the commands and their associated modules
   """
-  @spec commands! :: %{String.t() => Module}
-  def commands!, do: Cassian.Managers.CommandManager.commands!()
+  @spec commands! :: {list(Module), list(Module), list(Module)}
+  def commands! do
+    alias Cassian.Commands
+    alias Commands.Bot
+    alias Commands.Music
+    alias Music.Playlist
+
+    {
+      [
+        Bot.Ping,
+        Bot.Help
+      ],
+      [
+        Music.Stop,
+        Music.Play,
+      ],
+      [
+        Playlist.Backward,
+        Playlist.Forward,
+        Playlist.Next,
+        Playlist.Playlist,
+        Playlist.Previous,
+        Playlist.Repeat,
+        Playlist.Shuffle,
+        Playlist.Unshuffle
+      ]
+    }
+  end
 
   @doc """
   Get the avatar of the bot itself.

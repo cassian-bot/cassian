@@ -1,4 +1,4 @@
-defmodule Cassian.Commands.Ping do
+defmodule Cassian.Commands.Bot.Ping do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.MessageManager
