@@ -10,7 +10,7 @@ defmodule Cassian.Commands.List.Repeat do
   """
 
   def example do
-    "list repeat [one|none|all]"
+    "repeat [one|none|all]"
   end
 
   def short_desc do

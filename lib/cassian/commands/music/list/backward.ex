@@ -8,15 +8,15 @@ defmodule Cassian.Commands.List.Backward do
   """
 
   def example do
-    "list backwards"
+    "backward"
   end
 
   def short_desc do
-    "Play the list backwards."
+    "Play the playlist backward."
   end
 
   def long_desc do
-    "Play the list backwards. Newly added songs will play first."
+    "Play the list backward. Newly added songs will play first."
   end
 
   def execute(message, _args) do

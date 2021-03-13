@@ -1,14 +1,25 @@
-defmodule Cassian.Commands.Music.Show do
+defmodule Cassian.Commands.Music.Playlist do
   use Cassian.Behaviours.Command
   alias Cassian.Structs.Playlist
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Nostrum.Struct.Embed
   alias Cassian.Managers.MessageManager
 
-  def ship?, do: true
-  def caller, do: "info"
-  def desc, do: "Information the current song and some of the others in the playlist."
-  def example, do: "info"
+    @doc """
+    List command sub-module. Play the list forward.
+    """
+
+  def example do
+    "playlist"
+  end
+
+  def short_desc do
+    "Show the information for the current playlist."
+  end
+
+  def long_desc do
+    short_desc()
+  end
 
   def execute(message, _args) do
     case Playlist.show(message.guild_id) do

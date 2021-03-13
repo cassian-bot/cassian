@@ -8,15 +8,15 @@ defmodule Cassian.Commands.List.Forward do
   """
 
   def example do
-    "list forward"
+    "forward"
   end
 
   def short_desc do
-    "Play the list forward."
+    "Play the playlist forward."
   end
 
   def long_desc do
-    "Play the list forward. This is the default setting for lists."
+    "Play the playlist forward. This is the default setting for playlists."
   end
 
   def execute(message, _args) do

@@ -1,18 +1,18 @@
-defmodule Cassian.Commands.List.Next do
+defmodule Cassian.Commands.List.Previous do
   use Cassian.Behaviours.Command
 
   alias Cassian.Managers.PlayManager
 
   @doc """
-  List command sub-module. Play the next song in the list.
+  List command sub-module. Play the previous song.
   """
 
   def example do
-    "list next"
+    "previous"
   end
 
   def short_desc do
-    "Play the next song in the list."
+    "Play the previous song in the playlist."
   end
 
   def long_desc do
@@ -20,6 +20,6 @@ defmodule Cassian.Commands.List.Next do
   end
 
   def execute(message, _args) do
-    PlayManager.switch_song_with_notification(message, true)
+    PlayManager.switch_song_with_notification(message, false)
   end
 end

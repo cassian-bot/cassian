@@ -6,10 +6,17 @@ defmodule Cassian.Commands.Music.Play do
   alias Cassian.Utils.Voice, as: VoiceUtils
   alias Cassian.Managers.{MessageManager, PlayManager}
 
-  def ship?, do: true
-  def caller, do: "play"
-  def desc, do: "Play music in your voice channel!"
-  def example, do: "play"
+  def example do
+    "play"
+  end
+
+  def short_desc do
+    "Play or add a song to the playlist."
+  end
+
+  def long_desc do
+    short_desc()
+  end
 
   # Main logic pipe
 

@@ -8,7 +8,7 @@ defmodule Cassian.Commands.List.Shuffle do
   """
 
   def example do
-    "list shuffle"
+    "shuffle"
   end
 
   def short_desc do
