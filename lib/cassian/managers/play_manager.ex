@@ -350,4 +350,36 @@ defmodule Cassian.Managers.PlayManager do
     end
     |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
+
+  @doc """
+  Shuffle the playlist.
+  """
+  @spec shuffle(guild_id :: Snowflake.t()) :: :ok | :noop
+  def shuffle(guild_id) do
+    if Playlist.exists?(guild_id) do
+      Playlist.shuffle(guild_id)
+      :ok
+    else
+      :noop
+    end
+  end
+
+  @doc """
+  Shuffle the playlist and notify a channel that is has been shuffled.
+  """
+  @spec shuffle_and_notify(message :: %Message{}) :: :ok | :noop
+  def shuffle_and_notify(message) do
+    case shuffle(message.guild_id) do
+      :ok ->
+        EmbedUtils.create_empty_embed!()
+        |> Embed.put_title("Shuffled the music.")
+
+      :error ->
+        EmbedUtils.generate_error_embed(
+          "There is no playlist.",
+          "You can't shuffle the playlist if none exists."
+        )
+    end
+    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  end
 end
