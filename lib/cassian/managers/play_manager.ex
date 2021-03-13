@@ -86,7 +86,7 @@ defmodule Cassian.Managers.PlayManager do
               old_index
             end
 
-          should_play? = !((playlist.repeat == :none) and (!in_bound?(index, ordered)))
+          should_play? = !(playlist.repeat == :none and !in_bound?(index, ordered))
 
           index = old_index
 
@@ -103,6 +103,7 @@ defmodule Cassian.Managers.PlayManager do
             |> Map.put(:status, :playing)
             |> VoiceState.put()
           end
+
         _ ->
           nil
       end

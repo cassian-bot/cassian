@@ -171,15 +171,15 @@ defmodule Cassian.Servers.Playlist do
 
   @doc false
   def handle_cast(:unshuffle, state) when state.shuffle do
-      new_index =
-        state.shuffle_indexes
-        |> Enum.at(state.index)
+    new_index =
+      state.shuffle_indexes
+      |> Enum.at(state.index)
 
-      state =
-        state
-        |> Map.put(:shuffle_indexes, [])
-        |> Map.put(:shuffle, false)
-        |> Map.put(:index, new_index)
+    state =
+      state
+      |> Map.put(:shuffle_indexes, [])
+      |> Map.put(:shuffle, false)
+      |> Map.put(:index, new_index)
 
     {:noreply, state}
   end
