@@ -49,13 +49,12 @@ defmodule Cassian.Managers.PlayManager do
     end
   end
 
-  defp in_bound?(index, ordered) do
-    index = index + 1
-    index >= length(ordered) and index <= length(ordered)
+  def in_bound?(index, ordered) do
+    index >= 0 and index < length(ordered)
   end
 
   # Keep the index in bounds, loops around.
-  defp keep_in_bounds(index, ordered) do
+  def keep_in_bounds(index, ordered) do
     size = length(ordered)
     index = if index >= size, do: 0, else: index
     if index < 0, do: size - 1, else: index
@@ -78,10 +77,22 @@ defmodule Cassian.Managers.PlayManager do
     if state.status == :noop and Playlist.exists?(guild_id) do
       case Playlist.show(guild_id) do
         {:ok, playlist} ->
-          {index, ordered} = Playlist.order_playlist(playlist)
+          {old_index, ordered} = Playlist.order_playlist(playlist)
+
+          index =
+            if playlist.shuffle do
+              Enum.at(playlist.shuffle_indexes, old_index)
+            else
+              old_index
+            end
+
+          IO.inspect(playlist.repeat == :none, label: "Is none")
+          IO.inspect(in_bound?(index, ordered), label: "In bounds")
 
           should_play? = !((playlist.repeat == :none) and (!in_bound?(index, ordered)))
+          |> IO.inspect(label: "Should play")
 
+          index = old_index
 
           if should_play? do
             index = keep_in_bounds(index, ordered)
@@ -95,8 +106,7 @@ defmodule Cassian.Managers.PlayManager do
             state
             |> Map.put(:status, :playing)
             |> VoiceState.put()
-          end
-
+          else
         _ ->
           nil
       end
