@@ -1,9 +1,6 @@
 defmodule Cassian.Structs.VoiceState do
-  alias Cassian.Structs.Metadata
-
   defstruct [
     :guild_id,
-    :metadata,
     :status,
     :pause_seconds,
     :channel_id
@@ -11,7 +8,6 @@ defmodule Cassian.Structs.VoiceState do
 
   @type t() :: %__MODULE__{
           guild_id: Snowflake.t(),
-          metadata: Metadata.t(),
           status: :playing | :paused | :noop,
           pause_seconds: integer(),
           channel_id: Snowflake.t()
@@ -19,9 +15,6 @@ defmodule Cassian.Structs.VoiceState do
 
   @typedoc "The snowflake for the guild in question."
   @type guild_id :: Snowflake.t()
-
-  @typedoc "Map containing metadata for the currently playing song."
-  @type metadata :: Metadata.t()
 
   @typedoc "Atom regarding the status of playing."
   @type status :: :playing | :paused | :noop

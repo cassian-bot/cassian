@@ -10,6 +10,7 @@ defmodule Cassian.Commands.Ping do
   def ship?, do: true
   def caller, do: "ping"
   def desc, do: "Show the delay!"
+  def example, do: "ping"
 
   @doc false
   def execute(message, _args) do

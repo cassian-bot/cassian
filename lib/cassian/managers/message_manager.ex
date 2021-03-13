@@ -26,18 +26,12 @@ defmodule Cassian.Managers.MessageManager do
   end
 
   @doc """
-  Safely send a message embed to a chennl.
+  Safely send a message embed to a channel.
   """
-  # @spec send_embed(embed :: %Nostrum.Struct,Embed{}, channel_id :: Snowflake.t()) :: :ok | :noop
-  @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) :: :ok | :noop
+  @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) ::
+          {:ok, %Message{}} | {:error, any()}
   def send_embed(embed, channel_id) do
-    case Nostrum.Api.create_message(channel_id, embed: embed) do
-      {:ok, _message} ->
-        :ok
-
-      _ ->
-        :noop
-    end
+    Nostrum.Api.create_message(channel_id, embed: embed)
   end
 
   @doc """
