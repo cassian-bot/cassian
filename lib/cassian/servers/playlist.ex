@@ -114,9 +114,15 @@ defmodule Cassian.Servers.Playlist do
 
   @doc false
   def handle_cast({:insert, metadata}, state) do
+    # Doing this so that if it is shuffled, the shuffle index is added as well
+    # and the song is displayed.
     state =
-      state
-      |> Map.put(:elements, state.elements ++ [{metadata, nil}])
+      if state.shuffle do
+        Map.put(state, :shuffle_indexes, state.shuffle_indexes ++ [length(state.elements)])
+      else
+        state
+      end
+      |> Map.put(:elements, state.elements ++ [metadata])
 
     {:noreply, state}
   end
