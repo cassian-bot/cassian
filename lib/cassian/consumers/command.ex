@@ -52,6 +52,9 @@ defmodule Cassian.Consumers.Command do
       "next" ->
         Playback.Next
 
+      "previous" ->
+        Playback.Previous
+
       "playlist" ->
         Playback.Playlist
 
