@@ -1,6 +1,6 @@
 # Cassian
 
-![Cassian Banner](https://i.imgur.com/llT71oQ.png)
+![Cassian Banner](https://raw.githubusercontent.com/cassian-bot/assets/master/cassian_banner.png)
 
 A Discord bot for music written in Elixir.
 
