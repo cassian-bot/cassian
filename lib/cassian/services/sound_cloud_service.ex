@@ -12,7 +12,13 @@ defmodule Cassian.Services.SoundCloudService do
   def stream_from_url(url) do
     case acquire_track_id(url) do
       {:ok, track_id} ->
-        get_track_information(track_id)
+        case get_progressive_link(track_id) do
+          {:ok, progressive_transcoding} ->
+            stream_url(progressive_transcoding)
+
+          {:error, _} ->
+            nil
+        end
 
       _ ->
         {:error, nil}
@@ -47,7 +53,7 @@ defmodule Cassian.Services.SoundCloudService do
     end
   end
 
-  def get_track_information(track_id) do
+  def get_progressive_link(track_id) do
     url = "https://api-v2.soundcloud.com/tracks/#{track_id}"
 
     params = %{
@@ -55,6 +61,33 @@ defmodule Cassian.Services.SoundCloudService do
     }
 
     # Some information is here
-    HTTPoison.get(url, %{}, params: params)
+    case HTTPoison.get(url, %{}, params: params) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+      # Doesn't look safe but as long as SoundCloud IS giving an OK response the JSON is okay...
+        url =
+          Poison.decode!(body, %{keys: :atoms}).media.transcodings
+          |> Enum.filter(fn transcoding -> transcoding.format.protocol == "progressive" end)
+          |> List.first()
+          |> Map.get(:url)
+
+        {:ok, url}
+
+      _ ->
+        {:error, nil}
+    end
+  end
+
+  def stream_url(progressive_transcoding_url) do
+    params = %{
+      client_id: @client_id
+    }
+
+    case HTTPoison.get(progressive_transcoding_url, %{}, params: params) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {:ok, body |> Poison.decode!(keys: :atoms) |> Map.get(:url)}
+
+      _ ->
+        {:error, nil}
+    end
   end
 end
