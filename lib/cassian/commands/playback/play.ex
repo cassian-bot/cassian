@@ -4,7 +4,7 @@ defmodule Cassian.Commands.Playback.Play do
   import Cassian.Utils
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
-  alias Cassian.Managers.{MessageManager, PlayManager}
+  alias Cassian.Managers.{MessageManager, PlayManager, PlaylistManager}
 
   # Main logic pipe
 
@@ -59,7 +59,7 @@ defmodule Cassian.Commands.Playback.Play do
   """
   def handle_connect(message, voice_id, metadata) do
     VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
-    PlayManager.insert!(message.guild_id, message.channel_id, metadata)
+    PlaylistManager.insert!(message.guild_id, message.channel_id, metadata)
     PlayManager.play_if_needed(message.guild_id)
     MessageManager.disable_embed(message)
   end

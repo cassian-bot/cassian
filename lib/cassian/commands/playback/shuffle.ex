@@ -1,13 +1,13 @@
 defmodule Cassian.Commands.Playback.Shuffle do
   use Cassian.Behaviours.Command
 
-  alias Cassian.Managers.PlayManager
+  alias Cassian.Managers.PlaylistManager
 
   @doc """
   Shuffle and reshuffle.
   """
 
   def execute(message, _args) do
-    PlayManager.shuffle_and_notify(message)
+    PlaylistManager.shuffle_and_notify(message)
   end
 end

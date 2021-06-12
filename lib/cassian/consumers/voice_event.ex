@@ -7,7 +7,7 @@ defmodule Cassian.Consumers.VoiceEvent do
 
   alias Cassian.Structs.{VoiceState, Playlist}
 
-  alias Cassian.Managers.PlayManager
+  alias Cassian.Managers.{PlayManager, PlaylistManager}
 
   require Logger
 
@@ -24,7 +24,7 @@ defmodule Cassian.Consumers.VoiceEvent do
     |> Map.put(:status, :noop)
     |> VoiceState.put()
 
-    PlayManager.alter_index(guild_id)
+    PlaylistManager.alter_index(guild_id)
     PlayManager.play_if_needed(guild_id)
   end
 
