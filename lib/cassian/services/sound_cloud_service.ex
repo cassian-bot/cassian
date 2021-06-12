@@ -53,6 +53,7 @@ defmodule Cassian.Services.SoundCloudService do
     end
   end
 
+  @spec get_progressive_link(track_id :: String.t()) :: {:ok, String.t()} | {:error, any()}
   def get_progressive_link(track_id) do
     url = "https://api-v2.soundcloud.com/tracks/#{track_id}"
 
@@ -77,6 +78,10 @@ defmodule Cassian.Services.SoundCloudService do
     end
   end
 
+  @doc """
+  Get the stream URL from the transcoded-progressive url.
+  """
+  @spec stream_url(progressive_transcoding_url :: String.t()) :: {:ok, String.t()} | {:error, any()}
   def stream_url(progressive_transcoding_url) do
     params = %{
       client_id: client_id()
