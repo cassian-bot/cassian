@@ -4,6 +4,7 @@ defmodule Cassian.Structs.Metadata do
     :author,
     :provider,
     :link,
+    :thumbnail_url,
     :stream_link,
     :stream_method
   ]
@@ -13,25 +14,29 @@ defmodule Cassian.Structs.Metadata do
           author: String.t(),
           provider: String.t(),
           link: String.t(),
+          thumbnail_url: String.t(),
           stream_link: String.t(),
           stream_method: :url | :ytdl
         }
 
-  @typedoc ""
+  @typedoc "The title of the song."
   @type title :: String.t()
 
-  @typedoc ""
+  @typedoc "The name of the song author."
   @type author :: String.t()
 
-  @typedoc ""
+  @typedoc "The provider for the song."
   @type provider :: String.t()
 
-  @typedoc ""
+  @typedoc "The original link for the song."
   @type link :: String.t()
 
-  @typedoc ""
+  @typedoc "The thumbnail for the song."
+  @type thumbnail_url :: String.t()
+
+  @typedoc "The link for the song stream."
   @type stream_link :: String.t()
 
-  @typedoc ""
+  @typedoc "Streaming method for the song."
   @type stream_method :: :url | :ytdl
 end

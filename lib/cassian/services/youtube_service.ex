@@ -8,7 +8,7 @@ defmodule Cassian.Services.YoutubeService do
   @doc """
   Create metadata from a youtube song.
   """
-  @spec oembed_song_data(url :: String.t()) :: {:ok, %{}} | {:error, Integer.t()}
+  @spec oembed_song_data(url :: String.t()) :: {:ok, %Metadata{}} | {:error, Integer.t()}
   def oembed_song_data(url) do
     link = "https://www.youtube.com/oembed"
 
@@ -38,6 +38,7 @@ defmodule Cassian.Services.YoutubeService do
           author: body.author_name,
           provider: "youtube",
           link: url,
+          thumbnail_url: body.thumbnail_url,
           stream_link: url,
           stream_method: :ytdl
         }
@@ -115,6 +116,7 @@ defmodule Cassian.Services.YoutubeService do
       author: element["longBylineText"]["runs"] |> List.first() |> Map.get("text"),
       provider: "youtube",
       link: "https://www.youtube.com/watch?v=#{element["videoId"]}",
+      thumbnail_url: element["thumbnail"]["thumbnails"] |> List.last() |> Map.get("url"),
       stream_link: "https://www.youtube.com/watch?v=#{element["videoId"]}",
       stream_method: :ytdl
     }
