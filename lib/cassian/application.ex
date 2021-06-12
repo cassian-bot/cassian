@@ -19,7 +19,8 @@ defmodule Cassian.Application do
         %{
           id: Consumer,
           start: {Consumer, :start_link, []}
-        }
+        },
+        Cassian.Servers.SoundCloudToken
       ] ++ web_child!()
 
     children
