@@ -35,6 +35,7 @@ defmodule Cassian.Services.SoundCloudService do
           author: body.author_name,
           provider: "soundcloud",
           link: url,
+          color: "ff9033",
           thumbnail_url: body.thumbnail_url,
           stream_link: nil,
           stream_method: :url

@@ -4,6 +4,7 @@ defmodule Cassian.Structs.Metadata do
     :author,
     :provider,
     :link,
+    :color,
     :thumbnail_url,
     :stream_link,
     :stream_method
@@ -14,6 +15,7 @@ defmodule Cassian.Structs.Metadata do
           author: String.t(),
           provider: String.t(),
           link: String.t(),
+          color: String.t(),
           thumbnail_url: String.t(),
           stream_link: String.t(),
           stream_method: :url | :ytdl
@@ -30,6 +32,9 @@ defmodule Cassian.Structs.Metadata do
 
   @typedoc "The original link for the song."
   @type link :: String.t()
+
+  @typedoc "The hex color of the provider."
+  @type color :: String.t()
 
   @typedoc "The thumbnail for the song."
   @type thumbnail_url :: String.t()

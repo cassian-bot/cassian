@@ -2,6 +2,7 @@ defmodule Cassian.Utils.Voice do
   alias Nostrum.Api
   alias Cassian.Structs.VoicePermissions
   alias Nostrum.Cache.GuildCache
+  alias Cassian.Structs.Metadata
 
   @doc """
   Join or switch from the voice channel. Set the channel to nil to
@@ -38,15 +39,15 @@ defmodule Cassian.Utils.Voice do
   Play the music with a max retry amount. If the retry amount is less than zero it will just fail automatically.
   Every retry approx lasts for approx. `100ms`.
   """
-  @spec play_when_ready(link :: String.t(), guild_id :: Snowflake.t(), max_retries :: integer()) ::
+  @spec play_when_ready(metadata :: %Metadata{}, guild_id :: Snowflake.t(), max_retries :: integer()) ::
           {:ok, :ok | any()} | {:error, :failed_max}
-  def play_when_ready(link, guild_id, max_retries)
+  def play_when_ready(metadata, guild_id, max_retries)
       when is_integer(max_retries) and max_retries > 0 do
     if Nostrum.Voice.ready?(guild_id) do
-      {:ok, Nostrum.Voice.play(guild_id, link, :ytdl)}
+      {:ok, Nostrum.Voice.play(guild_id, metadata.stream_link, metadata.stream_method)}
     else
       :timer.sleep(100)
-      play_when_ready(link, guild_id, max_retries - 1)
+      play_when_ready(metadata, guild_id, max_retries - 1)
     end
   end
 
@@ -59,12 +60,12 @@ defmodule Cassian.Utils.Voice do
 
   See `play_when_ready/3` as a safe way to play this.
   """
-  def play_when_ready!(link, guild_id) do
+  def play_when_ready!(metadata, guild_id) do
     if Nostrum.Voice.ready?(guild_id) do
-      Nostrum.Voice.play(guild_id, link, :ytdl)
+      Nostrum.Voice.play(guild_id, metadata.stream_link, metadata.stream_method)
     else
       :timer.sleep(100)
-      play_when_ready!(link, guild_id)
+      play_when_ready!(metadata, guild_id)
     end
   end
 
