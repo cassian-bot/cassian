@@ -5,6 +5,10 @@ defmodule Cassian.Services.YoutubeService do
 
   alias Cassian.Structs.Metadata
 
+  @doc """
+  Create metadata from a youtube song.
+  """
+  @spec oembed_song_data(url :: String.t()) :: {:ok, %{}} | {:error, Integer.t()}
   def oembed_song_data(url) do
     link = "https://www.youtube.com/oembed"
 
@@ -41,6 +45,14 @@ defmodule Cassian.Services.YoutubeService do
     end
   end
 
+  @doc """
+  Get a list of metadatas from a youtube playlist.
+  """
+  @spec playlist_information(link :: String.t()) ::
+          {:ok, list(%Metadata{})}
+          | {:error, :invalid}
+          | {:error, :broken}
+          | {:error, :no_playlist}
   def playlist_information(link) do
     %URI{query: query} = URI.parse(link)
 
@@ -90,7 +102,8 @@ defmodule Cassian.Services.YoutubeService do
     end
   end
 
-  def playlist_element_to_meta(element) do
+  # Transform to meta...
+  defp playlist_element_to_meta(element) do
     element = element["playlistPanelVideoRenderer"]
 
     %Metadata{
