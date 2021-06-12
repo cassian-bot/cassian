@@ -24,7 +24,7 @@ defmodule Cassian.Utils do
         {true, metadata}
 
       _ ->
-        case SoundCloudService do
+        case SoundCloudService.oembed_song_data(link) do
           {:ok, metadata} ->
             {true, metadata}
 

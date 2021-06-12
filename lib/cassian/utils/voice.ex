@@ -44,7 +44,7 @@ defmodule Cassian.Utils.Voice do
   def play_when_ready(metadata, guild_id, max_retries)
       when is_integer(max_retries) and max_retries > 0 do
     if Nostrum.Voice.ready?(guild_id) do
-      {:ok, Nostrum.Voice.play(guild_id, metadata.stream_link, metadata.stream_method)}
+      {:ok, Nostrum.Voice.play(guild_id, stream_url!(metadata), metadata.stream_method)}
     else
       :timer.sleep(100)
       play_when_ready(metadata, guild_id, max_retries - 1)
@@ -55,6 +55,22 @@ defmodule Cassian.Utils.Voice do
     {:ok, :failed_max}
   end
 
+  defp stream_url!(metadata) do
+    case metadata.provider do
+      "soundcloud" ->
+        case Cassian.Services.SoundCloudService.stream_from_url(metadata.link) do
+          {:ok, stream} ->
+            stream
+
+          _ ->
+            nil
+        end
+
+      _ ->
+        metadata.stream_link
+    end
+  end
+
   @doc """
   Play the music without a max retry. This in theory can infinitely loop if the bot is never ready to play music.
 
@@ -62,7 +78,7 @@ defmodule Cassian.Utils.Voice do
   """
   def play_when_ready!(metadata, guild_id) do
     if Nostrum.Voice.ready?(guild_id) do
-      Nostrum.Voice.play(guild_id, metadata.stream_link, metadata.stream_method)
+      Nostrum.Voice.play(guild_id, stream_url!(metadata), metadata.stream_method)
     else
       :timer.sleep(100)
       play_when_ready!(metadata, guild_id)
