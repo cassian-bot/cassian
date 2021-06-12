@@ -27,7 +27,12 @@ defmodule Cassian.Services.YoutubeService do
         # Doing some sanitization for the link so that we get a singleton song...
         body =
           body
-          |> Map.put_new(:url, "https://www.youtube.com/watch?v=#{Regex.run(~r/(?<=\/embed\/)(.*)(?=\?feature)/, body.html)}")
+          |> Map.put_new(
+            :url,
+            "https://www.youtube.com/watch?v=#{
+              Regex.run(~r/(?<=\/embed\/)(.*)(?=\?feature)/, body.html)
+            }"
+          )
 
         {:ok, body}
 
@@ -38,6 +43,7 @@ defmodule Cassian.Services.YoutubeService do
 
   def playlist_information(link) do
     %URI{query: query} = URI.parse(link)
+
     case URI.decode_query(query || "") |> Map.get("list") do
       nil ->
         {:error, :invalid}
@@ -78,10 +84,8 @@ defmodule Cassian.Services.YoutubeService do
                 {:error, :no_playlist}
             end
 
-
           _ ->
             {:error, :broken}
-
         end
     end
   end
