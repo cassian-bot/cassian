@@ -95,7 +95,7 @@ defmodule Cassian.Managers.PlayManager do
 
             metadata = Enum.at(ordered, index)
 
-            Voice.play_when_ready!(metadata.youtube_link, guild_id)
+            Voice.play_when_ready!(metadata, guild_id)
 
             notifiy_playing(state.channel_id, metadata)
 
@@ -120,8 +120,8 @@ defmodule Cassian.Managers.PlayManager do
 
       embed =
         EmbedUtils.create_empty_embed!()
-        |> EmbedUtils.put_color_on_embed(metadata.provider_color)
-        |> Embed.put_url(metadata.youtube_link)
+        |> EmbedUtils.put_color_on_embed(metadata.color)
+        |> Embed.put_url(metadata.link)
         |> Embed.put_title("Enqueued: #{metadata.title}")
 
       MessageManager.send_dissapearing_embed(embed, state.channel_id)
@@ -139,8 +139,8 @@ defmodule Cassian.Managers.PlayManager do
 
     embed =
       EmbedUtils.create_empty_embed!()
-      |> EmbedUtils.put_color_on_embed(metadata.provider_color)
-      |> Embed.put_url(metadata.youtube_link)
+      |> EmbedUtils.put_color_on_embed(metadata.color)
+      |> Embed.put_url(metadata.link)
       |> Embed.put_title("Now playing: #{metadata.title}")
 
     MessageManager.send_embed(embed, channel_id)

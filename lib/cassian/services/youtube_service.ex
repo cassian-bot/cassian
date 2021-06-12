@@ -8,7 +8,7 @@ defmodule Cassian.Services.YoutubeService do
   @doc """
   Create metadata from a youtube song.
   """
-  @spec oembed_song_data(url :: String.t()) :: {:ok, %{}} | {:error, Integer.t()}
+  @spec oembed_song_data(url :: String.t()) :: {:ok, %Metadata{}} | {:error, Integer.t()}
   def oembed_song_data(url) do
     link = "https://www.youtube.com/oembed"
 
@@ -29,14 +29,20 @@ defmodule Cassian.Services.YoutubeService do
           |> Poison.decode!(keys: :atoms)
 
         # Doing some sanitization for the link so that we get a singleton song...
-        body =
-          body
-          |> Map.put_new(
-            :url,
-            "https://www.youtube.com/watch?v=#{
-              Regex.run(~r/(?<=\/embed\/)(.*)(?=\?feature)/, body.html)
-            }"
-          )
+        url = "https://www.youtube.com/watch?v=#{
+                Regex.run(~r/(?<=\/vi\/)(.*)(?=\/)/, body.thumbnail_url)
+              }"
+
+        body = %Metadata{
+          title: body.title,
+          author: body.author_name,
+          provider: "youtube",
+          link: url,
+          color: "ff3333",
+          thumbnail_url: body.thumbnail_url,
+          stream_link: url,
+          stream_method: :ytdl
+        }
 
         {:ok, body}
 
@@ -108,11 +114,13 @@ defmodule Cassian.Services.YoutubeService do
 
     %Metadata{
       title: element["title"]["runs"] |> List.first() |> Map.get("text"),
-      author_name: element["longBylineText"]["runs"] |> List.first() |> Map.get("text"),
-      provider_name: "youtube",
-      provider_url: "youtube.com",
-      provider_color: "ff0000",
-      link: "https://www.youtube.com/watch?v=#{element["videoId"]}"
+      author: element["longBylineText"]["runs"] |> List.first() |> Map.get("text"),
+      provider: "youtube",
+      link: "https://www.youtube.com/watch?v=#{element["videoId"]}",
+      color: "ff3333",
+      thumbnail_url: element["thumbnail"]["thumbnails"] |> List.last() |> Map.get("url"),
+      stream_link: "https://www.youtube.com/watch?v=#{element["videoId"]}",
+      stream_method: :ytdl
     }
   end
 end

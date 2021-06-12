@@ -1,63 +1,47 @@
 defmodule Cassian.Structs.Metadata do
   defstruct [
     :title,
-    :author_name,
-    :author_url,
-    :provider_name,
-    :provider_url,
-    :provider_color,
+    :author,
+    :provider,
     :link,
-    :youtube_link
+    :color,
+    :thumbnail_url,
+    :stream_link,
+    :stream_method
   ]
 
   @type t() :: %__MODULE__{
           title: String.t(),
-          author_name: String.t(),
-          author_url: String.t(),
-          provider_name: String.t(),
-          provider_url: String.t(),
-          provider_color: String.t(),
+          author: String.t(),
+          provider: String.t(),
           link: String.t(),
-          youtube_link: String.t()
+          color: String.t(),
+          thumbnail_url: String.t(),
+          stream_link: String.t(),
+          stream_method: :url | :ytdl
         }
-
-  @typedoc "Permission whether the bot is an admin."
-  @type administrator :: boolean()
 
   @typedoc "The title of the song."
   @type title :: String.t()
 
-  @typedoc "The name of the author."
-  @type author_name :: String.t()
+  @typedoc "The name of the song author."
+  @type author :: String.t()
 
-  @typedoc "The URL of the author."
-  @type author_url :: String.t()
+  @typedoc "The provider for the song."
+  @type provider :: String.t()
 
-  @typedoc "The name of the provider."
-  @type provider_name :: String.t()
-
-  @typedoc "The URL of the provider."
-  @type provider_url :: String.t()
-
-  @typedoc "The associated color of the provider in hex."
-  @type provider_color :: String.t()
-
-  @typedoc "The link of the song."
+  @typedoc "The original link for the song."
   @type link :: String.t()
 
-  @typedoc "The youtube link of the song."
-  @type youtube_link :: String.t()
+  @typedoc "The hex color of the provider."
+  @type color :: String.t()
 
-  def from_youtube_hash(hash, link) do
-    %__MODULE__{
-      title: hash["title"],
-      author_name: hash["author_name"],
-      author_url: hash["author_url"],
-      provider_name: hash["provider_name"],
-      provider_url: hash["provider_url"],
-      provider_color: "#ff0000",
-      link: link,
-      youtube_link: link
-    }
-  end
+  @typedoc "The thumbnail for the song."
+  @type thumbnail_url :: String.t()
+
+  @typedoc "The link for the song stream."
+  @type stream_link :: String.t()
+
+  @typedoc "Streaming method for the song."
+  @type stream_method :: :url | :ytdl
 end

@@ -3,34 +3,34 @@ defmodule Cassian.Utils do
   Module for general utils...
   """
 
+  alias Cassian.Services.{YoutubeService, SoundCloudService}
+
   @doc """
   Get the user avatar url.
   """
   @spec user_avatar(user :: Nostrum.Struct.User) :: String.t()
   def user_avatar(user) do
-    "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png"
+    "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
   end
-
-  alias Cassian.Structs.Metadata
 
   @doc """
   Check whether a link is a YouTube one.
   """
-  @spec youtube_metadata(link :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
-  def youtube_metadata(link) do
-    url = "https://www.youtube.com/oembed?url=#{link}&format=json"
+  @spec song_metadata(link :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
+  def song_metadata(link) do
 
-    headers = [
-      "User-agent": "#{Cassian.username!()} #{Cassian.version!()}",
-      Accept: "Application/json; Charset=utf-8"
-    ]
-
-    case HTTPoison.get(url, headers) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {true, body |> Poison.decode!() |> Metadata.from_youtube_hash(link)}
+    case YoutubeService.oembed_song_data(link) do
+      {:ok, metadata} ->
+        {true, metadata}
 
       _ ->
-        {false, :noop}
+        case SoundCloudService.oembed_song_data(link) do
+          {:ok, metadata} ->
+            {true, metadata}
+
+          _ ->
+            {false, :noop}
+        end
     end
   end
 end

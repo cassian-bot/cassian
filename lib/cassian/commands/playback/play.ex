@@ -44,7 +44,7 @@ defmodule Cassian.Commands.Playback.Play do
   logic pipe or send an embed that the link is not correct.
   """
   def handle_metadata(message, voice_id, args) do
-    case youtube_metadata(Enum.fetch!(args, 0)) do
+    case song_metadata(Enum.fetch!(args, 0)) do
       {true, metadata} ->
         handle_connect(message, voice_id, metadata)
 

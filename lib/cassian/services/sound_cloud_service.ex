@@ -3,7 +3,50 @@ defmodule Cassian.Services.SoundCloudService do
   Service module which does most of the calls for the SoundCloud API.
   """
 
+  alias Cassian.Structs.Metadata
+
   defdelegate client_id(), to: Cassian.Servers.SoundCloudToken
+
+  @doc """
+  Get the metadata for the song from the oembed... embed...
+  """
+  @spec oembed_song_data(url :: String.t()) :: {:ok, %Metadata{}} | {:error, any()}
+  def oembed_song_data(url) do
+    link = "https://soundcloud.com/oembed"
+
+    headers = [
+      "User-agent": "#{Cassian.username!()} #{Cassian.version!()}",
+      Accept: "Application/json; Charset=utf-8"
+    ]
+
+    params = %{
+      url: url,
+      format: :json
+    }
+
+    case HTTPoison.get(link, headers, params: params) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        body =
+          body
+          |> Poison.decode!(keys: :atoms)
+
+        body = %Metadata{
+          title: body.title,
+          author: body.author_name,
+          provider: "soundcloud",
+          link: url,
+          color: "ff9033",
+          thumbnail_url: body.thumbnail_url,
+          stream_link: nil,
+          stream_method: :url
+        }
+
+        {:ok, body}
+
+      {_, %HTTPoison.Response{status_code: code}} ->
+        {:error, code}
+    end
+  end
 
   @doc """
   Get the SoundCloud raw stream from a SoundCloud url.

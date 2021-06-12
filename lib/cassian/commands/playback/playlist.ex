@@ -52,8 +52,9 @@ defmodule Cassian.Commands.Playback.Playlist do
 
     embed =
       EmbedUtils.create_empty_embed!()
-      |> EmbedUtils.put_color_on_embed(metadata.provider_color)
+      |> EmbedUtils.put_color_on_embed(metadata.color)
       |> Embed.put_title("#{emojis}Showing the current playlist:")
+      |> Embed.put_image(metadata.thumbnail_url)
 
     description =
       sorted
