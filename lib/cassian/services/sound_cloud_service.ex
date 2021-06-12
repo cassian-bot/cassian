@@ -40,7 +40,10 @@ defmodule Cassian.Services.SoundCloudService do
       format: "json"
     }
 
-    case HTTPoison.get("https://soundcloud.com/oembed", headers, params: params, follow_redirect: true) do
+    case HTTPoison.get("https://soundcloud.com/oembed", headers,
+           params: params,
+           follow_redirect: true
+         ) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {
           :ok,
@@ -64,7 +67,7 @@ defmodule Cassian.Services.SoundCloudService do
     # Some information is here
     case HTTPoison.get(url, %{}, params: params) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-      # Doesn't look safe but as long as SoundCloud IS giving an OK response the JSON is okay...
+        # Doesn't look safe but as long as SoundCloud IS giving an OK response the JSON is okay...
         url =
           Poison.decode!(body, %{keys: :atoms}).media.transcodings
           |> Enum.filter(fn transcoding -> transcoding.format.protocol == "progressive" end)
@@ -81,7 +84,8 @@ defmodule Cassian.Services.SoundCloudService do
   @doc """
   Get the stream URL from the transcoded-progressive url.
   """
-  @spec stream_url(progressive_transcoding_url :: String.t()) :: {:ok, String.t()} | {:error, any()}
+  @spec stream_url(progressive_transcoding_url :: String.t()) ::
+          {:ok, String.t()} | {:error, any()}
   def stream_url(progressive_transcoding_url) do
     params = %{
       client_id: client_id()
