@@ -3,7 +3,7 @@ defmodule Cassian.Services.SoundCloudService do
   Service module which does most of the calls for the SoundCloud API.
   """
 
-  @client_id Application.get_env(:cassian, :sound_cloud_id)
+  defdelegate client_id(), to: Cassian.Servers.SoundCloudToken
 
   @doc """
   Get the SoundCloud raw stream from a SoundCloud url.
@@ -57,7 +57,7 @@ defmodule Cassian.Services.SoundCloudService do
     url = "https://api-v2.soundcloud.com/tracks/#{track_id}"
 
     params = %{
-      client_id: @client_id
+      client_id: client_id()
     }
 
     # Some information is here
@@ -79,7 +79,7 @@ defmodule Cassian.Services.SoundCloudService do
 
   def stream_url(progressive_transcoding_url) do
     params = %{
-      client_id: @client_id
+      client_id: client_id()
     }
 
     case HTTPoison.get(progressive_transcoding_url, %{}, params: params) do

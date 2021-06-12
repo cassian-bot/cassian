@@ -13,5 +13,4 @@ config :cassian,
   prefix: System.get_env("DEFAULT_BOT_PREFIX"),
   web_enabled: System.get_env("WEB_ENABLED"),
   port: System.get_env("PORT") || "4000",
-  force_ssl: System.get_env("FORCE_SSL"),
-  sound_cloud_id: System.get_env("SOUND_CLOUD_ID")
+  force_ssl: System.get_env("FORCE_SSL")
