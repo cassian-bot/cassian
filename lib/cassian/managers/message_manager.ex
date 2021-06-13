@@ -11,21 +11,6 @@ defmodule Cassian.Managers.MessageManager do
   """
 
   @doc """
-  Disable embed for a link. It's still a WIP.
-  """
-  @spec disable_embed(message :: %Message{}) :: :ok | :noop
-  def disable_embed(message) do
-    case Nostrum.Api.edit_message(message, embed: nil) do
-      {:ok, _message} ->
-        :ok
-
-      {:error, error} ->
-        Logger.warn(error |> Poison.encode!())
-        :nnop
-    end
-  end
-
-  @doc """
   Safely send a message embed to a channel.
   """
   @spec send_embed(embed :: %Embed{}, channel_id :: Snowflake.t()) ::

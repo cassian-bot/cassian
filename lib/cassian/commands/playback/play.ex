@@ -61,7 +61,6 @@ defmodule Cassian.Commands.Playback.Play do
     VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
     PlaylistManager.insert!(message.guild_id, message.channel_id, metadata)
     PlayManager.play_if_needed(message.guild_id)
-    MessageManager.disable_embed(message)
   end
 
   # Error handlers
