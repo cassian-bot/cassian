@@ -39,7 +39,11 @@ defmodule Cassian.Utils.Voice do
   Play the music with a max retry amount. If the retry amount is less than zero it will just fail automatically.
   Every retry approx lasts for approx. `100ms`.
   """
-  @spec play_when_ready(metadata :: %Metadata{}, guild_id :: Snowflake.t(), max_retries :: integer()) ::
+  @spec play_when_ready(
+          metadata :: %Metadata{},
+          guild_id :: Snowflake.t(),
+          max_retries :: integer()
+        ) ::
           {:ok, :ok | any()} | {:error, :failed_max}
   def play_when_ready(metadata, guild_id, max_retries)
       when is_integer(max_retries) and max_retries > 0 do

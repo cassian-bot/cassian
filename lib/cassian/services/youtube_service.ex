@@ -29,9 +29,10 @@ defmodule Cassian.Services.YoutubeService do
           |> Poison.decode!(keys: :atoms)
 
         # Doing some sanitization for the link so that we get a singleton song...
-        url = "https://www.youtube.com/watch?v=#{
-                Regex.run(~r/(?<=\/vi\/)(.*)(?=\/)/, body.thumbnail_url)
-              }"
+        url =
+          "https://www.youtube.com/watch?v=#{
+            Regex.run(~r/(?<=\/vi\/)(.*)(?=\/)/, body.thumbnail_url)
+          }"
 
         body = %Metadata{
           title: body.title,

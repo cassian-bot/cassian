@@ -18,7 +18,6 @@ defmodule Cassian.Utils do
   """
   @spec song_metadata(link :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
   def song_metadata(link) do
-
     case YoutubeService.oembed_song_data(link) do
       {:ok, metadata} ->
         {true, metadata}

@@ -39,7 +39,7 @@ defmodule Cassian.Managers.PlaylistManager do
     end
   end
 
-    @doc """
+  @doc """
   Add a song to the playlist.
   """
   def insert!(guild_id, channel_id, metadata) do
@@ -144,7 +144,6 @@ defmodule Cassian.Managers.PlaylistManager do
     end
   end
 
-
   @doc """
   Chaange the direction of the playlist and send a notification.
   """
@@ -204,7 +203,6 @@ defmodule Cassian.Managers.PlaylistManager do
     end
     |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
-
 
   @doc """
   Shuffle the playlist.
