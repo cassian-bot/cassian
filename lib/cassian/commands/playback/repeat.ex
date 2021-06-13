@@ -1,7 +1,7 @@
 defmodule Cassian.Commands.Playback.Repeat do
   use Cassian.Behaviours.Command
 
-  alias Cassian.Managers.{PlayManager, MessageManager}
+  alias Cassian.Managers.{PlaylistManager, MessageManager}
 
   import Cassian.Utils.Embed
 
@@ -13,7 +13,7 @@ defmodule Cassian.Commands.Playback.Repeat do
     type = Enum.at(args, 0)
 
     if type in ["one", "none", "all"] do
-      PlayManager.change_repeat_with_notification(message, String.to_atom(type), true)
+      PlaylistManager.change_repeat_with_notification(message, String.to_atom(type), true)
     else
       bad_error(message)
     end
