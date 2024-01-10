@@ -1,8 +1,5 @@
 use Mix.Config
 
-config :porcelain,
-  driver: Porcelain.Driver.Basic
-
 config :nostrum,
   ffmpeg: System.get_env("FFMPEG_PATH") || "/usr/bin/ffmpeg",
   youtubedl: System.get_env("YTDL_PATH") || "/usr/bin/youtube-dl",
