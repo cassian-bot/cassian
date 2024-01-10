@@ -7,7 +7,7 @@ defmodule Cassian.Servers.SoundCloudToken do
   require Logger
 
   # 15 minutes~
-  @timeout 5_000
+  @timeout 900_000
 
   # API
 
