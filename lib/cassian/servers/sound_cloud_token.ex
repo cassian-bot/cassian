@@ -7,7 +7,7 @@ defmodule Cassian.Servers.SoundCloudToken do
   require Logger
 
   # 15 minutes~
-  @timeout 900_000
+  @timeout 5_000
 
   # API
 
@@ -28,9 +28,8 @@ defmodule Cassian.Servers.SoundCloudToken do
 
   @impl true
   def handle_info(:timeout, state) do
-    Logger.debug("Got timeout with state #{state}")
-    state = acquire_new_client_id!()
-    Logger.debug("New client id is: #{state}")
+    Logger.debug("Got timeout!")
+    state = acquire_new_client_id()
     {:noreply, state, @timeout}
   end
 
@@ -40,19 +39,46 @@ defmodule Cassian.Servers.SoundCloudToken do
 
   @impl true
   def init(_),
-    do: {:ok, acquire_new_client_id!(), @timeout}
+    do: {:ok, acquire_new_client_id(), @timeout}
 
-  defp acquire_new_client_id!() do
-    scripts =
-      HTTPoison.get!("https://soundcloud.com/discover")
-      |> Map.get(:body)
-      |> Floki.parse_document!()
-      |> Floki.find("script")
-
-    {"script", [_head | [{"src", source}]], _} = Enum.at(scripts, length(scripts) - 2)
-
-    body = HTTPoison.get!(source).body
-
-    Regex.run(~r/(?<=,client_id:\")(.*)(?=\",env:)/, body) |> List.first()
+  defp acquire_new_client_id() do
+    with {:ok, response = %HTTPoison.Response{status_code: 200}} <- HTTPoison.get("https://soundcloud.com/discover"),
+         {:ok, value} <- generate_new_client_id(response) do
+          Logger.debug("Acquired new soundcloud token.")
+          value
+    else
+      _ ->
+        Logger.warning ("Failed to retrieve token!")
+        nil 
+    end
+  end
+  
+  defp generate_new_client_id(response) do
+    data = 
+      response
+        |> Map.get(:body)
+        |> Floki.parse_document!()
+        |> Floki.find("script[src][crossorigin]")
+        |> Stream.map(&filter_scripts/1)
+        |> Stream.reject(&is_nil/1)
+        |> Enum.reverse() # Generally client_id is near the end script from experience
+        |> Enum.find_value(fn script ->
+          with {:ok, response = %HTTPoison.Response{status_code: 200}} <- HTTPoison.get(script),
+               regex_code <- Regex.run(~r/client_id:\"(.*)\",env:/, response.body),
+               false <- is_nil(regex_code) do
+            {:ok, List.last(regex_code)}
+          else
+            _ ->
+              nil
+          end
+        end)
+  end
+  
+  defp filter_scripts({"script", [_, {"src", script}], _}) do
+    script
+  end
+  
+  defp filter_scripts(_) do
+    nil
   end
 end
