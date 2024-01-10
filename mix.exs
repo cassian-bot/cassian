@@ -22,7 +22,7 @@ defmodule Cassian.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nostrum, "~> 0.8.0"},
+      {:nostrum, github: "Kraigie/nostrum"},
       {:poison, "~> 5.0"},
       {:httpoison, "~> 2.0"},
       {:cowlib, "~> 2.9.1", override: true},
