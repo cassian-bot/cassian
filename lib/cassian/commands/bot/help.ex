@@ -18,7 +18,7 @@ defmodule Cassian.Commands.Bot.Help do
   def execute(interaction) do
     generate_help_embed!()
 
-    %{type: 4, data: %{embeds: [generate_help_embed!()]}}
+    %{type: 4, data: %{embeds: [generate_help_embed!()], flags: 1 <<< 6}}
   end
 
   import Cassian.Utils.Embed

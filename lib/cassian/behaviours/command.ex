@@ -17,6 +17,7 @@ defmodule Cassian.Behaviours.Command do
   defmacro __using__(_) do
     quote do
       @behaviour Cassian.Behaviours.Command
+      import Bitwise
     end
   end
 end
