@@ -16,20 +16,20 @@ defmodule Cassian.Utils do
   @doc """
   Check whether a link is a YouTube one.
   """
-  @spec song_metadata(link :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
+  @spec song_metadata(link :: String.t()) :: {:ok, metadata :: Hash} | {:error, :no_metadata}
   def song_metadata(link) do
 
     case YoutubeService.oembed_song_data(link) do
       {:ok, metadata} ->
-        {true, metadata}
+        {:ok, metadata}
 
       _ ->
         case SoundCloudService.oembed_song_data(link) do
           {:ok, metadata} ->
-            {true, metadata}
+            {:ok, metadata}
 
           _ ->
-            {false, :noop}
+            {:error, :no_metadata}
         end
     end
   end

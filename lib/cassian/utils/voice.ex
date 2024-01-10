@@ -88,9 +88,9 @@ defmodule Cassian.Utils.Voice do
   @doc """
   Safely the current voice id in which the user is. Also returns the guild id.
   """
-  @spec get_sender_voice_id(message :: Nostrum.Struct.Channel) ::
-          {:ok, {guild_id :: String.t(), channel_id :: String.t()}} | {:error, :noop}
-  def get_sender_voice_id(message) do
+  @spec sender_voice_id(message :: Nostrum.Struct.Channel) ::
+          {:ok, {guild_id :: String.t(), channel_id :: String.t()}} | {:error, :not_in_voice}
+  def sender_voice_id(message) do
     voice_id =
       GuildCache.get!(message.guild_id)
       |> Map.fetch!(:voice_states)
@@ -101,7 +101,7 @@ defmodule Cassian.Utils.Voice do
     if voice_id do
       {:ok, {message.guild_id, voice_id}}
     else
-      {:error, :noop}
+      {:error, :not_in_voice}
     end
   end
 
