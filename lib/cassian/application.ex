@@ -16,15 +16,12 @@ defmodule Cassian.Application do
 
     children =
       [
-        %{
-          id: Consumer,
-          start: {Consumer, :start_link, []}
-        },
+        Cassian.Consumer,
         Cassian.Servers.SoundCloudToken
       ] ++ web_child!()
 
     children
-    |> Enum.each(fn child -> DynamicSupervisor.start_child(Cassian.Supervisor, child) end)
+    |> Enum.each(fn child -> DynamicSupervisor.start_child(Cassian.Supervisor, child) |> IO.inspect(label: "Start child") end)
   end
 
   @doc false
