@@ -8,6 +8,8 @@ defmodule Cassian.Managers.PlayManager do
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Managers.MessageManager
   alias Nostrum.Struct.{Message, Embed}
+  
+  import Bitwise
 
   @doc """
   Add a song to the playlist.
@@ -198,24 +200,30 @@ defmodule Cassian.Managers.PlayManager do
   @doc """
   Chaange the direction of the playlist and send a notification.
   """
-  @spec change_direction_with_notification(message :: %Message{}, reverse :: boolean()) ::
-          :ok | :noop
-  def change_direction_with_notification(message, reverse) do
+  @spec change_direction_with_notification(interaction :: Interaction.t(), reverse :: boolean()) ::
+          {embed :: Embed.t(), flags :: integer()}
+  def change_direction_with_notification(interaction, reverse) do
     title_part = if reverse, do: "in reverse", else: "normally"
 
-    case change_direction(message.guild_id, reverse) do
-      :ok ->
-        EmbedUtils.create_empty_embed!()
-        |> Embed.put_title("Playing #{title_part}.")
-        |> Embed.put_description("The current playlist will play #{title_part}.")
+    {embed, flags} =
+      case change_direction(interaction.guild_id, true) do
+        :ok ->
+          {
+            EmbedUtils.create_empty_embed!()
+              |> Embed.put_title("Playing in reverse.")
+              |> Embed.put_description("The current playlist will play #{title_part}."),
+            0
+          }
 
-      :noop ->
-        EmbedUtils.generate_error_embed(
-          "There is no playlist.",
-          "I can't change the direction of the playlist if it doesn't exist."
-        )
-    end
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
+        :noop ->
+          {
+            EmbedUtils.generate_error_embed(
+              "There is no playlist.",
+              "I can't change the direction of the playlist if it doesn't exist."
+            ),
+            1 <<< 6
+          }
+      end
   end
 
   @doc """

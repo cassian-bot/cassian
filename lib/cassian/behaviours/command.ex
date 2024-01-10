@@ -18,6 +18,7 @@ defmodule Cassian.Behaviours.Command do
     quote do
       @behaviour Cassian.Behaviours.Command
       import Bitwise
+      alias Cassian.Utils.Embed, as: EmbedUtils
     end
   end
 end

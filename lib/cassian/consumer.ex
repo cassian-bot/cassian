@@ -19,7 +19,7 @@ defmodule Cassian.Consumer do
 
   @doc false
   def handle_event({:READY, user_data, _}) do
-    Enum.each(user_data.guilds, &generate_commands/1)
+    Enum.each(user_data.guilds, &Command.generate_commands/1)
     Nostrum.Api.update_status("", "music 🎶", 2)
   end
 
@@ -48,9 +48,4 @@ defmodule Cassian.Consumer do
     |> String.downcase()
     |> String.starts_with?(Cassian.command_prefix!())
   end
-
-  defp generate_commands(%Nostrum.Struct.Guild.UnavailableGuild{id: guild_id}) do
-    Nostrum.Api.create_guild_application_command(guild_id, Cassian.Commands.Bot.Help.application_command_definition())
-  end
-
 end

@@ -4,6 +4,8 @@ defmodule Cassian.Consumers.Command do
   """
   
   alias Nostrum.Api
+  
+  alias Cassian.Commands.{Bot, Playback}
 
   @doc """
   Handle the user interaction.
@@ -20,6 +22,16 @@ defmodule Cassian.Consumers.Command do
         |> (&Api.create_interaction_response(interaction, &1)).()
         :ok
     end
+  end
+  
+  @doc """
+  Generate the Discord interaction commands for each guild.
+  """
+  @spec generate_commands(Nostrum.Struct.Guild.UnavailableGuild.t()) :: :ok
+  def generate_commands(%Nostrum.Struct.Guild.UnavailableGuild{id: guild_id}) do
+    Nostrum.Api.create_guild_application_command(guild_id, Bot.Help.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Backward.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Forward.application_command_definition())
   end
 
   defp associated_module(command) do
