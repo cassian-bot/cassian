@@ -52,7 +52,7 @@ defmodule Cassian.Utils.Voice do
   end
 
   def play_when_ready(_, _, _) do
-    {:ok, :failed_max}
+    {:error, :failed_max}
   end
 
   defp stream_url!(metadata) do
@@ -72,34 +72,20 @@ defmodule Cassian.Utils.Voice do
   end
 
   @doc """
-  Play the music without a max retry. This in theory can infinitely loop if the bot is never ready to play music.
-
-  See `play_when_ready/3` as a safe way to play this.
-  """
-  def play_when_ready!(metadata, guild_id) do
-    if Nostrum.Voice.ready?(guild_id) do
-      Nostrum.Voice.play(guild_id, stream_url!(metadata), metadata.stream_method)
-    else
-      :timer.sleep(100)
-      play_when_ready!(metadata, guild_id)
-    end
-  end
-
-  @doc """
   Safely the current voice id in which the user is. Also returns the guild id.
   """
-  @spec sender_voice_id(message :: Nostrum.Struct.Channel) ::
+  @spec sender_voice_id(interaction :: Nostrum.Struct.Interaction.t()) ::
           {:ok, {guild_id :: String.t(), channel_id :: String.t()}} | {:error, :not_in_voice}
-  def sender_voice_id(message) do
+  def sender_voice_id(interaction) do
     voice_id =
-      GuildCache.get!(message.guild_id)
+      GuildCache.get!(interaction.guild_id)
       |> Map.fetch!(:voice_states)
-      |> Enum.filter(fn state -> state.user_id == message.author.id end)
+      |> Enum.filter(fn state -> state.user_id == interaction.user.id end)
       |> List.first()
       |> extract_id()
 
     if voice_id do
-      {:ok, {message.guild_id, voice_id}}
+      {:ok, {interaction.guild_id, voice_id}}
     else
       {:error, :not_in_voice}
     end

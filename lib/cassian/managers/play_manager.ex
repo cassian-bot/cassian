@@ -75,6 +75,8 @@ defmodule Cassian.Managers.PlayManager do
   """
   def play_if_needed(guild_id) do
     state = VoiceState.get!(guild_id)
+    
+    playing_state = false
 
     if state.status == :noop and Playlist.exists?(guild_id) do
       case Playlist.show(guild_id) do
@@ -96,20 +98,30 @@ defmodule Cassian.Managers.PlayManager do
             index = keep_in_bounds(index, ordered)
 
             metadata = Enum.at(ordered, index)
+            
+            IO.inspect("I mean I got here, no?")
 
-            Voice.play_when_ready!(metadata, guild_id)
+            case Voice.play_when_ready(metadata, guild_id, 20) do
+              {:ok, data} ->
+                notifiy_playing(state.channel_id, metadata)
 
-            notifiy_playing(state.channel_id, metadata)
-
-            state
-            |> Map.put(:status, :playing)
-            |> VoiceState.put()
+                state
+                |> Map.put(:status, :playing)
+                |> VoiceState.put()
+                
+                playing_state = true
+                
+              _ ->
+               nil
+            end 
           end
 
         _ ->
           nil
       end
     end
+    
+    if playing_state, do: {:ok, :will_play}, else: {:error, :wont_play}
   end
 
   @doc """

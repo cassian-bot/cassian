@@ -32,6 +32,7 @@ defmodule Cassian.Consumers.Command do
     Nostrum.Api.create_guild_application_command(guild_id, Bot.Help.application_command_definition())
     Nostrum.Api.create_guild_application_command(guild_id, Playback.Backward.application_command_definition())
     Nostrum.Api.create_guild_application_command(guild_id, Playback.Forward.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Play.application_command_definition()) |> IO.inspect()
   end
 
   defp associated_module(command) do
