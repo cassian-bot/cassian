@@ -9,7 +9,6 @@ A Discord bot for music written in Elixir.
 ## Table of contents
 
 - [About](#about)
-- [Note regarding Nostrum](#note-regarding-nostrum)
 - [Note regarding the web part](#note-regarding-the-web-part)
 - [System requirements](#system-requirements)
 - [Configuration](#configuration)
@@ -23,10 +22,6 @@ The bot is written in Elixir, a functional programming language based upon Erlan
 
 The Discord library is [Nostrum](https://github.com/Kraigie/nostrum), written in Elixir and supporting everything from events to voice channels.
 
-## Note regarding Nostrum
-
-As of now the Hex release of Nostrum `v0.4.6` is a bit buggy so the current version of this bot uses the nightly version of Nostrum.
-
 ## Note regarding the web part
 
 This is deprecated. It will be removed once a web app has been created because I don't want to add web functionality to the bot.
@@ -39,18 +34,20 @@ This bot needs `youtube-dl` and `ffmpeg` in order to play music. The path of the
 
 ### General bot requirements
 
-Of course as this is written in Elixir, you will need Elixir installed. This can be easily done on Debian-based distros:
+Of course as this is written in Elixir, you will need Elixir installed. This can be easily done with [asdf](https://asdf-vm.com/). After following the asdf [instructions](https://asdf-vm.com/guide/getting-started.html) one can start adding the required plugins for the runtimes:
 
 ```bash
-sudo apt-get install elixir
+asdf plugin add elixir
+asdf plugin add erlang
+asdf install
 ```
 
-After installing Elixir you should be able to see the version:
+After that you should be able to run `elixir -v`
 
 ```bash
-Erlang/OTP 23 [erts-11.1.7] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [hipe]
+Erlang/OTP 26 [erts-14.2.1] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit:ns]
 
-Elixir 1.11.2 (compiled with Erlang/OTP 23)
+Elixir 1.16.0 (compiled with Erlang/OTP 24)
 ```
 
 Try to keep the Elixir version `1.11.2` and up.
