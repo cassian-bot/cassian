@@ -13,13 +13,13 @@ defmodule Cassian.Consumer do
   end
 
   @doc false
-  def handle_event({:MESSAGE_CREATE, message, _ws_state}) do
-    if !message.author.bot and is_cassian_command?(message),
-      do: Command.handle_message(message)
+  def handle_event({:INTERACTION_CREATE, interaction, _ws_state}) when is_nil(interaction.user.bot) do
+    Command.handle_interaction(interaction)
   end
 
   @doc false
-  def handle_event({:READY, _, _}) do
+  def handle_event({:READY, user_data, _}) do
+    Enum.each(user_data.guilds, &generate_commands/1)
     Nostrum.Api.update_status("", "music 🎶", 2)
   end
 
@@ -48,4 +48,9 @@ defmodule Cassian.Consumer do
     |> String.downcase()
     |> String.starts_with?(Cassian.command_prefix!())
   end
+
+  defp generate_commands(%Nostrum.Struct.Guild.UnavailableGuild{id: guild_id}) do
+    Nostrum.Api.create_guild_application_command(guild_id, Cassian.Commands.Bot.Help.application_command_definition())
+  end
+
 end

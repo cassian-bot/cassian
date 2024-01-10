@@ -6,13 +6,19 @@ defmodule Cassian.Commands.Bot.Help do
   @moduledoc """
   The help command. Shows a menu of commands.
   """
+  
+  def application_command_definition() do
+    %{
+      name: "help",
+      description: "Get the list of all commands from Cassian"
+    }
+  end
 
   @doc false
-  def execute(message, _args) do
+  def execute(interaction) do
     generate_help_embed!()
-    |> MessageManager.send_embed(message.channel_id)
 
-    :ok
+    %{type: 4, data: %{embeds: [generate_help_embed!()]}}
   end
 
   import Cassian.Utils.Embed

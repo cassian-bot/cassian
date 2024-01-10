@@ -2,36 +2,25 @@ defmodule Cassian.Consumers.Command do
   @moduledoc """
   Main consumer for the command event of the bot. Redirects it to other commands.
   """
+  
+  alias Nostrum.Api
 
   @doc """
-  Handle the mssage. A message has been filtered which is for the bot.
-  Dynamically find which module should be used for the command and continue on with that.
+  Handle the user interaction.
   """
-  @spec handle_message(message :: Nostrum.Struct.Message) :: :ok | :noop
-  def handle_message(message) do
-    {command, args} =
-      message.content
-      |> String.trim_leading()
-      |> String.split(" ")
-      |> List.pop_at(0)
-      |> filter_command()
-
-    case associated_module(command) do
+  @spec handle_interaction(interaction :: Nostrum.Struct.Interaction) :: :ok | :noop
+  def handle_interaction(interaction) do
+    case associated_module(interaction.data.name) do
       nil ->
         :noop
 
       module ->
-        module.execute(message, args)
+        interaction
+        |> module.execute()
+        |> (&Api.create_interaction_response(interaction, &1)).()
         :ok
     end
   end
-
-  # Filter the prefix from the command in the tuple.
-  @spec filter_command({command :: String.t(), args :: list(String.t())}) ::
-          {command :: String.t(), args :: list(String.t())}
-  defp filter_command({command, args}),
-    do:
-      {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
 
   defp associated_module(command) do
     alias Cassian.Commands.{Bot, Playback}
@@ -39,9 +28,6 @@ defmodule Cassian.Consumers.Command do
     case command do
       "help" ->
         Bot.Help
-
-      "ping" ->
-        Bot.Ping
 
       "backward" ->
         Playback.Backward

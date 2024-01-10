@@ -7,11 +7,15 @@ defmodule Cassian.Behaviours.Command do
   @doc """
   The function which is called that does all of the stuff needed in the command.
   """
-  @callback execute(message :: Nostrum.Struct.Message.t(), args :: List.t()) :: :ok
+  @callback execute(interaction :: Nostrum.Struct.Interaction.t()) :: :ok
+  
+  @doc """
+  The definition as a Discord application command.
+  """
+  @callback application_command_definition() :: %{}
 
   defmacro __using__(_) do
     quote do
-      defmacro handle_command(message, args), do: execute(message, args)
       @behaviour Cassian.Behaviours.Command
     end
   end
