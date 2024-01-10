@@ -18,8 +18,8 @@ defmodule Cassian.Commands.Playback.Play do
   """
   def handle_request(message, args) do
     with {:ok, {_guild_id, voice_id}} <- VoiceUtils.sender_voice_id(message),
-         {:voice_connect, true} <- {:voice_connect, VoiceUtils.can_connect?(message.guild_id, voice_id)} do
-         {:ok, metadata} <- song_metadata(Enum.fetch!(args, 0))
+         {:voice_connect, true} <- {:voice_connect, VoiceUtils.can_connect?(message.guild_id, voice_id)},
+         {:ok, metadata} <- song_metadata(Enum.fetch!(args, 0)) do
 
       VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
       PlayManager.insert!(message.guild_id, message.channel_id, metadata)

@@ -18,8 +18,6 @@ defmodule Cassian.Consumer do
       do: Command.handle_message(message)
   end
 
-  @dialyzer {:no_return, {:update_status, 3}}
-
   @doc false
   def handle_event({:READY, _, _}) do
     Nostrum.Api.update_status("", "music 🎶", 2)
