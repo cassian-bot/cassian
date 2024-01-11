@@ -8,19 +8,17 @@ defmodule Cassian.Consumer do
 
   alias Cassian.Consumers.{Command, VoiceEvent}
 
-  def start_link do
-    Consumer.start_link(__MODULE__)
-  end
-
   @doc false
   def handle_event({:INTERACTION_CREATE, interaction, _ws_state}) when is_nil(interaction.user.bot) do
     Command.handle_interaction(interaction)
+    :ok
   end
 
   @doc false
   def handle_event({:READY, user_data, _}) do
     Enum.each(user_data.guilds, &Command.generate_commands/1)
-    Nostrum.Api.update_status("", "music 🎶", 2)
+    Nostrum.Api.update_status(:online, "music 🎶", 2)
+    :ok
   end
 
   @doc false
@@ -36,16 +34,5 @@ defmodule Cassian.Consumer do
   @doc false
   def handle_event(_) do
     :noop
-  end
-
-  @doc """
-  Checks whether the command is for this bot. Returns a boolean.
-  """
-  @spec is_cassian_command?(message :: Nostrum.Struct.Message) :: boolean()
-  def is_cassian_command?(message) do
-    message.content
-    |> String.trim_leading()
-    |> String.downcase()
-    |> String.starts_with?(Cassian.command_prefix!())
   end
 end

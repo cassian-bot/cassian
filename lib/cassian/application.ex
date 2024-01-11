@@ -12,8 +12,6 @@ defmodule Cassian.Application do
 
   @doc false
   def add_children() do
-    alias Cassian.Consumer
-
     children =
       [
         Cassian.Consumer,

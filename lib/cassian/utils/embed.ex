@@ -7,7 +7,7 @@ defmodule Cassian.Utils.Embed do
   Add a color on an embed. The `color` params ia a hex string value of the color.
   It will be automaically converted to something Discord can use.
   """
-  @spec put_color_on_embed(embed :: Embed, color :: String.t()) :: Embed
+  @spec put_color_on_embed(embed :: Embed.t(), color :: String.t()) :: Embed.t()
   def put_color_on_embed(embed, color \\ "#6996ff") do
     {color, _} =
       color
@@ -24,7 +24,7 @@ defmodule Cassian.Utils.Embed do
   @doc """
   Create an empty embed. It has the default color of the bot.
   """
-  @spec create_empty_embed!() :: Embed
+  @spec create_empty_embed!() :: Embed.t()
   def create_empty_embed!() do
     %Nostrum.Struct.Embed{}
     |> put_color_on_embed()

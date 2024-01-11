@@ -42,8 +42,8 @@ defmodule Cassian.Servers.SoundCloudToken do
     do: {:ok, acquire_new_client_id(), @timeout}
 
   defp acquire_new_client_id() do
-    with {:ok, response = %HTTPoison.Response{status_code: 200}} <- HTTPoison.get("https://soundcloud.com/discover"),
-         {:ok, value} <- generate_new_client_id(response) do
+    with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get("https://soundcloud.com/discover"),
+         {:ok, value} <- generate_new_client_id(body) do
           Logger.debug("Acquired new soundcloud token.")
           value
     else
@@ -53,25 +53,23 @@ defmodule Cassian.Servers.SoundCloudToken do
     end
   end
   
-  defp generate_new_client_id(response) do
-    data = 
-      response
-        |> Map.get(:body)
-        |> Floki.parse_document!()
-        |> Floki.find("script[src][crossorigin]")
-        |> Stream.map(&filter_scripts/1)
-        |> Stream.reject(&is_nil/1)
-        |> Enum.reverse() # Generally client_id is near the end script from experience
-        |> Enum.find_value(fn script ->
-          with {:ok, response = %HTTPoison.Response{status_code: 200}} <- HTTPoison.get(script),
-               regex_code <- Regex.run(~r/client_id:\"(.*)\",env:/, response.body),
-               false <- is_nil(regex_code) do
-            {:ok, List.last(regex_code)}
-          else
-            _ ->
-              nil
-          end
-        end)
+  defp generate_new_client_id(body) do
+    body
+    |> Floki.parse_document!()
+    |> Floki.find("script[src][crossorigin]")
+    |> Stream.map(&filter_scripts/1)
+    |> Stream.reject(&is_nil/1)
+    |> Enum.reverse() # Generally client_id is near the end script from experience
+    |> Enum.find_value(fn script ->
+      with {:ok, response = %HTTPoison.Response{status_code: 200}} <- HTTPoison.get(script),
+            regex_code <- Regex.run(~r/client_id:\"(.*)\",env:/, response.body),
+            false <- is_nil(regex_code) do
+        {:ok, List.last(regex_code)}
+      else
+        _ ->
+          nil
+      end
+    end)
   end
   
   defp filter_scripts({"script", [_, {"src", script}], _}) do

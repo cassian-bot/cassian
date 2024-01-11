@@ -14,23 +14,21 @@ defmodule Cassian.Utils do
   end
 
   @doc """
-  Check whether a link is a YouTube one.
+  Get the song metadata if it's from a valid provider
   """
   @spec song_metadata(link :: String.t()) :: {:ok, metadata :: Hash} | {:error, :no_metadata}
   def song_metadata(link) do
-
-    case YoutubeService.oembed_song_data(link) do
-      {:ok, metadata} ->
-        {:ok, metadata}
+    [YoutubeService, SoundCloudService]
+    |> Enum.find_value({:error, :no_metadata}, &check_for_data(&1, link))
+  end
+  
+  defp check_for_data(module, link) do
+    case module.oembed_song_data(link) do
+      {:ok, data} ->
+        {:ok, data}
 
       _ ->
-        case SoundCloudService.oembed_song_data(link) do
-          {:ok, metadata} ->
-            {:ok, metadata}
-
-          _ ->
-            {:error, :no_metadata}
-        end
+        nil
     end
   end
 end

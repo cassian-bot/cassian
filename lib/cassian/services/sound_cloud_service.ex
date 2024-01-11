@@ -4,6 +4,8 @@ defmodule Cassian.Services.SoundCloudService do
   """
 
   alias Cassian.Structs.Metadata
+  
+  require Logger
 
   defdelegate client_id(), to: Cassian.Servers.SoundCloudToken
 
@@ -24,25 +26,25 @@ defmodule Cassian.Services.SoundCloudService do
       format: :json
     }
 
-    case HTTPoison.get(link, headers, params: params) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        body =
-          body
-          |> Poison.decode!(keys: :atoms)
+    with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(link, headers, params: params),
+         {:ok, body} <- Poison.decode(body, %{keys: :atoms}) do
+      metadata = %Metadata{
+        title: body.title,
+        author: body.author_name,
+        provider: "soundcloud",
+        link: url,
+        color: "ff9033",
+        thumbnail_url: body.thumbnail_url,
+        stream_link: nil,
+        stream_method: :url
+      }
 
-        body = %Metadata{
-          title: body.title,
-          author: body.author_name,
-          provider: "soundcloud",
-          link: url,
-          color: "ff9033",
-          thumbnail_url: body.thumbnail_url,
-          stream_link: nil,
-          stream_method: :url
-        }
+      {:ok, metadata}
 
-        {:ok, body}
-
+    else
+      {_, %HTTPoison.Response{status_code: code}} ->
+        {:error, code}
+        
       {_, %HTTPoison.Response{status_code: code}} ->
         {:error, code}
     end
@@ -53,6 +55,7 @@ defmodule Cassian.Services.SoundCloudService do
   """
   @spec stream_from_url(url :: String.t()) :: {:ok, String.t()} | {:error, any()}
   def stream_from_url(url) do
+    Logger.debug("Stream from url called with: #{inspect(url)}")
     case acquire_track_id(url) do
       {:ok, track_id} ->
         case get_progressive_link(track_id) do
@@ -75,23 +78,26 @@ defmodule Cassian.Services.SoundCloudService do
   def acquire_track_id(url) do
     headers = [
       # I honestly have no clue what is the content type...
-      {"Content-Type", "*/*"}
+      {"Content-Type", "application/json"}
     ]
 
     params = %{
       url: url,
       format: "json"
     }
+    
+    response =
+      HTTPoison.get("https://soundcloud.com/oembed", headers,
+        params: params,
+        follow_redirect: true
+      )
 
-    case HTTPoison.get("https://soundcloud.com/oembed", headers,
-           params: params,
-           follow_redirect: true
-         ) do
+    case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {
           :ok,
           # Woohoo Regex magic
-          Regex.run(~r/(?<=tracks%2F)(.*)(?=&show_artwork)/, body) |> List.first()
+          Regex.run(~r/tracks%2F(.*)&show_artwork/, body) |> List.last()
         }
 
       _ ->
@@ -108,19 +114,27 @@ defmodule Cassian.Services.SoundCloudService do
     }
 
     # Some information is here
-    case HTTPoison.get(url, %{}, params: params) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        # Doesn't look safe but as long as SoundCloud IS giving an OK response the JSON is okay...
-        url =
-          Poison.decode!(body, %{keys: :atoms}).media.transcodings
-          |> Enum.filter(fn transcoding -> transcoding.format.protocol == "progressive" end)
-          |> List.first()
-          |> Map.get(:url)
-
+    with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(url, %{}, params: params),
+         {:ok, decoded} <- Poison.decode(body, %{keys: :atoms}),
+         {:ok, url} <- acquire_link_from_body(decoded) do
         {:ok, url}
-
+    else
       _ ->
         {:error, nil}
+    end
+  end
+  
+  defp acquire_link_from_body(body) do
+    transcoding =
+      body.media.transcodings
+      |> Enum.find(fn transcoding -> transcoding.format.protocol == "progressive" end)
+      |> Map.get(:url)
+      
+    case transcoding do
+      nil ->
+        {:error, nil}
+      value ->
+        {:ok, value}
     end
   end
 
@@ -133,13 +147,15 @@ defmodule Cassian.Services.SoundCloudService do
     params = %{
       client_id: client_id()
     }
-
-    case HTTPoison.get(progressive_transcoding_url, %{}, params: params) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, body |> Poison.decode!(keys: :atoms) |> Map.get(:url)}
-
+    
+    with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(progressive_transcoding_url, %{}, params: params),
+         {:ok, decoded} <- Poison.decode(body, %{keys: :atoms}),
+         value <- Map.get(decoded, :url),
+         false <- is_nil(value) do
+      {:ok, value}
+    else
       _ ->
-        {:error, nil}
+        {:error, nil}  
     end
   end
 end

@@ -98,10 +98,8 @@ defmodule Cassian.Managers.PlayManager do
             index = keep_in_bounds(index, ordered)
 
             metadata = Enum.at(ordered, index)
-            
-            IO.inspect("I mean I got here, no?")
 
-            case Voice.play_when_ready(metadata, guild_id, 20) do
+            case Voice.play_when_ready(metadata, guild_id, 10) do
               {:ok, data} ->
                 notifiy_playing(state.channel_id, metadata)
 

@@ -10,7 +10,7 @@ defmodule Cassian.Consumers.Command do
   @doc """
   Handle the user interaction.
   """
-  @spec handle_interaction(interaction :: Nostrum.Struct.Interaction) :: :ok | :noop
+  @spec handle_interaction(interaction :: Nostrum.Struct.Interaction.t()) :: :ok | :noop
   def handle_interaction(interaction) do
     case associated_module(interaction.data.name) do
       nil ->
@@ -32,7 +32,7 @@ defmodule Cassian.Consumers.Command do
     Nostrum.Api.create_guild_application_command(guild_id, Bot.Help.application_command_definition())
     Nostrum.Api.create_guild_application_command(guild_id, Playback.Backward.application_command_definition())
     Nostrum.Api.create_guild_application_command(guild_id, Playback.Forward.application_command_definition())
-    Nostrum.Api.create_guild_application_command(guild_id, Playback.Play.application_command_definition()) |> IO.inspect()
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Play.application_command_definition())
   end
 
   defp associated_module(command) do
