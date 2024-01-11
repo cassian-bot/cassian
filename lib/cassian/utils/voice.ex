@@ -1,6 +1,6 @@
 defmodule Cassian.Utils.Voice do
+  alias Nostrum.Snowflake
   alias Nostrum.Api
-  alias Cassian.Structs.VoicePermissions
   alias Nostrum.Cache.GuildCache
   alias Cassian.Structs.Metadata
   
@@ -14,6 +14,7 @@ defmodule Cassian.Utils.Voice do
   def join_or_switch_voice(guild_id, channel_id) do
     guild_id
     |> Api.update_voice_state(channel_id, false, true)
+    :ok
   end
 
   @doc """
@@ -82,7 +83,7 @@ defmodule Cassian.Utils.Voice do
   Safely the current voice id in which the user is. Also returns the guild id.
   """
   @spec sender_voice_id(interaction :: Nostrum.Struct.Interaction.t()) ::
-          {:ok, {guild_id :: String.t(), channel_id :: String.t()}} | {:error, :not_in_voice}
+          {:ok, {guild_id :: Snowflake.t(), channel_id :: Snowflake.t()}} | {:error, :not_in_voice}
   def sender_voice_id(interaction) do
     voice_id =
       GuildCache.get!(interaction.guild_id)

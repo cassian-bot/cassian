@@ -3,6 +3,7 @@ defmodule Cassian.Managers.PlayManager do
   Manager for queues.
   """
 
+  alias Nostrum.Snowflake
   alias Cassian.Structs.{VoiceState, Playlist}
   alias Cassian.Utils.Voice
   alias Cassian.Utils.Embed, as: EmbedUtils
@@ -14,6 +15,7 @@ defmodule Cassian.Managers.PlayManager do
   @doc """
   Add a song to the playlist.
   """
+  @spec insert!(guild_id :: Snowflake.t(), channel_id :: Snowflake.t(), metadata :: Metadata.t()) :: :ok
   def insert!(guild_id, channel_id, metadata) do
     Playlist.insert!(guild_id, metadata)
 

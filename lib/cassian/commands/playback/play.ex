@@ -4,7 +4,7 @@ defmodule Cassian.Commands.Playback.Play do
 
   import Cassian.Utils
   alias Cassian.Utils.Voice, as: VoiceUtils
-  alias Cassian.Managers.{MessageManager, PlayManager}
+  alias Cassian.Managers.PlayManager
 
   # Main logic pipe
   
@@ -27,11 +27,11 @@ defmodule Cassian.Commands.Playback.Play do
   def execute(interaction) do
     {embed, flags} =
       with {:ok, {_guild_id, voice_id}} <- VoiceUtils.sender_voice_id(interaction),
-          {:ok, query} <- fetch_query(interaction.data.options),
-          {:ok, metadata} <- song_metadata(query),
-          :ok <- VoiceUtils.join_or_switch_voice(interaction.guild_id, voice_id),
-          :ok <- PlayManager.insert!(interaction.guild_id, interaction.channel_id, metadata),
-          {:ok, :will_play} <- PlayManager.play_if_needed(interaction.guild_id) do
+           {:ok, query} <- fetch_query(interaction.data.options),
+           {:ok, metadata} <- song_metadata(query),
+           :ok <- VoiceUtils.join_or_switch_voice(interaction.guild_id, voice_id), # just to continue with the flow
+           :ok <- PlayManager.insert!(interaction.guild_id, interaction.channel_id, metadata),
+           {:ok, :will_play} <- PlayManager.play_if_needed(interaction.guild_id) do
         {
           EmbedUtils.create_empty_embed!()
           |> Embed.put_title("Enqueued the song")
@@ -40,13 +40,11 @@ defmodule Cassian.Commands.Playback.Play do
         }
       else
         {:error, :not_in_voice} ->
-          no_channel_error(interaction)
-        {:voice_connect, false} ->
-          no_permissions_error(interaction)
+          no_channel_error()
         {:error, :no_metadata} ->
-          invalid_link_error(interaction)
+          invalid_link_error()
         {:error, :wont_play} ->
-          no_permissions_error(interaction)
+          no_permissions_error()
       end
     
     %{type: 4, data: %{embeds: [embed], flags: flags}}
@@ -71,7 +69,7 @@ defmodule Cassian.Commands.Playback.Play do
   @doc """
   Generate and send the embed for when a user isn't in a voice channel.
   """
-  def no_channel_error(message) do
+  def no_channel_error() do
     {
       EmbedUtils.generate_error_embed(
         "Hey you... You're not in a voice channel.",
@@ -85,7 +83,7 @@ defmodule Cassian.Commands.Playback.Play do
   Generate and send the embed for when the bot doesn't have permissions to view, connect or
   speak in a channel.
   """
-  def no_permissions_error(message) do
+  def no_permissions_error() do
     {
       EmbedUtils.generate_error_embed(
         "And how do you think that's possible?",
@@ -98,7 +96,7 @@ defmodule Cassian.Commands.Playback.Play do
   @doc """
   Tell the user that the link is not valid.
   """
-  def invalid_link_error(message) do
+  def invalid_link_error() do
     {
       EmbedUtils.generate_error_embed(
         "Yeah, that won't work.",

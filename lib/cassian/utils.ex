@@ -3,6 +3,7 @@ defmodule Cassian.Utils do
   Module for general utils...
   """
 
+  alias Cassian.Structs.Metadata
   alias Cassian.Services.{YoutubeService, SoundCloudService}
 
   @doc """
@@ -16,7 +17,7 @@ defmodule Cassian.Utils do
   @doc """
   Get the song metadata if it's from a valid provider
   """
-  @spec song_metadata(link :: String.t()) :: {:ok, metadata :: Hash} | {:error, :no_metadata}
+  @spec song_metadata(link :: String.t()) :: {:ok, metadata :: Metadata.t()} | {:error, :no_metadata}
   def song_metadata(link) do
     [YoutubeService, SoundCloudService]
     |> Enum.find_value({:error, :no_metadata}, &check_for_data(&1, link))
