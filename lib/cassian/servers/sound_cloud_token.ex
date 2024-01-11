@@ -27,8 +27,8 @@ defmodule Cassian.Servers.SoundCloudToken do
   end
 
   @impl true
-  def handle_info(:timeout, state) do
-    Logger.debug("Got timeout!")
+  def handle_info(:timeout, _) do
+    Logger.debug("Got timeout on SoundCloud, acquiring new token!")
     state = acquire_new_client_id()
     {:noreply, state, @timeout}
   end
