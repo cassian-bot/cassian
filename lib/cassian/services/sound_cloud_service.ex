@@ -45,8 +45,11 @@ defmodule Cassian.Services.SoundCloudService do
       {_, %HTTPoison.Response{status_code: code}} ->
         {:error, code}
         
-      {_, %HTTPoison.Response{status_code: code}} ->
-        {:error, code}
+      {_, %HTTPoison.Error{}} ->
+        {:error, -1}
+        
+      {_, _} ->
+        {:error, -2}
     end
   end
 
