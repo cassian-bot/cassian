@@ -64,9 +64,9 @@ FROM alpine:3.19.0 AS cassian-app
 RUN adduser -D cassian --disabled-password
 
 RUN apk update
-# 
+
 RUN apk upgrade
-# 
+
 RUN apk add ffmpeg youtube-dl
 
 USER cassian
