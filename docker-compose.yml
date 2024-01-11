@@ -5,3 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      DISCORD_BOT_TOKEN: $DISCORD_BOT_TOKEN
+      WEB_ENABLED: false
+      FORCE_SSL: false
+
