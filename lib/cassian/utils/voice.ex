@@ -26,16 +26,6 @@ defmodule Cassian.Utils.Voice do
     |> Api.update_voice_state(nil)
   end
 
-  @doc """
-  Check if the bot can connect to a specific voice channel.
-  """
-  @spec can_connect?(guild_id :: Snowflake.t(), voice_id :: Snowflake.t()) :: boolean()
-  def can_connect?(guild_id, voice_id) do
-    perms = VoicePermissions.my_channel_permissions(guild_id, voice_id)
-
-    perms.administrator || perms.connect
-  end
-
   defguard positive_integer(value) when is_integer(value) and value > 0
 
   @doc """
