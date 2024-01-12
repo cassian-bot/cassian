@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :nostrum,
   ffmpeg: System.get_env("FFMPEG_PATH") || "/usr/bin/ffmpeg",
