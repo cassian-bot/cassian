@@ -20,8 +20,8 @@ defmodule Cassian.Managers.MessageManager do
         :ok
 
       {:error, error} ->
-        Logger.warn(error |> Poison.encode!())
-        :nnop
+        Logger.warning("Failed to edit message: #{inspect(message)} with error: #{inspect(error)}!")
+        :noop
     end
   end
 

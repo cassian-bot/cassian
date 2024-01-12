@@ -45,6 +45,8 @@ defmodule Cassian.Commands.Playback.Play do
           invalid_link_error()
         {:error, :failed_to_join} ->
           no_permissions_error()
+        {:error, :failed_to_get_stream}
+          invalid_link_error()
       end
     
     %{type: 4, data: %{embeds: [embed], flags: flags}}

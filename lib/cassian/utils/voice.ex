@@ -21,11 +21,11 @@ defmodule Cassian.Utils.Voice do
       ConsumerGroup.join()
       receive do
         {:event, {:VOICE_STATE_UPDATE, %Nostrum.Struct.Event.VoiceState{}, _socket}} ->
-          Logger.debug("Got event for voice state update, joined without and issue #{guild_id}.")
+          Logger.info("Joined voice chat on guild_id: #{inspect(guild_id)}")
           {:ok, :joined}
       after
         1_000 ->
-          Logger.debug("Failed to join on guild: #{guild_id}.")
+          Logger.error("Failed to join voice chat on guild: #{guild_id}.")
           {:error, :failed_to_join}
       end
     end
@@ -47,23 +47,31 @@ defmodule Cassian.Utils.Voice do
   Every retry approx lasts for approx one second.
   """
   @spec play_when_ready(metadata :: %Metadata{}, guild_id :: Snowflake.t(), max_retries :: integer()) ::
-          {:ok, :ok | any()} | {:error, :failed_max}
+          {:ok, :ok | any()} | {:error, :failed_max} | {:error, :failed_to_get_stream}
   def play_when_ready(metadata, guild_id, max_retries)
       when is_integer(max_retries) and max_retries > 0 do
         
+    Logger.info("play_when_ready/3 on guild_id: #{inspect(guild_id)} failed. Trying #{inspect(max_retries)} more tries.")
     Logger.debug("Trying to play song from metadata: #{inspect(metadata)} in guild id: #{guild_id}. Remaining retries: #{max_retries}.")
         
     if Nostrum.Voice.ready?(guild_id) do
-      stream_source = stream_url!(metadata)
-      Logger.debug("Voice is ready. Streaming audiosource: #{inspect(stream_source)}")
-      {:ok, Nostrum.Voice.play(guild_id, stream_source, metadata.stream_method)}
+      case stream_url!(metadata) do
+        nil ->
+          Logger.error("Failed to get stream source. Erroring out safely!")
+          {:error, :failed_to_get_stream}
+        stream_source ->
+          Logger.info("Joined voice chat on guild_id: #{inspect(guild_id)}.")
+          Logger.debug("Voice is ready. Streaming audiosource: #{inspect(stream_source)}")
+          {:ok, Nostrum.Voice.play(guild_id, stream_source, metadata.stream_method)}
+      end
     else
       :timer.sleep(1000)
       play_when_ready(metadata, guild_id, max_retries - 1)
     end
   end
 
-  def play_when_ready(_, _, _) do
+  def play_when_ready(_, guild_id, _) do
+    Logger.error("Failed to join voice chat on guild_id: #{inspect(guild_id)}.")
     {:error, :failed_max}
   end
 

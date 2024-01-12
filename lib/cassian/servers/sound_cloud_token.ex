@@ -28,8 +28,9 @@ defmodule Cassian.Servers.SoundCloudToken do
 
   @impl true
   def handle_info(:timeout, _) do
-    Logger.debug("Got timeout on SoundCloud, acquiring new token!")
+    Logger.info("Got timeout on SoundCloud, acquiring new token!")
     state = acquire_new_client_id()
+    Logger.debug("New token is: #{inspect(state)}")
     {:noreply, state, @timeout}
   end
 
@@ -44,11 +45,12 @@ defmodule Cassian.Servers.SoundCloudToken do
   defp acquire_new_client_id() do
     with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get("https://soundcloud.com/discover"),
          {:ok, value} <- generate_new_client_id(body) do
-          Logger.debug("Acquired new soundcloud token.")
+          Logger.info("Acquired new soundcloud token.")
+          Logger.debug("New token is: #{inspect(value)}.")
           value
     else
       _ ->
-        Logger.warning ("Failed to retrieve token!")
+        Logger.error("Failed to retrieve token!")
         nil 
     end
   end

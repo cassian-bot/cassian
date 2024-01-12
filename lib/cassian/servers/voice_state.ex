@@ -71,19 +71,20 @@ defmodule Cassian.Servers.VoiceState do
 
   @doc false
   def handle_cast({:put, new}, _state) do
-    Logger.debug("Putting new value #{Poison.encode!(new)}")
+    Logger.debug("Putting new voice state: #{inspect(new)}")
     {:noreply, new, @timeout}
   end
 
   @doc false
   def handle_info(:timeout, %VoiceState{status: :noop} = state) do
-    Logger.debug("Matched #{Poison.encode!(state)}")
+    Logger.info("Matched noop voice state.")
+    Logger.info("Noop voice state on timeout: #{inspect(state)}")
     {:stop, {:shutdown, :afk}, state}
   end
 
   @doc false
   def handle_info(:timeout, state) do
-    Logger.debug("Not matched #{Poison.encode!(state)}")
+    Logger.debug("Did not match noop voice state: #{inspect(state)}")
     {:noreply, state, @timeout}
   end
 
@@ -93,7 +94,8 @@ defmodule Cassian.Servers.VoiceState do
   end
 
   def terminate({:shutdown, :afk}, state) do
-    Logger.debug("Clossing #{Poison.encode!(state)}")
+    Logger.info("Shutdown state due to afk on guild_id: #{state.guild_id}.")
+    Logger.debug("Clossing voice state due to afk: #{inspect(state)}.")
     Cassian.Utils.Voice.join_or_switch_voice(state.guild_id, nil)
     {:shutdown, :afk}
   end

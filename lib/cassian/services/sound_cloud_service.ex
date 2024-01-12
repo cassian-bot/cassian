@@ -59,16 +59,10 @@ defmodule Cassian.Services.SoundCloudService do
   @spec stream_from_url(url :: String.t()) :: {:ok, String.t()} | {:error, any()}
   def stream_from_url(url) do
     Logger.debug("Stream from url called with: #{inspect(url)}")
-    case acquire_track_id(url) do
-      {:ok, track_id} ->
-        case get_progressive_link(track_id) do
-          {:ok, progressive_transcoding} ->
-            stream_url(progressive_transcoding)
-
-          {:error, _} ->
-            nil
-        end
-
+    with {:ok, track_id} <- acquire_track_id(url),
+         {:ok, transcoding} <- get_progressive_link(track_id) do
+      stream_url(transcoding)
+    else    
       _ ->
         {:error, nil}
     end
@@ -94,13 +88,21 @@ defmodule Cassian.Services.SoundCloudService do
         params: params,
         follow_redirect: true
       )
+      
+    Logger.debug("Got SoundCloud acquire_track_id/1 response: #{inspect(response)}")
 
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        track_id =
+          Regex.run(~r/tracks%2F(.*)&show_artwork/, body)
+          |> List.last()
+          
+        Logger.debug("SoundCloud track_id is: #{inspect(track_id)}.")
+        
         {
           :ok,
           # Woohoo Regex magic
-          Regex.run(~r/tracks%2F(.*)&show_artwork/, body) |> List.last()
+          track_id
         }
 
       _ ->
@@ -115,14 +117,17 @@ defmodule Cassian.Services.SoundCloudService do
     params = %{
       client_id: client_id()
     }
+    
+    response = HTTPoison.get(url, %{}, params: params)
 
     # Some information is here
-    with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(url, %{}, params: params),
+    with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- response,
          {:ok, decoded} <- Poison.decode(body, %{keys: :atoms}),
          {:ok, url} <- acquire_link_from_body(decoded) do
         {:ok, url}
     else
       _ ->
+        Logger.error("Failed to get correct response, it's: #{inspect(response)}")
         {:error, nil}
     end
   end
