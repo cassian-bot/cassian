@@ -24,10 +24,8 @@ defmodule Cassian.MixProject do
     [
       {:nostrum, github: "Kraigie/nostrum"},
       {:poison, "~> 5.0"},
-      {:httpoison, "~> 2.0"},
       {:cowlib, "~> 2.9.1", override: true},
-      {:plug_cowboy, "~> 2.4"},
-      {:floki, "~> 0.31.0"}
+      {:plug_cowboy, "~> 2.4"}
     ]
   end
 end
