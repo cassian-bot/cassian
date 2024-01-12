@@ -25,7 +25,13 @@ defmodule Cassian.Managers.PlayManager do
     |> VoiceState.put()
   end
 
+  @spec alter_index(any()) :: nil | no_return()
   @doc """
+  Alter the new index in the playlist. It will either increment or decrement it.
+  
+  * `no repeat`, keep the new index
+  * `one`, repeat the song
+  * `all`, alter the index but loop it around (keep it in bounds)
   """
   def alter_index(guild_id) do
     case Playlist.show(guild_id) do
@@ -41,7 +47,7 @@ defmodule Cassian.Managers.PlayManager do
               playlist.index
 
             :all ->
-              keep_in_bounds(index, playlist.elements)
+              keep_in_bounds!(index, playlist.elements)
           end
 
         playlist
@@ -53,12 +59,12 @@ defmodule Cassian.Managers.PlayManager do
     end
   end
 
-  def in_bound?(index, ordered) do
+  defp in_bound?(index, ordered) do
     index >= 0 and index < length(ordered)
   end
 
   # Keep the index in bounds, loops around.
-  def keep_in_bounds(index, ordered) do
+  defp keep_in_bounds!(index, ordered) do
     size = length(ordered)
     index = if index >= size, do: 0, else: index
     if index < 0, do: size - 1, else: index
@@ -97,7 +103,7 @@ defmodule Cassian.Managers.PlayManager do
           index = old_index
 
           if should_play? do
-            index = keep_in_bounds(index, ordered)
+            index = keep_in_bounds!(index, ordered)
 
             metadata = Enum.at(ordered, index)
 

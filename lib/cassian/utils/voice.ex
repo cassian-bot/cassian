@@ -10,7 +10,7 @@ defmodule Cassian.Utils.Voice do
   leave it. It can take up to one second to get the correct event from discord
   or fail with `{:error, :failed_to_join}` tuple.
   """
-  @spec join_or_switch_voice(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) :: {:ok, :joined} | {:ok, :present} | {:error, :failed_to_join}
+  @spec join_or_switch_voice(guild_id :: Snowflake.t(), channel_id :: Snowflake.t() | nil) :: {:ok, :joined} | {:ok, :present} | {:error, :failed_to_join}
   def join_or_switch_voice(guild_id, channel_id) do
     guild_id
     |> Api.update_voice_state(channel_id, false, true)
