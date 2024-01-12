@@ -1,4 +1,5 @@
 defmodule Cassian.Commands.Playback.Play do
+  require Logger
   alias Nostrum.Struct.Embed
   use Cassian.Behaviours.Command
 
@@ -18,7 +19,6 @@ defmodule Cassian.Commands.Playback.Play do
           name: "query",
           required: true,
           description: "Name of the song of URL for it."
-      
         }
       ]
     }
@@ -29,9 +29,9 @@ defmodule Cassian.Commands.Playback.Play do
       with {:ok, {_guild_id, voice_id}} <- VoiceUtils.sender_voice_id(interaction),
            {:ok, query} <- fetch_query(interaction.data.options),
            {:ok, metadata} <- song_metadata(query),
-           :ok <- VoiceUtils.join_or_switch_voice(interaction.guild_id, voice_id), # just to continue with the flow
-           :ok <- PlayManager.insert!(interaction.guild_id, interaction.channel_id, metadata),
-           {:ok, :will_play} <- PlayManager.play_if_needed(interaction.guild_id) do
+           {:ok, _} <- VoiceUtils.join_or_switch_voice(interaction.guild_id, voice_id),
+           :ok <- PlayManager.insert!(interaction.guild_id, interaction.channel_id, metadata) do
+        PlayManager.play_if_needed(interaction.guild_id)
         {
           EmbedUtils.create_empty_embed!()
           |> Embed.put_title("Enqueued the song")
@@ -43,7 +43,7 @@ defmodule Cassian.Commands.Playback.Play do
           no_channel_error()
         {:error, :no_metadata} ->
           invalid_link_error()
-        {:error, :wont_play} ->
+        {:error, :failed_to_join} ->
           no_permissions_error()
       end
     
@@ -87,7 +87,7 @@ defmodule Cassian.Commands.Playback.Play do
     {
       EmbedUtils.generate_error_embed(
         "And how do you think that's possible?",
-        "I don't have the permissions to play music there... Fix it up first."
+        "I don't have the permissions to play music there or something else really messed me up."
       ),
       1 <<< 6
     }

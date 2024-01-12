@@ -1,6 +1,5 @@
 defmodule Cassian.Utils.Voice do
-  alias Nostrum.Snowflake
-  alias Nostrum.Api
+  alias Nostrum.{Snowflake, Api, ConsumerGroup}
   alias Nostrum.Cache.GuildCache
   alias Cassian.Structs.Metadata
   
@@ -8,13 +7,28 @@ defmodule Cassian.Utils.Voice do
 
   @doc """
   Join or switch from the voice channel. Set the channel to nil to
-  leave it.
+  leave it. It can take up to one second to get the correct event from discord
+  or fail with `{:error, :failed_to_join}` tuple.
   """
-  @spec join_or_switch_voice(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) :: :ok
+  @spec join_or_switch_voice(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) :: {:ok, :joined} | {:ok, :present} | {:error, :failed_to_join}
   def join_or_switch_voice(guild_id, channel_id) do
     guild_id
     |> Api.update_voice_state(channel_id, false, true)
-    :ok
+    
+    if Nostrum.Voice.ready?(guild_id) do
+      {:ok, :present}
+    else
+      ConsumerGroup.join()
+      receive do
+        {:event, {:VOICE_STATE_UPDATE, %Nostrum.Struct.Event.VoiceState{}, _socket}} ->
+          Logger.debug("Got event for voice state update, joined without and issue #{guild_id}.")
+          {:ok, :joined}
+      after
+        1_000 ->
+          Logger.debug("Failed to join on guild: #{guild_id}.")
+          {:error, :failed_to_join}
+      end
+    end
   end
 
   @doc """
