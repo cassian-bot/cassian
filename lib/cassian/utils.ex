@@ -4,7 +4,7 @@ defmodule Cassian.Utils do
   """
 
   alias Cassian.Structs.Metadata
-  alias Cassian.Services.{YoutubeService, SoundCloudService}
+  alias Cassian.Services.{Youtube, SoundCloud}
 
   @doc """
   Get the user avatar url.
@@ -19,12 +19,12 @@ defmodule Cassian.Utils do
   """
   @spec song_metadata(link :: String.t()) :: {:ok, metadata :: Metadata.t()} | {:error, :no_metadata}
   def song_metadata(link) do
-    [YoutubeService, SoundCloudService]
+    [Youtube, SoundCloud]
     |> Enum.find_value({:error, :no_metadata}, &check_for_data(&1, link))
   end
   
   defp check_for_data(module, link) do
-    case module.oembed_song_data(link) do
+    case module.song_metadata(link) do
       {:ok, data} ->
         {:ok, data}
 

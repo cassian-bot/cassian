@@ -1,8 +1,6 @@
 import Config
 
 config :nostrum,
-  ffmpeg: "/usr/bin/ffmpeg",
-  youtubedl: "/usr/bin/youtube-dl",
   token: System.fetch_env!("DISCORD_BOT_TOKEN"),
   num_shards: :auto
 

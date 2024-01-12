@@ -55,15 +55,9 @@ defmodule Cassian.Utils.Voice do
     Logger.debug("Trying to play song from metadata: #{inspect(metadata)} in guild id: #{guild_id}. Remaining retries: #{max_retries}.")
         
     if Nostrum.Voice.ready?(guild_id) do
-      case stream_url!(metadata) do
-        nil ->
-          Logger.error("Failed to get stream source. Erroring out safely!")
-          {:error, :failed_to_get_stream}
-        stream_source ->
-          Logger.info("Joined voice chat on guild_id: #{inspect(guild_id)}.")
-          Logger.debug("Voice is ready. Streaming audiosource: #{inspect(stream_source)}")
-          {:ok, Nostrum.Voice.play(guild_id, stream_source, metadata.stream_method)}
-      end
+      Logger.info("Joined voice chat on guild_id: #{inspect(guild_id)}.")
+      Logger.debug("Voice is ready. Streaming audiosource: #{inspect(metadata.stream_link)}")
+      {:ok, Nostrum.Voice.play(guild_id, metadata.stream_link, metadata.stream_method)}
     else
       :timer.sleep(1000)
       play_when_ready(metadata, guild_id, max_retries - 1)
@@ -73,22 +67,6 @@ defmodule Cassian.Utils.Voice do
   def play_when_ready(_, guild_id, _) do
     Logger.error("Failed to join voice chat on guild_id: #{inspect(guild_id)}.")
     {:error, :failed_max}
-  end
-
-  defp stream_url!(metadata) do
-    case metadata.provider do
-      "soundcloud" ->
-        case Cassian.Services.SoundCloudService.stream_from_url(metadata.link) do
-          {:ok, stream} ->
-            stream
-
-          _ ->
-            nil
-        end
-
-      _ ->
-        metadata.stream_link
-    end
   end
 
   @doc """

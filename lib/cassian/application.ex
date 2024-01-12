@@ -15,7 +15,6 @@ defmodule Cassian.Application do
     children =
       [
         Cassian.Consumer,
-        Cassian.Servers.SoundCloudToken
       ] ++ web_child!()
 
     children
