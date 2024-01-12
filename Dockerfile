@@ -11,7 +11,7 @@ RUN apk update && \
     gcc autoconf automake ncurses-dev \
     bash make g++ openssl-dev
 
-RUN adduser -gD cassian --disabled-password
+RUN adduser -gD builder --disabled-password
 
 # Building Erlang/Elixir
 
@@ -19,9 +19,9 @@ WORKDIR /build
 
 COPY .tool-versions .
 
-RUN chown -R cassian:cassian /build
+RUN chown -R builder:builder /build
 
-USER cassian
+USER builder
 
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.13.1;
 
@@ -29,7 +29,7 @@ RUN /bin/bash -c 'echo -e "\n\n## Configure ASDF \n. $HOME/.asdf/asdf.sh" >> ~/.
 
 RUN /bin/bash -c 'echo -e "\n\n## ASDF Bash Completion: \n. $HOME/.asdf/completions/asdf.bash" >> ~/.bashrc';
 
-ENV PATH="$PATH:/home/cassian/.asdf/bin:/home/cassian/.asdf/shims"
+ENV PATH="$PATH:/home/builder/.asdf/bin:/home/builder/.asdf/shims"
 
 RUN asdf plugin add elixir
 
@@ -59,9 +59,9 @@ RUN mix release
 
 # Actual app stage
 
-FROM alpine:3.19.0 AS cassian-app
+FROM alpine:3.19.0 AS runtime
 
-RUN adduser -D cassian --disabled-password
+RUN adduser -D runner --disabled-password
 
 RUN apk update
 
@@ -69,7 +69,7 @@ RUN apk upgrade
 
 RUN apk add ffmpeg youtube-dl
 
-USER cassian
+USER runner
 
 WORKDIR /app
 
