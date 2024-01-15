@@ -23,6 +23,15 @@ defmodule Cassian.Utils do
     |> Enum.find_value({:error, :no_metadata}, &check_for_data(&1, link))
   end
   
+  @doc """
+  Create an interaction response for events which can take a little bit longer. This will keep it like that
+  for roughly 15 minutes.
+  """
+  @spec notify_longer_response(interaction :: Nostrum.Struct.Interaction.t(), flags :: integer()) :: no_return()
+  def notify_longer_response(interaction, flags \\ 64) do
+    Nostrum.Api.create_interaction_response(interaction, %{type: 5, data: %{flags: flags}})
+  end
+  
   defp check_for_data(module, link) do
     case module.song_metadata(link) do
       {:ok, data} ->

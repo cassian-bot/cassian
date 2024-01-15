@@ -2,6 +2,7 @@ defmodule Cassian.Utils.Voice do
   alias Nostrum.{Snowflake, Api, ConsumerGroup}
   alias Nostrum.Cache.GuildCache
   alias Cassian.Structs.Metadata
+  alias Nostrum.Struct.Guild
   
   require Logger
 
@@ -24,7 +25,7 @@ defmodule Cassian.Utils.Voice do
           Logger.info("Joined voice chat on guild_id: #{inspect(guild_id)}")
           {:ok, :joined}
       after
-        1_000 ->
+        5_000 ->
           Logger.error("Failed to join voice chat on guild: #{guild_id}.")
           {:error, :failed_to_join}
       end
@@ -74,22 +75,19 @@ defmodule Cassian.Utils.Voice do
   """
   @spec sender_voice_id(interaction :: Nostrum.Struct.Interaction.t()) ::
           {:ok, {guild_id :: Snowflake.t(), channel_id :: Snowflake.t()}} | {:error, :not_in_voice}
-  def sender_voice_id(interaction) do
-    voice_id =
-      GuildCache.get!(interaction.guild_id)
-      |> Map.fetch!(:voice_states)
-      |> Enum.filter(fn state -> state.user_id == interaction.user.id end)
-      |> List.first()
-      |> extract_id()
+  def sender_voice_id(interaction = %Nostrum.Struct.Interaction{user: user, guild_id: guild_id}) do
+    Logger.debug("Checking if user is in voice: #{inspect(interaction)}")
 
-    if voice_id do
-      {:ok, {interaction.guild_id, voice_id}}
+    with {:ok, %Guild{voice_states: voice_states}} <- GuildCache.get(guild_id),
+        new_filter <- Enum.filter(voice_states, fn state -> state.user_id == user.id end),
+        voice_channel <- List.first(new_filter),
+        false <- is_nil(voice_channel) do
+      Logger.debug("User is present in voice chat: #{inspect(voice_channel)}")
+      {:ok, {guild_id, voice_channel.channel_id}}
     else
-      {:error, :not_in_voice}
+      _ ->
+        Logger.debug("User is not present in voice channel!")
+        {:error, :not_in_voice}
     end
-  end
-
-  defp extract_id(channel) do
-    channel[:channel_id]
   end
 end

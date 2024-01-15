@@ -1,6 +1,7 @@
 defmodule Cassian.Commands.Playback.Play do
   require Logger
-  alias Nostrum.Struct.Embed
+  alias Cassian.Utils
+  alias Nostrum.Struct.{Embed, ApplicationCommandInteractionDataOption}
   use Cassian.Behaviours.Command
 
   import Cassian.Utils
@@ -25,6 +26,8 @@ defmodule Cassian.Commands.Playback.Play do
   end
 
   def execute(interaction) do
+    Utils.notify_longer_response(interaction)
+    
     {embed, flags} =
       with {:ok, {_guild_id, voice_id}} <- VoiceUtils.sender_voice_id(interaction),
            {:ok, query} <- fetch_query(interaction.data.options),
@@ -49,22 +52,18 @@ defmodule Cassian.Commands.Playback.Play do
           invalid_link_error()
       end
     
-    %{type: 4, data: %{embeds: [embed], flags: flags}}
+    %{type: 4, data: %{embeds: [embed], flags: flags}, edit: true}
   end
   
-  defp fetch_query(options) do
-    option =
-      options
-      |> Enum.find(fn option -> String.equivalent?(option.name, "query") end)
-    
-    case option do
-      nil ->
-        {:error, :no_metadata}
-      
-      _ ->
-        {:ok, option.value}
-    end
+  # Pattern-matches per-element if the head doesn't have this and it'll try to find the first
+  # element which has "query" as the name.
+  defp fetch_query([%ApplicationCommandInteractionDataOption{name: "query", value: value} | _]) do
+    {:ok, value}
   end
+  
+  defp fetch_query([_ | tail]), do: fetch_query(tail)
+  
+  defp fetch_query(_), do: {:error, :no_metadata}
 
   # Error handlers
 

@@ -8,7 +8,7 @@ defmodule Cassian.Services.Youtube do
   require Logger
 
   def song_metadata(url) do
-    with {json_body, 0} <- System.cmd("youtube-dl", [url, "--dump-json"]),
+    with {json_body, 0} <- System.cmd("youtube-dl", [url, "--dump-json", "--no-playlist", "--quiet"]),
          {:ok, body = %{"extractor" => "youtube"}} <- Poison.decode(json_body) do
           
       Logger.debug("Got Youtube JSON from youtube-dl: #{inspect(body)}.")
@@ -25,7 +25,7 @@ defmodule Cassian.Services.Youtube do
           stream_method: :ytdl
         }
         
-        Logger.debug("Giving metadata: #{inspect(metadata)}.")
+      Logger.debug("Giving metadata: #{inspect(metadata)}.")
       
       {:ok, metadata}
     else
@@ -35,8 +35,6 @@ defmodule Cassian.Services.Youtube do
       {:error, _} ->
         Logger.critical("Youtube body failed to decode.")
         {:error, :json_decode}
-      {:ok, _} ->
-          Logger.debug("URL is not a youtube one: #{inspect(url)}")
     end
   end
 end
