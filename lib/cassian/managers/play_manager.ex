@@ -3,6 +3,7 @@ defmodule Cassian.Managers.PlayManager do
   Manager for queues.
   """
 
+  alias Nostrum.Struct.Interaction
   alias Nostrum.Snowflake
   alias Cassian.Structs.{VoiceState, Playlist}
   alias Cassian.Utils.Voice
@@ -323,22 +324,22 @@ defmodule Cassian.Managers.PlayManager do
   @doc """
   Switch to the next or previous song. Also send notification to the channel.
   """
-  @spec switch_song_with_notification(message :: %Message{}, next :: boolean()) :: :ok | :noop
-  def switch_song_with_notification(message, next) do
+  @spec switch_song_with_notification(message :: Interaction.t(), next :: boolean()) :: :ok | :noop
+  def switch_song_with_notification(interaction, next) do
     title_part = if next, do: "next", else: "previous"
 
-    case switch_song(message.guild_id, next) do
+    case switch_song(interaction.guild_id, next) do
       :ok ->
         EmbedUtils.create_empty_embed!()
         |> Embed.put_title("Playing #{title_part} song.")
 
-      :noop ->
+      _ ->
         EmbedUtils.generate_error_embed(
           "There is no playlist.",
           "You can't change songs if there is no playlist."
         )
     end
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
+    |> MessageManager.send_dissapearing_embed(interaction.channel_id)
   end
 
   @doc """

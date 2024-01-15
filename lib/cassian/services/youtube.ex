@@ -29,6 +29,9 @@ defmodule Cassian.Services.Youtube do
       
       {:ok, metadata}
     else
+      {:ok, json} when is_map(json) ->
+        Logger.debug("The link is not a youtube one: #{inspect(json)}!")
+        {:error, :no_youtube_dl}
       {output, code} when is_integer(code) ->
         Logger.critical("youtube-dl failed with code: #{inspect(code)} and output: #{inspect(output)}!")
         {:error, :no_youtube_dl}

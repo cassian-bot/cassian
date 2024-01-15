@@ -3,31 +3,39 @@ defmodule Cassian.Commands.Playback.Playlist do
   alias Cassian.Structs.Playlist
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Nostrum.Struct.Embed
-  alias Cassian.Managers.MessageManager
+  
+  def application_command_definition() do
+    %{
+      name: "playlist",
+      description: "Show the playlist."
+    }
+  end
 
   @doc """
   Show info about the playlist.
   """
 
-  def execute(message, _args) do
-    case Playlist.show(message.guild_id) do
+  def execute(interaction) do
+    {embed, flags} = 
+    case Playlist.show(interaction.guild_id) do
       {:ok, playlist} ->
-        send_metadata(message, playlist)
+        {create_embed(playlist), 0}
 
       {:error, :noop} ->
-        send_not_playing(message)
+        {send_not_playing(), 0}
     end
+    
+    %{type: 4, data: %{embeds: [embed], flags: flags}}
   end
 
-  def send_not_playing(message) do
+  def send_not_playing() do
     EmbedUtils.create_empty_embed!()
     |> EmbedUtils.put_error_color_on_embed()
     |> Embed.put_title("I don't have any songs in the playlist.")
     |> Embed.put_description("I just don't have them. Give me songs first.")
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
   end
 
-  def send_metadata(message, playlist) do
+  def create_embed(playlist) do
     {index, sorted} =
       playlist
       |> Playlist.order_playlist()
@@ -61,10 +69,9 @@ defmodule Cassian.Commands.Playback.Playlist do
       |> Enum.with_index()
       |> Enum.reduce([], &filter(&1, &2, index))
       |> Enum.join("\n")
-
+ 
     embed
     |> Embed.put_description(description)
-    |> MessageManager.send_embed(message.channel_id)
   end
 
   defp filter({metadata, current_index}, acc, index) do
