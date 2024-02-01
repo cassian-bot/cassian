@@ -3,15 +3,20 @@ defmodule Cassian.Managers.PlayManager do
   Manager for queues.
   """
 
+  alias Nostrum.Struct.Interaction
+  alias Nostrum.Snowflake
   alias Cassian.Structs.{VoiceState, Playlist}
   alias Cassian.Utils.Voice
   alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Managers.MessageManager
   alias Nostrum.Struct.{Message, Embed}
+  
+  import Bitwise
 
   @doc """
   Add a song to the playlist.
   """
+  @spec insert!(guild_id :: Snowflake.t(), channel_id :: Snowflake.t(), metadata :: Metadata.t()) :: :ok
   def insert!(guild_id, channel_id, metadata) do
     Playlist.insert!(guild_id, metadata)
 
@@ -21,7 +26,13 @@ defmodule Cassian.Managers.PlayManager do
     |> VoiceState.put()
   end
 
+  @spec alter_index(any()) :: nil | no_return()
   @doc """
+  Alter the new index in the playlist. It will either increment or decrement it.
+  
+  * `no repeat`, keep the new index
+  * `one`, repeat the song
+  * `all`, alter the index but loop it around (keep it in bounds)
   """
   def alter_index(guild_id) do
     case Playlist.show(guild_id) do
@@ -37,7 +48,7 @@ defmodule Cassian.Managers.PlayManager do
               playlist.index
 
             :all ->
-              keep_in_bounds(index, playlist.elements)
+              keep_in_bounds!(index, playlist.elements)
           end
 
         playlist
@@ -49,12 +60,12 @@ defmodule Cassian.Managers.PlayManager do
     end
   end
 
-  def in_bound?(index, ordered) do
+  defp in_bound?(index, ordered) do
     index >= 0 and index < length(ordered)
   end
 
   # Keep the index in bounds, loops around.
-  def keep_in_bounds(index, ordered) do
+  defp keep_in_bounds!(index, ordered) do
     size = length(ordered)
     index = if index >= size, do: 0, else: index
     if index < 0, do: size - 1, else: index
@@ -73,6 +84,8 @@ defmodule Cassian.Managers.PlayManager do
   """
   def play_if_needed(guild_id) do
     state = VoiceState.get!(guild_id)
+    
+    playing_state = false
 
     if state.status == :noop and Playlist.exists?(guild_id) do
       case Playlist.show(guild_id) do
@@ -91,23 +104,31 @@ defmodule Cassian.Managers.PlayManager do
           index = old_index
 
           if should_play? do
-            index = keep_in_bounds(index, ordered)
+            index = keep_in_bounds!(index, ordered)
 
             metadata = Enum.at(ordered, index)
 
-            Voice.play_when_ready!(metadata, guild_id)
+            case Voice.play_when_ready(metadata, guild_id, 10) do
+              {:ok, data} ->
+                notifiy_playing(state.channel_id, metadata)
 
-            notifiy_playing(state.channel_id, metadata)
-
-            state
-            |> Map.put(:status, :playing)
-            |> VoiceState.put()
+                state
+                |> Map.put(:status, :playing)
+                |> VoiceState.put()
+                
+                playing_state = true
+                
+              _ ->
+               nil
+            end 
           end
 
         _ ->
           nil
       end
     end
+    
+    if playing_state, do: {:ok, :will_play}, else: {:error, :wont_play}
   end
 
   @doc """
@@ -198,24 +219,30 @@ defmodule Cassian.Managers.PlayManager do
   @doc """
   Chaange the direction of the playlist and send a notification.
   """
-  @spec change_direction_with_notification(message :: %Message{}, reverse :: boolean()) ::
-          :ok | :noop
-  def change_direction_with_notification(message, reverse) do
+  @spec change_direction_with_notification(interaction :: Interaction.t(), reverse :: boolean()) ::
+          {embed :: Embed.t(), flags :: integer()}
+  def change_direction_with_notification(interaction, reverse) do
     title_part = if reverse, do: "in reverse", else: "normally"
 
-    case change_direction(message.guild_id, reverse) do
-      :ok ->
-        EmbedUtils.create_empty_embed!()
-        |> Embed.put_title("Playing #{title_part}.")
-        |> Embed.put_description("The current playlist will play #{title_part}.")
+    {embed, flags} =
+      case change_direction(interaction.guild_id, true) do
+        :ok ->
+          {
+            EmbedUtils.create_empty_embed!()
+              |> Embed.put_title("Playing in reverse.")
+              |> Embed.put_description("The current playlist will play #{title_part}."),
+            0
+          }
 
-      :noop ->
-        EmbedUtils.generate_error_embed(
-          "There is no playlist.",
-          "I can't change the direction of the playlist if it doesn't exist."
-        )
-    end
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
+        :noop ->
+          {
+            EmbedUtils.generate_error_embed(
+              "There is no playlist.",
+              "I can't change the direction of the playlist if it doesn't exist."
+            ),
+            1 <<< 6
+          }
+      end
   end
 
   @doc """
@@ -297,22 +324,22 @@ defmodule Cassian.Managers.PlayManager do
   @doc """
   Switch to the next or previous song. Also send notification to the channel.
   """
-  @spec switch_song_with_notification(message :: %Message{}, next :: boolean()) :: :ok | :noop
-  def switch_song_with_notification(message, next) do
+  @spec switch_song_with_notification(message :: Interaction.t(), next :: boolean()) :: :ok | :noop
+  def switch_song_with_notification(interaction, next) do
     title_part = if next, do: "next", else: "previous"
 
-    case switch_song(message.guild_id, next) do
+    case switch_song(interaction.guild_id, next) do
       :ok ->
         EmbedUtils.create_empty_embed!()
         |> Embed.put_title("Playing #{title_part} song.")
 
-      :noop ->
+      _ ->
         EmbedUtils.generate_error_embed(
           "There is no playlist.",
           "You can't change songs if there is no playlist."
         )
     end
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
+    |> MessageManager.send_dissapearing_embed(interaction.channel_id)
   end
 
   @doc """

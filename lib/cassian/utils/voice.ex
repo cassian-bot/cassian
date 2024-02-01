@@ -1,17 +1,35 @@
 defmodule Cassian.Utils.Voice do
-  alias Nostrum.Api
-  alias Cassian.Structs.VoicePermissions
+  alias Nostrum.{Snowflake, Api, ConsumerGroup}
   alias Nostrum.Cache.GuildCache
   alias Cassian.Structs.Metadata
+  alias Nostrum.Struct.Guild
+  
+  require Logger
 
   @doc """
   Join or switch from the voice channel. Set the channel to nil to
-  leave it.
+  leave it. It can take up to one second to get the correct event from discord
+  or fail with `{:error, :failed_to_join}` tuple.
   """
-  @spec join_or_switch_voice(guild_id :: Snowflake.t(), channel_id :: Snowflake.t()) :: :ok
+  @spec join_or_switch_voice(guild_id :: Snowflake.t(), channel_id :: Snowflake.t() | nil) :: {:ok, :joined} | {:ok, :present} | {:error, :failed_to_join}
   def join_or_switch_voice(guild_id, channel_id) do
     guild_id
     |> Api.update_voice_state(channel_id, false, true)
+    
+    if Nostrum.Voice.ready?(guild_id) do
+      {:ok, :present}
+    else
+      ConsumerGroup.join()
+      receive do
+        {:event, {:VOICE_STATE_UPDATE, %Nostrum.Struct.Event.VoiceState{}, _socket}} ->
+          Logger.info("Joined voice chat on guild_id: #{inspect(guild_id)}")
+          {:ok, :joined}
+      after
+        5_000 ->
+          Logger.error("Failed to join voice chat on guild: #{guild_id}.")
+          {:error, :failed_to_join}
+      end
+    end
   end
 
   @doc """
@@ -23,89 +41,53 @@ defmodule Cassian.Utils.Voice do
     |> Api.update_voice_state(nil)
   end
 
-  @doc """
-  Check if the bot can connect to a specific voice channel.
-  """
-  @spec can_connect?(guild_id :: Snowflake.t(), voice_id :: Snowflake.t()) :: boolean()
-  def can_connect?(guild_id, voice_id) do
-    perms = VoicePermissions.my_channel_permissions(guild_id, voice_id)
-
-    perms.administrator || perms.connect
-  end
-
   defguard positive_integer(value) when is_integer(value) and value > 0
 
   @doc """
   Play the music with a max retry amount. If the retry amount is less than zero it will just fail automatically.
-  Every retry approx lasts for approx. `100ms`.
+  Every retry approx lasts for approx one second.
   """
   @spec play_when_ready(metadata :: %Metadata{}, guild_id :: Snowflake.t(), max_retries :: integer()) ::
-          {:ok, :ok | any()} | {:error, :failed_max}
+          {:ok, :ok | any()} | {:error, :failed_max} | {:error, :failed_to_get_stream}
   def play_when_ready(metadata, guild_id, max_retries)
       when is_integer(max_retries) and max_retries > 0 do
+        
+    Logger.info("play_when_ready/3 on guild_id: #{inspect(guild_id)} failed. Trying #{inspect(max_retries)} more tries.")
+    Logger.debug("Trying to play song from metadata: #{inspect(metadata)} in guild id: #{guild_id}. Remaining retries: #{max_retries}.")
+        
     if Nostrum.Voice.ready?(guild_id) do
-      {:ok, Nostrum.Voice.play(guild_id, stream_url!(metadata), metadata.stream_method)}
+      Logger.info("Joined voice chat on guild_id: #{inspect(guild_id)}.")
+      Logger.debug("Voice is ready. Streaming audiosource: #{inspect(metadata.stream_link)}")
+      {:ok, Nostrum.Voice.play(guild_id, metadata.stream_link, metadata.stream_method)}
     else
-      :timer.sleep(100)
+      :timer.sleep(1000)
       play_when_ready(metadata, guild_id, max_retries - 1)
     end
   end
 
-  def play_when_ready(_, _, _) do
-    {:ok, :failed_max}
-  end
-
-  defp stream_url!(metadata) do
-    case metadata.provider do
-      "soundcloud" ->
-        case Cassian.Services.SoundCloudService.stream_from_url(metadata.link) do
-          {:ok, stream} ->
-            stream
-
-          _ ->
-            nil
-        end
-
-      _ ->
-        metadata.stream_link
-    end
-  end
-
-  @doc """
-  Play the music without a max retry. This in theory can infinitely loop if the bot is never ready to play music.
-
-  See `play_when_ready/3` as a safe way to play this.
-  """
-  def play_when_ready!(metadata, guild_id) do
-    if Nostrum.Voice.ready?(guild_id) do
-      Nostrum.Voice.play(guild_id, stream_url!(metadata), metadata.stream_method)
-    else
-      :timer.sleep(100)
-      play_when_ready!(metadata, guild_id)
-    end
+  def play_when_ready(_, guild_id, _) do
+    Logger.error("Failed to join voice chat on guild_id: #{inspect(guild_id)}.")
+    {:error, :failed_max}
   end
 
   @doc """
   Safely the current voice id in which the user is. Also returns the guild id.
   """
-  @spec get_sender_voice_id(message :: Nostrum.Struct.Channel) ::
-          {:ok, {guild_id :: String.t(), channel_id :: String.t()}} | {:error, :noop}
-  def get_sender_voice_id(message) do
-    voice_id =
-      GuildCache.get!(message.guild_id)
-      |> Map.fetch!(:voice_states)
-      |> Enum.filter(fn state -> state.user_id == message.author.id end)
-      |> List.first()
-      |> extract_id()
+  @spec sender_voice_id(interaction :: Nostrum.Struct.Interaction.t()) ::
+          {:ok, {guild_id :: Snowflake.t(), channel_id :: Snowflake.t()}} | {:error, :not_in_voice}
+  def sender_voice_id(interaction = %Nostrum.Struct.Interaction{user: user, guild_id: guild_id}) do
+    Logger.debug("Checking if user is in voice: #{inspect(interaction)}")
 
-    if voice_id do
-      {:ok, {message.guild_id, voice_id}}
+    with {:ok, %Guild{voice_states: voice_states}} <- GuildCache.get(guild_id),
+        new_filter <- Enum.filter(voice_states, fn state -> state.user_id == user.id end),
+        voice_channel <- List.first(new_filter),
+        false <- is_nil(voice_channel) do
+      Logger.debug("User is present in voice chat: #{inspect(voice_channel)}")
+      {:ok, {guild_id, voice_channel.channel_id}}
     else
-      {:error, :noop}
+      _ ->
+        Logger.debug("User is not present in voice channel!")
+        {:error, :not_in_voice}
     end
-  end
-
-  defp extract_id(channel) do
-    channel[:channel_id]
   end
 end

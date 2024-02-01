@@ -1,11 +1,6 @@
-use Mix.Config
-
-config :porcelain,
-  driver: Porcelain.Driver.Basic
+import Config
 
 config :nostrum,
-  ffmpeg: System.get_env("FFMPEG_PATH") || "/usr/bin/ffmpeg",
-  youtubedl: System.get_env("YTDL_PATH") || "/usr/bin/youtube-dl",
   token: System.get_env("DISCORD_BOT_TOKEN"),
   num_shards: :auto
 

@@ -3,7 +3,8 @@ defmodule Cassian.Utils do
   Module for general utils...
   """
 
-  alias Cassian.Services.{YoutubeService, SoundCloudService}
+  alias Cassian.Structs.Metadata
+  alias Cassian.Services.{Youtube, SoundCloud}
 
   @doc """
   Get the user avatar url.
@@ -14,23 +15,30 @@ defmodule Cassian.Utils do
   end
 
   @doc """
-  Check whether a link is a YouTube one.
+  Get the song metadata if it's from a valid provider
   """
-  @spec song_metadata(link :: String.t()) :: {true, metadata :: Hash} | {false, :noop}
+  @spec song_metadata(link :: String.t()) :: {:ok, metadata :: Metadata.t()} | {:error, :no_metadata}
   def song_metadata(link) do
-
-    case YoutubeService.oembed_song_data(link) do
-      {:ok, metadata} ->
-        {true, metadata}
+    [Youtube, SoundCloud]
+    |> Enum.find_value({:error, :no_metadata}, &check_for_data(&1, link))
+  end
+  
+  @doc """
+  Create an interaction response for events which can take a little bit longer. This will keep it like that
+  for roughly 15 minutes.
+  """
+  @spec notify_longer_response(interaction :: Nostrum.Struct.Interaction.t(), flags :: integer()) :: no_return()
+  def notify_longer_response(interaction, flags \\ 64) do
+    Nostrum.Api.create_interaction_response(interaction, %{type: 5, data: %{flags: flags}})
+  end
+  
+  defp check_for_data(module, link) do
+    case module.song_metadata(link) do
+      {:ok, data} ->
+        {:ok, data}
 
       _ ->
-        case SoundCloudService.oembed_song_data(link) do
-          {:ok, metadata} ->
-            {true, metadata}
-
-          _ ->
-            {false, :noop}
-        end
+        nil
     end
   end
 end

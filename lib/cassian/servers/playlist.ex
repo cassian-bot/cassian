@@ -5,6 +5,7 @@ defmodule Cassian.Servers.Playlist do
 
   use GenServer
 
+  require Logger
   alias Cassian.Structs.{Metadata, Playlist}
 
   @doc """
@@ -42,6 +43,7 @@ defmodule Cassian.Servers.Playlist do
   """
   @spec delete(guild_id :: Snowflake.t()) :: :ok
   def delete(guild_id) do
+    Logger.info("Disconnected from voice chat. Deleting playlist for guild_id: #{inspect(guild_id)}")
     if exists?(guild_id), do: GenServer.stop(from_guild_id(guild_id))
     :ok
   end

@@ -12,15 +12,9 @@ defmodule Cassian.Application do
 
   @doc false
   def add_children() do
-    alias Cassian.Consumer
-
     children =
       [
-        %{
-          id: Consumer,
-          start: {Consumer, :start_link, []}
-        },
-        Cassian.Servers.SoundCloudToken
+        Cassian.Consumer,
       ] ++ web_child!()
 
     children

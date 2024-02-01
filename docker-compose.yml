@@ -1,0 +1,14 @@
+version: '3.0'
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    name: cassian-bot
+    restart: always
+    environment:
+      DISCORD_BOT_TOKEN: $DISCORD_BOT_TOKEN
+      WEB_ENABLED: false
+      FORCE_SSL: false
+

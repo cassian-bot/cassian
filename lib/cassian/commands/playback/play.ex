@@ -1,102 +1,109 @@
 defmodule Cassian.Commands.Playback.Play do
+  require Logger
+  alias Cassian.Utils
+  alias Nostrum.Struct.{Embed, ApplicationCommandInteractionDataOption}
   use Cassian.Behaviours.Command
 
   import Cassian.Utils
-  alias Cassian.Utils.Embed, as: EmbedUtils
   alias Cassian.Utils.Voice, as: VoiceUtils
-  alias Cassian.Managers.{MessageManager, PlayManager}
+  alias Cassian.Managers.PlayManager
 
   # Main logic pipe
-
-  def execute(message, args) do
-    handle_request(message, args)
+  
+  def application_command_definition() do
+    %{
+      name: "play",
+      description: "Play a song or queue it.",
+      options: [
+        %{
+          type: 3,
+          name: "query",
+          required: true,
+          description: "Name of the song of URL for it."
+        }
+      ]
+    }
   end
 
-  @doc """
-  Handle the request. Continues with the rest of the logic pipe or
-  sends an embed message that the user isn't connected to channel.
-  """
-  def handle_request(message, args) do
-    case VoiceUtils.get_sender_voice_id(message) do
-      {:ok, {_guild_id, voice_id}} ->
-        handle_connect_possibility(message, voice_id, args)
-
-      # THe user is not in a voice channel...
-      {:error, :noop} ->
-        no_channel_error(message)
-    end
+  def execute(interaction) do
+    Utils.notify_longer_response(interaction)
+    
+    {embed, flags} =
+      with {:ok, {_guild_id, voice_id}} <- VoiceUtils.sender_voice_id(interaction),
+           {:ok, query} <- fetch_query(interaction.data.options),
+           {:ok, metadata} <- song_metadata(query),
+           {:ok, _} <- VoiceUtils.join_or_switch_voice(interaction.guild_id, voice_id),
+           :ok <- PlayManager.insert!(interaction.guild_id, interaction.channel_id, metadata) do
+        PlayManager.play_if_needed(interaction.guild_id)
+        {
+          EmbedUtils.create_empty_embed!()
+          |> Embed.put_title("Enqueued the song")
+          |> Embed.put_description("It'll start playing soon..."),
+          1 <<< 6
+        }
+      else
+        {:error, :not_in_voice} ->
+          no_channel_error()
+        {:error, :no_metadata} ->
+          invalid_link_error()
+        {:error, :failed_to_join} ->
+          no_permissions_error()
+        {:error, :failed_to_get_stream}
+          invalid_link_error()
+      end
+    
+    %{type: 4, data: %{embeds: [embed], flags: flags}, edit: true}
   end
-
-  @doc """
-  Determine whether you have the possiblity to connect. Continues
-  with the rest of the logic pipe or sends an embed message
-  that the bot doesn't have permission to connect.
-  """
-  def handle_connect_possibility(message, voice_id, args) do
-    if VoiceUtils.can_connect?(message.guild_id, voice_id),
-      do: handle_metadata(message, voice_id, args),
-      else: no_permissions_error(message)
+  
+  # Pattern-matches per-element if the head doesn't have this and it'll try to find the first
+  # element which has "query" as the name.
+  defp fetch_query([%ApplicationCommandInteractionDataOption{name: "query", value: value} | _]) do
+    {:ok, value}
   end
-
-  @doc """
-  It is determined that the caller user is in a voice channel and that the bot has permissions
-  to connect. Awesome. Now check if the link metadata is correct. If it is correct, continue with the
-  logic pipe or send an embed that the link is not correct.
-  """
-  def handle_metadata(message, voice_id, args) do
-    case song_metadata(Enum.fetch!(args, 0)) do
-      {true, metadata} ->
-        handle_connect(message, voice_id, metadata)
-
-      {false, :noop} ->
-        invalid_link_error(message)
-    end
-  end
-
-  @doc """
-  Everything is A-ok. You can connect and the link is valid. Connect to the voice channel and
-  cache the voice state. Continue wth the pipeline.
-  """
-  def handle_connect(message, voice_id, metadata) do
-    VoiceUtils.join_or_switch_voice(message.guild_id, voice_id)
-    PlayManager.insert!(message.guild_id, message.channel_id, metadata)
-    PlayManager.play_if_needed(message.guild_id)
-    MessageManager.disable_embed(message)
-  end
+  
+  defp fetch_query([_ | tail]), do: fetch_query(tail)
+  
+  defp fetch_query(_), do: {:error, :no_metadata}
 
   # Error handlers
 
   @doc """
   Generate and send the embed for when a user isn't in a voice channel.
   """
-  def no_channel_error(message) do
-    EmbedUtils.generate_error_embed(
-      "Hey you... You're not in a voice channel.",
-      "I can't play any music if you're not a voice channel. Join one first."
-    )
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  def no_channel_error() do
+    {
+      EmbedUtils.generate_error_embed(
+        "Hey you... You're not in a voice channel.",
+        "I can't play any music if you're not a voice channel. Join one first."
+      ),
+      1 <<< 6
+    }
   end
 
   @doc """
   Generate and send the embed for when the bot doesn't have permissions to view, connect or
   speak in a channel.
   """
-  def no_permissions_error(message) do
-    EmbedUtils.generate_error_embed(
-      "And how do you think that's possible?",
-      "I don't have the permissions to play music there... Fix it up first."
-    )
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  def no_permissions_error() do
+    {
+      EmbedUtils.generate_error_embed(
+        "And how do you think that's possible?",
+        "I don't have the permissions to play music there or something else really messed me up."
+      ),
+      1 <<< 6
+    }
   end
 
   @doc """
   Tell the user that the link is not valid.
   """
-  def invalid_link_error(message) do
-    EmbedUtils.generate_error_embed(
-      "Yeah, that won't work.",
-      "The link you tried to provide me isn't working. Recheck it."
-    )
-    |> MessageManager.send_dissapearing_embed(message.channel_id)
+  def invalid_link_error() do
+    {
+      EmbedUtils.generate_error_embed(
+        "Yeah, that won't work.",
+        "The link you tried to provide me isn't working. Recheck it."
+      ),
+      1 <<< 6
+    }
   end
 end

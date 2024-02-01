@@ -2,36 +2,65 @@ defmodule Cassian.Consumers.Command do
   @moduledoc """
   Main consumer for the command event of the bot. Redirects it to other commands.
   """
+  
+  require Logger
+  alias Nostrum.Api
+  
+  alias Cassian.Commands.{Bot, Playback}
 
   @doc """
-  Handle the mssage. A message has been filtered which is for the bot.
-  Dynamically find which module should be used for the command and continue on with that.
+  Handle the user interaction.
   """
-  @spec handle_message(message :: Nostrum.Struct.Message) :: :ok | :noop
-  def handle_message(message) do
-    {command, args} =
-      message.content
-      |> String.trim_leading()
-      |> String.split(" ")
-      |> List.pop_at(0)
-      |> filter_command()
-
-    case associated_module(command) do
+  @spec handle_interaction(interaction :: Nostrum.Struct.Interaction.t()) :: :ok | :noop
+  def handle_interaction(interaction) do
+    case associated_module(interaction.data.name) do
       nil ->
         :noop
 
       module ->
-        module.execute(message, args)
-        :ok
+        api_response =
+          interaction
+          |> module.execute()
+          |> (&send_response(interaction, &1)).()
+          
+        Logger.debug("API's response is: #{inspect(api_response)}.")
     end
   end
-
-  # Filter the prefix from the command in the tuple.
-  @spec filter_command({command :: String.t(), args :: list(String.t())}) ::
-          {command :: String.t(), args :: list(String.t())}
-  defp filter_command({command, args}),
-    do:
-      {String.replace_leading(command, Cassian.command_prefix!(), "") |> String.downcase(), args}
+  
+  # I know it looks ugly when called in the pipeline *but* it's consitent with
+  # the library that itneraction should be first and then the response should be
+  # something additional.
+  defp send_response(interaction, response = %{edit: true}) do
+    new_response = %{
+      embeds: response.data.embeds,
+      type: response.type,
+      flags: response.data.flags
+    }
+    
+    Logger.debug("Sending edit response: #{inspect(new_response)}")
+    
+    Api.edit_interaction_response(interaction, new_response)
+  end
+  
+  defp send_response(interaction, response) do
+    Logger.debug("Sending standard response: #{inspect(response)}")
+    
+    Api.create_interaction_response(interaction, response)
+  end
+  
+  @doc """
+  Generate the Discord interaction commands for each guild.
+  """
+  @spec generate_commands(Nostrum.Struct.Guild.UnavailableGuild.t()) :: no_return()
+  def generate_commands(%Nostrum.Struct.Guild.UnavailableGuild{id: guild_id}) do
+    Nostrum.Api.create_guild_application_command(guild_id, Bot.Help.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Backward.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Forward.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Play.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Previous.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Next.application_command_definition())
+    Nostrum.Api.create_guild_application_command(guild_id, Playback.Playlist.application_command_definition())
+  end
 
   defp associated_module(command) do
     alias Cassian.Commands.{Bot, Playback}
@@ -39,9 +68,6 @@ defmodule Cassian.Consumers.Command do
     case command do
       "help" ->
         Bot.Help
-
-      "ping" ->
-        Bot.Ping
 
       "backward" ->
         Playback.Backward

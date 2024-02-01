@@ -33,3 +33,5 @@ cassian-*.tar
 
 # For certificates
 /priv
+
+.asdf-vars
